@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "ms-playwright.playwright",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "christian-kohler.path-intellisense",
+    "eamodio.gitlens",
+    "christian-kohler.npm-intellisense",
+    "gruntfuggly.todo-tree",
+    "humao.rest-client",
+    "xabikos.javascriptsnippets"
+  ]
+}

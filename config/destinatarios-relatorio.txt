@@ -1,0 +1,4 @@
+# Destinatários do e-mail da rodada diária da automação (07:00).
+# Um e-mail por linha. Para remover alguém, apague a linha ou comece com #.
+eva.souza@revvo.com.br
+paloma.surgek@revvo.com.br

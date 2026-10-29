@@ -1,0 +1,38 @@
+{
+  "name": "automacao-learningflix",
+  "private": true,
+  "scripts": {
+    "test": "playwright test --project=desktop",
+    "test:ui": "playwright test --project=desktop --ui",
+    "test:visivel": "playwright test --project=desktop --headed",
+    "test:login": "playwright test tests/Login --project=desktop",
+    "test:cadastro": "playwright test tests/Cadastro --project=desktop",
+    "test:redefinicao-senha": "playwright test tests/RedefinicaoSenha --project=desktop",
+    "test:rodape": "playwright test tests/Rodape --project=desktop",
+    "test:acesso-visitante": "playwright test tests/AcessoVisitante --project=desktop",
+    "test:cadastro-real": "cross-env EXECUTAR_CADASTRO_REAL=sim playwright test tests/Cadastro/valida_cadastro_novo_usuario.spec.ts --project=desktop",
+    "test:visitante-config": "cross-env EXECUTAR_CONFIG_VISITANTE=sim playwright test tests/AcessoVisitante/valida_configuracao_botao_visitante.spec.ts --project=desktop",
+    "test:ajuda-envio": "cross-env EXECUTAR_ENVIO_AJUDA=sim playwright test tests/AcessoVisitante/valida_envio_ajuda_visitante.spec.ts --project=desktop",
+    "test:redefinicao-config": "cross-env EXECUTAR_CONFIG_REDEFINICAO=sim playwright test tests/RedefinicaoSenha/valida_configuracao_redefinicao_personalizada.spec.ts --project=desktop",
+    "test:rodape-config": "cross-env EXECUTAR_CONFIG_RODAPE=sim playwright test tests/Rodape/valida_configuracao_rodape.spec.ts --project=desktop",
+    "test:responsivo": "playwright test --project=desktop --grep @responsivo",
+    "test:diaria": "cross-env EXECUTAR_CADASTRO_REAL=sim EXECUTAR_CONFIG_VISITANTE=sim EXECUTAR_ENVIO_AJUDA=sim EXECUTAR_CONFIG_REDEFINICAO=sim EXECUTAR_CONFIG_RODAPE=sim playwright test --project=desktop",
+    "login:perfis": "playwright test --project=setup",
+    "report": "playwright show-report",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@faker-js/faker": "^9.9.0",
+    "@playwright/test": "^1.48.0",
+    "@types/node": "^20.0.0",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.0",
+    "eslint": "^9.39.5",
+    "eslint-plugin-playwright": "^2.12.1",
+    "prettier": "^3.9.10",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.72.0"
+  }
+}
