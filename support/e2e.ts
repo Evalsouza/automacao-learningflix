@@ -15,6 +15,8 @@ import { PerdeuSenhaPage } from './redefinicaosenha_commands/PerdeuSenhaPage';
 import { ConfiguracaoRedefinicaoPage } from './redefinicaosenha_commands/ConfiguracaoRedefinicaoPage';
 import { RodapePage } from './rodape_commands/RodapePage';
 import { TemaPage } from './rodape_commands/TemaPage';
+import { CarrosselPage } from './carrossel_commands/CarrosselPage';
+import { ConfiguracaoCarrosselPage } from './carrossel_commands/ConfiguracaoCarrosselPage';
 
 type Telas = {
   login: LoginPage;
@@ -33,6 +35,8 @@ type Telas = {
   configuracaoRedefinicao: ConfiguracaoRedefinicaoPage;
   rodape: RodapePage;
   tema: TemaPage;
+  carrossel: CarrosselPage;
+  configuracaoCarrossel: ConfiguracaoCarrosselPage;
 };
 
 // Telas disponíveis em todos os testes: async ({ login, menu, criarConta }) => { ... }
@@ -53,6 +57,8 @@ export const test = base.extend<Telas>({
   configuracaoRedefinicao: async ({ page }, use) => use(new ConfiguracaoRedefinicaoPage(page)),
   rodape: async ({ page }, use) => use(new RodapePage(page)),
   tema: async ({ page }, use) => use(new TemaPage(page)),
+  carrossel: async ({ page }, use) => use(new CarrosselPage(page)),
+  configuracaoCarrossel: async ({ page }, use) => use(new ConfiguracaoCarrosselPage(page)),
 });
 
 export { expect };
