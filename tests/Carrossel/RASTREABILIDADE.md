@@ -11,7 +11,7 @@ Arquivos: `valida_*.spec.ts` para as validações funcionais e `validacao_respon
 | Script | O que roda |
 |---|---|
 | `npm run test:carrossel` | Todo o módulo, menos a suíte de configuração |
-| `npm run test:carrossel-config` | Só a suíte de configuração (`EXECUTAR_CONFIG_CARROSSEL=sim`) — também roda na rodada diária |
+| `npm run test:carrossel-config` | Só a suíte de configuração (`EXECUTAR_CONFIG_CARROSSEL=sim`) — também roda na rodada semanal (sexta, 12:00) |
 
 ---
 

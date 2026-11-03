@@ -11,7 +11,7 @@ Arquivos: `valida_*.spec.ts` para as validações funcionais e `validacao_respon
 | Script | O que roda |
 |---|---|
 | `npm run test:rodape` | Todo o módulo, menos a suíte de configuração |
-| `npm run test:rodape-config` | Só a suíte de configuração (`EXECUTAR_CONFIG_RODAPE=sim`) — também roda na rodada diária |
+| `npm run test:rodape-config` | Só a suíte de configuração (`EXECUTAR_CONFIG_RODAPE=sim`) — também roda na rodada semanal (sexta, 12:00) |
 
 ---
 
