@@ -22,7 +22,8 @@ export default defineConfig({
     locale: 'pt-BR',
   },
   projects: [
-    { name: 'setup', testDir: './support', testMatch: /auth\.setup\.ts/ },
+    // Login dos perfis: se o QA estiver lento, tenta de novo antes de deixar todos os testes sem executar
+    { name: 'setup', testDir: './support', testMatch: /auth\.setup\.ts/, retries: 2 },
     {
       name: 'desktop',
       use: { ...devices['Desktop Chrome'] },
