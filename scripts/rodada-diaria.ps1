@@ -1,27 +1,45 @@
-﻿# Rodada diária da automação — roda fora do Claude, pelo Agendador de Tarefas do Windows (09:03).
-# Executa todos os testes (npm run test:diaria) e guarda o resultado em relatorios\AAAA-MM-DD\:
+﻿# Rodadas da automação — rodam fora do Claude, pelo Agendador de Tarefas do Windows.
+#   -Tipo diaria  (seg a sex, 09:03): npm run test:diaria  — suítes normais, só leitura → relatorios\AAAA-MM-DD\
+#   -Tipo semanal (sexta, 12:00):    npm run test:semanal — suítes que alteram configuração, criam usuário
+#                                     ou enviam e-mail → relatorios\AAAA-MM-DD-semanal\
+# Em cada pasta:
 #   resumo.txt          — resultado da rodada (o mesmo do terminal)
 #   resultado.json      — resultado completo, para análise
 #   playwright-report\  — relatório HTML com prints e vídeos (abra o index.html)
 #   execucao.log        — saída completa do comando
-#   status.json         — início, fim, código de saída e se a rodada terminou
+#   status.json         — início, fim, código de saída, se a rodada terminou e se foi interrompida pelo limite
 # A tarefa "Rodada diária — envio do relatório" do Claude lê essa pasta e publica no Confluence e por e-mail.
+
+param([ValidateSet('diaria', 'semanal')][string]$Tipo = 'diaria')
 
 $ErrorActionPreference = 'Continue'
 $projeto = Split-Path -Parent $PSScriptRoot
 $data = Get-Date -Format 'yyyy-MM-dd'
-$pasta = Join-Path $projeto "relatorios\$data"
+$pasta = Join-Path $projeto ("relatorios\$data" + $(if ($Tipo -eq 'semanal') { '-semanal' } else { '' }))
 New-Item -ItemType Directory -Force -Path $pasta | Out-Null
 
-$status = [ordered]@{ data = $data; inicio = (Get-Date).ToString('s'); fim = $null; codigoSaida = $null; concluida = $false }
+$status = [ordered]@{ tipo = $Tipo; data = $data; inicio = (Get-Date).ToString('s'); fim = $null; codigoSaida = $null; concluida = $false; interrompida = $null }
 $status | ConvertTo-Json | Out-File -Encoding utf8 (Join-Path $pasta 'status.json')
 
 Set-Location $projeto
 # Remove o resultado da rodada anterior para não publicar dados antigos
 Remove-Item -Recurse -Force -ErrorAction SilentlyContinue (Join-Path $projeto 'test-results'), (Join-Path $projeto 'playwright-report')
 
-cmd /c "npm run test:diaria > `"$pasta\execucao.log`" 2>&1"
-$codigo = $LASTEXITCODE
+# Limite próprio, 10 minutos antes do limite da tarefa do Windows (4 h diária, 8 h semanal): o limite da tarefa
+# encerra só este PowerShell e deixa o Playwright rodando solto; aqui a rodada inteira (npm, Playwright e
+# navegadores) é encerrada e o que já existe é salvo.
+$limiteMinutos = if ($Tipo -eq 'semanal') { 470 } else { 230 }
+$rodada = Start-Process cmd.exe -ArgumentList "/c npm run test:$Tipo > `"$pasta\execucao.log`" 2>&1" `
+  -WorkingDirectory $projeto -WindowStyle Hidden -PassThru
+$null = $rodada.Handle  # necessário para ler o ExitCode depois
+if ($rodada.WaitForExit($limiteMinutos * 60 * 1000)) {
+  $codigo = $rodada.ExitCode
+} else {
+  taskkill /PID $rodada.Id /T /F | Out-Null
+  $codigo = $null
+  $status.interrompida = "Passou do limite de $limiteMinutos minutos"
+  Add-Content -Encoding utf8 "$pasta\execucao.log" "`r`n*** Rodada encerrada: passou do limite de $limiteMinutos minutos ***"
+}
 
 foreach ($arquivo in 'resumo.txt', 'resultado.json') {
   $origem = Join-Path $projeto "test-results\$arquivo"
@@ -37,6 +55,6 @@ $status | ConvertTo-Json | Out-File -Encoding utf8 (Join-Path $pasta 'status.jso
 
 # Mantém só os últimos 30 dias de relatórios
 Get-ChildItem (Join-Path $projeto 'relatorios') -Directory |
-  Where-Object { $_.Name -match '^\d{4}-\d{2}-\d{2}$' } |
+  Where-Object { $_.Name -match '^\d{4}-\d{2}-\d{2}(-semanal)?$' } |
   Sort-Object Name -Descending | Select-Object -Skip 30 |
   Remove-Item -Recurse -Force

@@ -12,11 +12,13 @@ Decisão da QA (29/10/2026), para economizar tokens. O papel do Claude é **cria
 - Checagens locais rápidas, sem navegador, podem rodar sem perguntar: `npx tsc -p .`, `npx eslint <arquivos>`, `npx prettier --write <arquivos>` e `npx playwright test <arquivo> --project=desktop --no-deps --list`.
 - Mapear telas no QA (abrir o navegador para entender a tela) também só com o "ok" da QA.
 
-## Rodada diária
+## Rodadas diária e semanal
 
-- **09:03** — Agendador de Tarefas do Windows roda `scripts\rodada-diaria.ps1`: `npm run test:diaria` (todos os módulos, inclusive as suítes desligadas) e salva o resultado em `relatorios\AAAA-MM-DD\` (`resumo.txt`, `resultado.json`, `playwright-report\`, `execucao.log`, `status.json`).
-- **13:00** — tarefa agendada do Claude "Rodada diária — envio do relatório" só lê essa pasta e publica na página do Confluence "Execução Diária da Automação" e por e-mail para `config\destinatarios-relatorio.txt`. Ela não executa testes.
-- Para agendar no Windows (uma vez): `powershell -ExecutionPolicy Bypass -File scripts\agendar-rodada-diaria.ps1`.
+- **Diária — seg a sex, 09:03** — Agendador de Tarefas do Windows roda `scripts\rodada-diaria.ps1 -Tipo diaria`: `npm run test:diaria` (só as suítes normais) e salva em `relatorios\AAAA-MM-DD\` (`resumo.txt`, `resultado.json`, `playwright-report\`, `execucao.log`, `status.json`).
+- **Semanal — sexta, 12:00** — `-Tipo semanal`: `npm run test:semanal` (suítes `@altera-configuracao`, `@cria-usuario`, `@envia-email`) e salva em `relatorios\AAAA-MM-DD-semanal\`.
+- **13:00** — tarefa agendada do Claude "Rodada diária — envio do relatório" só lê essas pastas e publica na página do Confluence "Execução Diária da Automação" e por e-mail para `config\destinatarios-relatorio.txt`. Ela não executa testes.
+- Para agendar no Windows (uma vez): `powershell -ExecutionPolicy Bypass -File scripts\agendar-rodada-diaria.ps1` — cria as duas tarefas.
+- Suíte nova que altera configuração, cria usuário ou envia e-mail precisa da tag correspondente para entrar só na semanal.
 
 ## Nunca
 
