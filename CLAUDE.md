@@ -14,8 +14,8 @@ Decisão da QA (29/10/2026), para economizar tokens. O papel do Claude é **cria
 
 ## Rodada diária
 
-- **07:00** — Agendador de Tarefas do Windows roda `scripts\rodada-diaria.ps1`: `npm run test:diaria` (todos os módulos, inclusive as suítes desligadas) e salva o resultado em `relatorios\AAAA-MM-DD\` (`resumo.txt`, `resultado.json`, `playwright-report\`, `execucao.log`, `status.json`).
-- **10:00** — tarefa agendada do Claude "Rodada diária — envio do relatório" só lê essa pasta e publica na página do Confluence "Execução Diária da Automação" e por e-mail para `config\destinatarios-relatorio.txt`. Ela não executa testes.
+- **09:03** — Agendador de Tarefas do Windows roda `scripts\rodada-diaria.ps1`: `npm run test:diaria` (todos os módulos, inclusive as suítes desligadas) e salva o resultado em `relatorios\AAAA-MM-DD\` (`resumo.txt`, `resultado.json`, `playwright-report\`, `execucao.log`, `status.json`).
+- **13:00** — tarefa agendada do Claude "Rodada diária — envio do relatório" só lê essa pasta e publica na página do Confluence "Execução Diária da Automação" e por e-mail para `config\destinatarios-relatorio.txt`. Ela não executa testes.
 - Para agendar no Windows (uma vez): `powershell -ExecutionPolicy Bypass -File scripts\agendar-rodada-diaria.ps1`.
 
 ## Nunca

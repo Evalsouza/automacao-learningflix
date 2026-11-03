@@ -150,7 +150,7 @@ await login.entrar(usuarios.administrador);
 | `npm run test:ajuda-envio` | Envia a Ajuda como visitante: manda e-mail para o suporte — use só quando necessário |
 | `npm run test:redefinicao-senha` | Só o módulo RedefinicaoSenha — a suíte que altera configuração fica pulada; a redefinição padrão falha enquanto a personalizada estiver ativa |
 | `npm run test:redefinicao-config` | Altera campos de perfil e o campo primário/secundário da redefinição personalizada e restaura no final — use só quando necessário |
-| `npm run test:diaria` | Rodada diária completa: todos os módulos, inclusive as suítes desligadas por padrão — roda sozinha às 07:00 |
+| `npm run test:diaria` | Rodada diária completa: todos os módulos, inclusive as suítes desligadas por padrão — roda sozinha às 09:03 |
 | `npm run test:rodape` | Só o módulo Rodape — a suíte que altera configuração fica pulada |
 | `npm run test:rodape-config` | Habilita e desabilita as opções de footer do Tema e restaura no final — use só quando necessário |
 | `npm run test:carrossel` | Só o módulo Carrossel — a suíte que altera configuração fica pulada |
@@ -160,13 +160,13 @@ await login.entrar(usuarios.administrador);
 | `npm run lint` | ESLint |
 | `npm run format` | Prettier |
 
-### Rodada diária (07:00) — fora do Claude
+### Rodada diária (09:03) — fora do Claude
 
 Durante o dia, rode só o módulo em que está trabalhando (`npm run test:<modulo>`). A rodada completa roda sozinha:
 
-- **07:00 — Agendador de Tarefas do Windows** roda `scripts\rodada-diaria.ps1`: executa `npm run test:diaria` — todos os módulos, inclusive as suítes que criam usuário, alteram configuração ou enviam e-mail — e salva em `relatorios\AAAA-MM-DD\`:
+- **09:03 — Agendador de Tarefas do Windows** roda `scripts\rodada-diaria.ps1`: executa `npm run test:diaria` — todos os módulos, inclusive as suítes que criam usuário, alteram configuração ou enviam e-mail — e salva em `relatorios\AAAA-MM-DD\`:
   `resumo.txt`, `resultado.json`, `playwright-report\index.html` (prints e vídeos), `execucao.log` e `status.json`. Guarda os últimos 30 dias.
-- **10:00 — tarefa do Claude "Rodada diária — envio do relatório"** só lê essa pasta (não executa testes) e publica a rodada no topo da página do Confluence [Execução Diária da Automação](https://epicbrasil.atlassian.net/wiki/spaces/LP1/pages/5912526881) e por e-mail para os endereços de `config/destinatarios-relatorio.txt` — um por linha; para incluir ou remover alguém, edite esse arquivo.
+- **13:00 — tarefa do Claude "Rodada diária — envio do relatório"** só lê essa pasta (não executa testes) e publica a rodada no topo da página do Confluence [Execução Diária da Automação](https://epicbrasil.atlassian.net/wiki/spaces/LP1/pages/5912526881) e por e-mail para os endereços de `config/destinatarios-relatorio.txt` — um por linha; para incluir ou remover alguém, edite esse arquivo. O e-mail traz o caminho do `index.html` no computador da QA: o conector do Outlook não envia anexos.
 
 Para agendar no Windows (uma vez, no PowerShell, na pasta do projeto):
 
@@ -174,7 +174,7 @@ Para agendar no Windows (uma vez, no PowerShell, na pasta do projeto):
 powershell -ExecutionPolicy Bypass -File scripts\agendar-rodada-diaria.ps1
 ```
 
-A tarefa roda com o seu usuário, quando você estiver conectado ao Windows; se o computador estiver desligado às 07:00, roda assim que possível. Para rodar na hora: `Start-ScheduledTask -TaskName 'Automacao LearningFlix - Rodada diaria'`.
+A tarefa roda com o seu usuário, quando você estiver conectado ao Windows; se o computador estiver desligado às 09:03, roda assim que possível. Para rodar na hora: `Start-ScheduledTask -TaskName 'Automacao LearningFlix - Rodada diaria'`.
 
 Ao terminar qualquer rodada pelo terminal, aparece o **Resultado da rodada**: os testes agrupados por módulo com ✅ Passou, ❌ Falhou, ⚠️ Instável ou ⏸ Pulado/Pendente e o tempo de cada um; o detalhe de cada falha — arquivo, passo, motivo e print —; e os totais. O mesmo resumo fica salvo em `test-results/resumo.txt`. No modo UI (`npm run test:ui`) o resumo não aparece: lá o resultado é mostrado na própria janela.
 

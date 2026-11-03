@@ -1,4 +1,4 @@
-﻿# Rodada diária da automação — roda fora do Claude, pelo Agendador de Tarefas do Windows (07:00).
+﻿# Rodada diária da automação — roda fora do Claude, pelo Agendador de Tarefas do Windows (09:03).
 # Executa todos os testes (npm run test:diaria) e guarda o resultado em relatorios\AAAA-MM-DD\:
 #   resumo.txt          — resultado da rodada (o mesmo do terminal)
 #   resultado.json      — resultado completo, para análise
