@@ -23,12 +23,15 @@ export class GerenciarUsuariosPage extends PaginaBase {
     if (await administracao.count()) await administracao.first().click();
     else await this.abrir('/theme/smart/client_admin.php');
     await this.page.getByRole('link', { name: 'Gerenciar Usuários', exact: true }).click();
+    await this.campoPesquisa.waitFor();
+    await this.aguardarCarregar();
   }
 
   async pesquisar(nome: string) {
     await this.campoPesquisa.fill(nome);
     await this.campoPesquisa.press('Enter');
     await this.linha(nome).waitFor();
+    await this.aguardarCarregar();
   }
 
   linha(nome: string): Locator {
@@ -36,7 +39,9 @@ export class GerenciarUsuariosPage extends PaginaBase {
   }
 
   // Clique pelo título exato: na mesma linha ficam "Suspender conta de usuário" e "Ativar conta de usuário"
+  // O lápis só abre o modal depois que os scripts da página carregam
   async abrirEdicao(nome: string) {
+    await this.aguardarCarregar();
     await this.linha(nome).getByTitle('Editar usuário', { exact: true }).click();
     await this.botaoCancelarModal.waitFor();
   }

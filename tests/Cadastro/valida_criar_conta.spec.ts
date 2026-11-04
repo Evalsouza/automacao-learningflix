@@ -2,6 +2,9 @@
 import { test, expect } from '../../support/e2e';
 import { sessoes, semSessao, comSessao } from '../../support/sessoes';
 import { CriarContaPage } from '../../support/cadastro_commands/CriarContaPage';
+import { MinhaPaginaPage } from '../../support/cadastro_commands/MinhaPaginaPage';
+import { lerDadosDoUsuario } from '../../support/redefinicaosenha_commands/dadosDoUsuario';
+import { usuarios } from '../../support/usuarios';
 import {
   paginas,
   cargos,
@@ -102,10 +105,13 @@ test.describe('CENÁRIO 1: Cadastro de usuário com Cargo "Comum"', { tag: '@dt-
   test.describe('Estudante', () => {
     test.use({ storageState: sessoes.estudante });
 
-    test('C006 - "Minha página" exibe o Cargo e o Gestor em "Dados Profissionais"', async ({ minhaPagina }) => {
+    // O Cargo da Eva muda na plataforma: é lido do cadastro na hora — decisão da QA (04/11)
+    test('C006 - "Minha página" exibe o Cargo e o Gestor em "Dados Profissionais"', async ({ browser, minhaPagina }) => {
+      const cargo = await test.step('Dado que li o Cargo da "Eva Souza" em "Gerenciar usuários" → "Editar usuário", sem salvar', async () =>
+        (await lerDadosDoUsuario(browser, usuarios.estudante.nome)).position);
       await test.step('Quando acessei a "Minha página"', () => minhaPagina.acessar());
-      await test.step(`Então o campo "Cargo" exibiu "${cargos.analistaDeQualidade}"`, () =>
-        expect(minhaPagina.valorDoCampo('Cargo')).toHaveText(cargos.analistaDeQualidade));
+      await test.step(`Então o campo "Cargo" exibiu o Cargo do cadastro, "${cargo}"`, () =>
+        expect(minhaPagina.valorDoCampo('Cargo')).toHaveText(cargo));
       await test.step(`E o campo "Gestor" exibiu "${cargos.gestorDaEstudante}"`, () =>
         expect(minhaPagina.valorDoCampo('Gestor')).toHaveText(cargos.gestorDaEstudante));
     });
@@ -122,14 +128,20 @@ test.describe('CENÁRIO 2: Consulta do cadastro do usuário na página de Cadast
     test.describe(perfil, () => {
       test.use({ storageState: sessao });
 
-      test(`${id} - "${perfil}" consulta o Cargo de "Eva Souza" em "Gerenciar usuários"`, async ({ gerenciarUsuarios }) => {
+      test(`${id} - "${perfil}" consulta o Cargo de "Eva Souza" em "Gerenciar usuários"`, async ({ browser, gerenciarUsuarios }) => {
+        const cargo = await test.step('Dado que li o Cargo na "Minha página" da "Eva Souza"', () =>
+          comSessao(browser, sessoes.estudante, async (pagina) => {
+            const minhaPagina = new MinhaPaginaPage(pagina);
+            await minhaPagina.acessar();
+            return minhaPagina.valorOuVazio('Cargo');
+          }));
         await test.step('Quando acessei "Administração → Gerenciar usuários" e pesquisei "Eva Souza"', async () => {
           await gerenciarUsuarios.acessarPelaAdministracao();
           await gerenciarUsuarios.pesquisar('Eva Souza');
         });
         await test.step('E abri "Editar usuário"', () => gerenciarUsuarios.abrirEdicao('Eva Souza'));
-        await test.step(`Então o campo "Cargo" exibiu "${cargos.analistaDeQualidade}"`, () =>
-          expect(gerenciarUsuarios.cargoNoModal).toHaveText(cargos.analistaDeQualidade));
+        await test.step(`Então o campo "Cargo" exibiu o mesmo Cargo da "Minha página", "${cargo}"`, () =>
+          expect(gerenciarUsuarios.cargoNoModal).toHaveText(cargo));
         await test.step('E fechei sem salvar', () => gerenciarUsuarios.botaoCancelarModal.click());
       });
     });
@@ -214,16 +226,18 @@ test.describe('Botão "Cancelar"', { tag: '@dt-criar-conta' }, () => {
     test.use({ storageState: sessoes.cliente });
 
     test('CAN04 - "Cancelar" em "Editar usuário" fecha sem alterar o Cargo', async ({ gerenciarUsuarios }) => {
-      await test.step('Quando abri "Editar usuário" de "Eva Souza" e cliquei em "Cancelar"', async () => {
+      let cargo = '';
+      await test.step('Quando abri "Editar usuário" de "Eva Souza", anotei o Cargo e cliquei em "Cancelar"', async () => {
         await gerenciarUsuarios.acessarPelaAdministracao();
         await gerenciarUsuarios.pesquisar('Eva Souza');
         await gerenciarUsuarios.abrirEdicao('Eva Souza');
+        cargo = (await gerenciarUsuarios.cargoNoModal.innerText()).trim();
         await gerenciarUsuarios.botaoCancelarModal.click();
       });
       await test.step('Então a janela foi fechada', () => expect(gerenciarUsuarios.modalEditar).toBeHidden());
-      await test.step(`E o Cargo continuou "${cargos.analistaDeQualidade}"`, async () => {
+      await test.step('E o Cargo continuou o mesmo', async () => {
         await gerenciarUsuarios.abrirEdicao('Eva Souza');
-        await expect(gerenciarUsuarios.cargoNoModal).toHaveText(cargos.analistaDeQualidade);
+        await expect(gerenciarUsuarios.cargoNoModal).toHaveText(cargo);
         await gerenciarUsuarios.botaoCancelarModal.click();
       });
     });

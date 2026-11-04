@@ -60,12 +60,17 @@ export class CriarContaPage extends PaginaBase {
   async acessarPeloLogin() {
     await this.abrir('/login/index.php');
     await this.linkCriarConta.click();
+    await this.tituloVerificacao.waitFor();
+    await this.aguardarCarregar();
   }
 
   async verificarIdadeELocalizacao(idade: string, pais: string) {
     await this.campoIdade.fill(idade);
     await this.campoPaisVerificacao.selectOption({ label: pais });
     await this.botaoContinuar.click();
+    // Nova conta, menor digital ou a mesma página com as mensagens dos campos
+    await this.tituloNovaConta.or(this.mensagemMenorDigital).or(this.page.locator('.form-control-feedback:visible')).first().waitFor();
+    await this.aguardarCarregar();
   }
 
   async selecionarCargo(cargo: string) {

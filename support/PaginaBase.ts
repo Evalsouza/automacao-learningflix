@@ -11,6 +11,12 @@ export class PaginaBase {
     await this.page.goto(caminho, { waitUntil: espera });
   }
 
+  // Depois de navegar por um clique: sem os scripts carregados, o Moodle valida o formulário no servidor (mensagens
+  // diferentes, sem o "- ") e botões como o lápis "Editar usuário" não abrem o modal
+  async aguardarCarregar() {
+    await this.page.waitForLoadState('load');
+  }
+
   // Mensagem do sistema na tela — texto parcial
   mensagem(texto: string): Locator {
     return this.page.getByText(texto, { exact: false }).first();

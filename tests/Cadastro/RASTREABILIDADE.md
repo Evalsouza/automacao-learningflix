@@ -82,6 +82,8 @@ Execuções de 28/10:
 - E-mails de teste sempre `@yopmail.com`; cadastro criado na execução é excluído ao final.
 - C001 só verifica que "Mostrar na página de cadastro?" está ativo — não altera a configuração.
 - C009 e C010: o Cargo é consultado em "Editar usuário" e a janela é fechada com "Cancelar", sem salvar.
+- Cargo da Eva lido na hora (04/11): o cadastro mudou de "Analista de Qualidade" para "Analista de Qualidade Júnior". C006 compara a "Minha página" com o Cargo lido em "Editar usuário" pelo Administrador; C009 e C010 comparam "Editar usuário" com o Cargo da "Minha página" da Eva; CAN04 compara o Cargo antes e depois do "Cancelar". O Gestor do C006 continua fixo.
+- Esperar o carregamento da página (04/11): sem os scripts carregados, o Moodle valida o formulário no servidor — mensagens sem o "- " e outras mensagens na "Nova conta", como "Endereço de e-mail inválido" e a política de senha — e o lápis "Editar usuário" não abre a janela. Os testes esperam o carregamento depois de cada navegação por clique (`aguardarCarregar()`).
 - C007 compara com os cargos marcados como "Cargo Gestor = Sim" no Gerenciador de Hierarquia na hora da execução.
 - Os dois "CENÁRIO 1" do documento foram agrupados em um.
 - Textos ajustados para os da tela: "Nova conta", campo "Cargo", "Mostrar na página de cadastro?".
@@ -93,7 +95,7 @@ Execuções de 28/10:
 
 | Caso | Esperado — DTI/EVTI | Obtido |
 |---|---|---|
-| C007 | Cargos marcados como Gestor **NÃO** exibidos no campo "Cargo" da "Nova conta" | 36 cargos de gestão exibidos — ex.: Coordenador de Qualidade, CTO, Diretor Geral, Coordenador de Tecnologia |
+| C007 | Cargos marcados como Gestor **NÃO** exibidos no campo "Cargo" da "Nova conta" | 36 cargos de gestão exibidos — ex.: Coordenador de Qualidade, CTO, Diretor Geral, Coordenador de Tecnologia. Em 04/11 passaram a 38: o Gerenciador de Hierarquia foi alterado — conferir com a QA |
 
 **Não automatizados**
 
@@ -106,6 +108,7 @@ Execuções de 28/10:
 - Caminho do Administrador: o documento diz "Sidebar → Administração → Gerenciar usuários"; o sidebar do Administrador tem "Administração do site", não "Administração". O teste abre a página de administração direto — a mesma que o Adm Cliente acessa pelo sidebar.
 - O campo "Cargo" da "Nova conta" é um autocomplete sem rótulo acessível: o teste usa o `id` do campo — `#fitem_id_profile_field_position`. Vale pedir ao DEV um `data-testid`.
 - O objetivo do documento fala em "Plugins de Hierarquia" — mantido como está, nomenclatura da plataforma.
+- A tela do Adm Cliente agora se chama "Gerenciamento de Usuários" (04/11), com os filtros "Pesquisa", "Status" e "Último acesso", o botão "Filtrar" e as ações por ícone — lápis "Editar usuário" e olho "Suspender conta de usuário". A janela "Editar usuário" e os campos de perfil não mudaram.
 
 ---
 
