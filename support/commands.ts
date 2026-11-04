@@ -1,5 +1,6 @@
 import { Page, Locator } from '@playwright/test';
 
+// Componente presente em todas as páginas após o login — não é uma tela, por isso não herda PaginaBase
 export class MenuUsuario {
   readonly page: Page;
   readonly botaoMenu: Locator;
@@ -15,7 +16,9 @@ export class MenuUsuario {
     this.nomeUsuario = menuAberto.getByRole('menuitem').first();
   }
 
+  // O menu só responde ao clique depois que os scripts da página carregam
   async abrir() {
+    await this.page.waitForLoadState('load');
     await this.botaoMenu.click();
   }
 

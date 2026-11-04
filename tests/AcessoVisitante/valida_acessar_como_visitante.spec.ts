@@ -1,5 +1,6 @@
 // DT/EVT - "Acessar como visitante" Inserir a funcionalidade na página de login — rastreabilidade em RASTREABILIDADE.md
 import { test, expect } from '../../support/e2e';
+import { sessoes, semSessao } from '../../support/sessoes';
 import {
   paginas,
   blocos,
@@ -12,14 +13,12 @@ import {
   dadosDoVisitanteNaAjuda,
 } from '../../fixtures/acessovisitante';
 
-const semSessao = { cookies: [], origins: [] };
-
 test.describe(
   'CASOS DE TESTE 001: Habilitar a visualização do botão "Acessar como visitante"',
   { tag: '@dt-acessar-como-visitante' },
   () => {
     test.describe('Administrador', () => {
-      test.use({ storageState: '.auth/administrador.json' });
+      test.use({ storageState: sessoes.administrador });
 
       test('V01 - "Botão de entrada como visitante" está em "Mostrar" em "Gerenciar autenticação"', async ({ gerenciarAutenticacao }) => {
         await test.step('Quando acessei "Administração do site → Plugins → Gerenciar autenticação"', () =>
@@ -217,7 +216,7 @@ test.describe('CASOS DE TESTE 002: Acessando a plataforma como visitante', { tag
   });
 
   test.describe('Administrador', () => {
-    test.use({ storageState: '.auth/administrador.json' });
+    test.use({ storageState: sessoes.administrador });
 
     test(`V12 - Curso "${cursoVisitante.nome}" tem o método "${cursoVisitante.metodo}" ativo`, async ({ curso }) => {
       await test.step(`Quando acessei "Participantes → Métodos de inscrição" do curso "${cursoVisitante.nome}"`, () =>

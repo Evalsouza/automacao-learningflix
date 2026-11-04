@@ -3,6 +3,7 @@
 // Cada conta é encontrada pelo e-mail: nunca exclui outro usuário com o mesmo nome
 // Desligada por padrão: rode com `npm run test:cadastro-real`
 import { test, expect } from '../../support/e2e';
+import { sessoes, semSessao, comSessao } from '../../support/sessoes';
 import { CriarContaPage } from '../../support/cadastro_commands/CriarContaPage';
 import { ListaUsuariosAdminPage } from '../../support/cadastro_commands/ListaUsuariosAdminPage';
 import { GerenciarUsuariosPage } from '../../support/cadastro_commands/GerenciarUsuariosPage';
@@ -24,40 +25,16 @@ const cadastros = [
   },
 ];
 
-async function comoAdministrador<T>(browser: Browser, acao: (lista: ListaUsuariosAdminPage) => Promise<T>) {
-  const contexto = await browser.newContext({ storageState: '.auth/administrador.json' });
-  const lista = new ListaUsuariosAdminPage(await contexto.newPage());
-  try {
-    await lista.acessar();
-    return await acao(lista);
-  } finally {
-    await contexto.close();
-  }
-}
-
 async function excluirSeExistir(browser: Browser) {
   for (const { usuario } of cadastros)
-    await comoAdministrador(browser, async (lista) => {
-      await lista.filtrarPorNome(nomeCompleto(usuario));
-      if (await lista.linha(usuario.email).count()) await lista.excluir(usuario.email);
-    });
-}
-
-// Cargo lido em "Gerenciar usuários" → "Editar usuário", fechando com "Cancelar"; sem Cargo, devolve ''
-async function cargoEmEditarUsuario(browser: Browser, sessao: string, email: string) {
-  const contexto = await browser.newContext({ storageState: sessao });
-  try {
-    const gerenciar = new GerenciarUsuariosPage(await contexto.newPage());
-    await gerenciar.acessarPelaAdministracao();
-    return (await gerenciar.dadosDoUsuario(email)).position ?? '';
-  } finally {
-    await contexto.close();
-  }
+    await comSessao(browser, sessoes.administrador, (pagina) =>
+      new ListaUsuariosAdminPage(pagina).excluirSeExistir(nomeCompleto(usuario), usuario.email),
+    );
 }
 
 test.describe('CENÁRIO 1: Cadastro de usuário com Cargo "Comum" — cadastro real', { tag: ['@dt-criar-conta', '@cria-usuario'] }, () => {
   test.skip(!executar, 'Cria usuários reais no ambiente: rode com npm run test:cadastro-real');
-  test.use({ storageState: { cookies: [], origins: [] } });
+  test.use({ storageState: semSessao });
 
   test.beforeAll(async ({ browser }) => {
     test.setTimeout(600_000);
@@ -82,26 +59,27 @@ test.describe('CENÁRIO 1: Cadastro de usuário com Cargo "Comum" — cadastro r
         login,
         minhaPagina,
       }) => {
-        await test.step(`Quando realizei o cadastro do usuário "${usuario.identificacao}" ${cargo ? `com o "Cargo" ${cargoEsperado}` : 'sem preencher o campo "Cargo"'}`, async () => {
-          const contexto = await browser.newContext({ storageState: { cookies: [], origins: [] } });
-          const criarConta = new CriarContaPage(await contexto.newPage());
-          await criarConta.acessarPeloLogin();
-          await criarConta.verificarIdadeELocalizacao(Factories.cadastro.idadeAdulta(), pais);
-          await criarConta.preencherNovaConta({ ...usuario, dataNascimento: Factories.cadastro.dataNascimentoAdulta() });
-          if (cargo) await criarConta.selecionarCargo(cargo);
-          await criarConta.botaoCriarMinhaConta.click();
-          // Se o formulário não avançar, a falha mostra as mensagens dos campos
-          await expect(criarConta.botaoCriarMinhaConta)
-            .toBeHidden()
-            .catch(async (erro) => {
-              const mensagens = await criarConta.page.locator('.form-control-feedback:visible').allInnerTexts();
-              throw new Error(`"Nova conta" não foi criada. Mensagens do formulário: ${JSON.stringify(mensagens.filter(Boolean))}
+        await test.step(`Quando realizei o cadastro do usuário "${usuario.identificacao}" ${cargo ? `com o "Cargo" ${cargoEsperado}` : 'sem preencher o campo "Cargo"'}`, () =>
+          comSessao(browser, semSessao, async (pagina) => {
+            const criarConta = new CriarContaPage(pagina);
+            await criarConta.acessarPeloLogin();
+            await criarConta.verificarIdadeELocalizacao(Factories.cadastro.idadeAdulta(), pais);
+            await criarConta.preencherNovaConta({ ...usuario, dataNascimento: Factories.cadastro.dataNascimentoAdulta() });
+            if (cargo) await criarConta.selecionarCargo(cargo);
+            await criarConta.botaoCriarMinhaConta.click();
+            // Se o formulário não avançar, a falha mostra as mensagens dos campos
+            await expect(criarConta.botaoCriarMinhaConta)
+              .toBeHidden()
+              .catch(async (erro) => {
+                const mensagens = await criarConta.page.locator('.form-control-feedback:visible').allInnerTexts();
+                throw new Error(`"Nova conta" não foi criada. Mensagens do formulário: ${JSON.stringify(mensagens.filter(Boolean))}
 ${erro}`);
-            });
-          await contexto.close();
-        });
+              });
+          }));
         await test.step('E a conta foi confirmada pelo Administrador', () =>
-          comoAdministrador(browser, async (lista) => {
+          comSessao(browser, sessoes.administrador, async (pagina) => {
+            const lista = new ListaUsuariosAdminPage(pagina);
+            await lista.acessar();
             await lista.filtrarPorNome(nome);
             await lista.confirmarConta(usuario.email);
           }));
@@ -118,13 +96,13 @@ ${erro}`);
       });
 
       for (const { id, perfil, sessao } of [
-        { id: ids.cliente, perfil: 'Adm Cliente', sessao: '.auth/cliente.json' },
-        { id: ids.administrador, perfil: 'Administrador', sessao: '.auth/administrador.json' },
+        { id: ids.cliente, perfil: 'Adm Cliente', sessao: sessoes.cliente },
+        { id: ids.administrador, perfil: 'Administrador', sessao: sessoes.administrador },
       ]) {
         test(`${id} - "${perfil}" consulta o Cargo de "${usuario.identificacao}" em "Gerenciar usuários"`, async ({ browser }) => {
           const lido =
             await test.step(`Quando acessei com o "${perfil}" "Gerenciar usuários", pesquisei "${usuario.email}" e abri "Editar usuário"`, () =>
-              cargoEmEditarUsuario(browser, sessao, usuario.email));
+              comSessao(browser, sessao, (pagina) => new GerenciarUsuariosPage(pagina).cargoDoUsuario(usuario.email)));
           await test.step(`Então o campo "Cargo" exibiu ${cargoEsperado}, e fechei sem salvar`, () => expect(lido).toBe(cargo));
         });
       }

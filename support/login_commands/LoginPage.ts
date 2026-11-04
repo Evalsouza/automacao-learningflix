@@ -1,9 +1,9 @@
 import { Page, Locator } from '@playwright/test';
+import { PaginaBase } from '../PaginaBase';
 
 type Credenciais = { identificacao?: string; senha?: string };
 
-export class LoginPage {
-  readonly page: Page;
+export class LoginPage extends PaginaBase {
   readonly titulo: Locator;
   readonly campoUsuario: Locator;
   readonly campoSenha: Locator;
@@ -15,7 +15,7 @@ export class LoginPage {
   readonly iconeOlhoEsconder: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.titulo = page.getByRole('heading', { name: 'Acesso', level: 1 });
     this.campoUsuario = page.getByRole('textbox', { name: 'CPF' });
     this.campoSenha = page.getByRole('textbox', { name: 'Senha', exact: true });
@@ -29,7 +29,7 @@ export class LoginPage {
   }
 
   async acessar() {
-    await this.page.goto('/login/index.php');
+    await this.abrir('/login/index.php');
   }
 
   // Campos não informados ficam vazios — usado nos casos negativos
@@ -48,8 +48,8 @@ export class LoginPage {
     await this.iconeOlho.click();
   }
 
-  // A plataforma exibe a mensagem de erro duas vezes na tela
-  mensagem(texto: string): Locator {
+  // A plataforma exibe a mensagem de erro duas vezes na tela; no login o texto precisa ser exato
+  override mensagem(texto: string): Locator {
     return this.page.getByText(texto, { exact: true }).first();
   }
 }

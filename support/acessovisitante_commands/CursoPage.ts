@@ -1,19 +1,18 @@
 import { Page, Locator } from '@playwright/test';
+import { PaginaBase } from '../PaginaBase';
 
 // Página do curso e "Métodos de inscrição" do curso
-export class CursoPage {
-  readonly page: Page;
-
+export class CursoPage extends PaginaBase {
   constructor(page: Page) {
-    this.page = page;
+    super(page);
   }
 
   async acessar(id: number) {
-    await this.page.goto(`/course/view.php?id=${id}`);
+    await this.abrir(`/course/view.php?id=${id}`);
   }
 
   async acessarMetodosDeInscricao(id: number) {
-    await this.page.goto(`/enrol/instances.php?id=${id}`);
+    await this.abrir(`/enrol/instances.php?id=${id}`);
     await this.page.getByRole('heading', { name: 'Métodos de inscrição' }).first().waitFor();
   }
 

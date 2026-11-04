@@ -1,15 +1,15 @@
 import { Page, Locator } from '@playwright/test';
+import { PaginaBase } from '../PaginaBase';
 
 // Sidebar → Administração → Gerenciar Usuários
-export class GerenciarUsuariosPage {
-  readonly page: Page;
+export class GerenciarUsuariosPage extends PaginaBase {
   readonly campoPesquisa: Locator;
   readonly modalEditar: Locator;
   readonly cargoNoModal: Locator;
   readonly botaoCancelarModal: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.campoPesquisa = page.getByRole('textbox', { name: 'Pesquisa' });
     this.modalEditar = page.getByRole('dialog').filter({ has: page.getByRole('heading', { name: 'Editar usuário' }) });
     this.cargoNoModal = this.modalEditar.locator('select[name=profile_field_position] option:checked');
@@ -17,11 +17,11 @@ export class GerenciarUsuariosPage {
   }
 
   async acessarPelaAdministracao() {
-    await this.page.goto('/my/');
+    await this.abrir('/my/');
     const administracao = this.page.getByRole('link', { name: 'Administração', exact: true });
     // O Administrador geral não tem "Administração" no sidebar, só "Administração do site": abre a mesma página direto
     if (await administracao.count()) await administracao.first().click();
-    else await this.page.goto('/theme/smart/client_admin.php');
+    else await this.abrir('/theme/smart/client_admin.php');
     await this.page.getByRole('link', { name: 'Gerenciar Usuários', exact: true }).click();
   }
 
@@ -72,5 +72,11 @@ export class GerenciarUsuariosPage {
     });
     await this.botaoCancelarModal.click();
     return dados;
+  }
+
+  // Cargo lido em "Editar usuário", fechando com "Cancelar"; sem Cargo, devolve ''
+  async cargoDoUsuario(email: string): Promise<string> {
+    await this.acessarPelaAdministracao();
+    return (await this.dadosDoUsuario(email)).position ?? '';
   }
 }

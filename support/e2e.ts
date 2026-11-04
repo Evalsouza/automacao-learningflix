@@ -17,6 +17,7 @@ import { RodapePage } from './rodape_commands/RodapePage';
 import { TemaPage } from './rodape_commands/TemaPage';
 import { CarrosselPage } from './carrossel_commands/CarrosselPage';
 import { ConfiguracaoCarrosselPage } from './carrossel_commands/ConfiguracaoCarrosselPage';
+import { bloquearVideos } from './sessoes';
 
 type Telas = {
   login: LoginPage;
@@ -39,8 +40,18 @@ type Telas = {
   configuracaoCarrossel: ConfiguracaoCarrosselPage;
 };
 
+type Opcoes = {
+  // Vídeos bloqueados por padrão; o módulo Carrossel libera com test.use({ bloquearVideos: false })
+  bloquearVideos: boolean;
+};
+
 // Telas disponíveis em todos os testes: async ({ login, menu, criarConta }) => { ... }
-export const test = base.extend<Telas>({
+export const test = base.extend<Telas & Opcoes>({
+  bloquearVideos: [true, { option: true }],
+  context: async ({ context, bloquearVideos: bloquear }, use) => {
+    if (bloquear) await bloquearVideos(context);
+    await use(context);
+  },
   login: async ({ page }, use) => use(new LoginPage(page)),
   menu: async ({ page }, use) => use(new MenuUsuario(page)),
   criarConta: async ({ page }, use) => use(new CriarContaPage(page)),

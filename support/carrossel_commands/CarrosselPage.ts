@@ -1,14 +1,14 @@
 import { Page, Locator } from '@playwright/test';
+import { PaginaBase } from '../PaginaBase';
 
 // Carrossel do topo da "Página inicial" (my) — Glide. Mostra só os slides do idioma do usuário
-export class CarrosselPage {
-  readonly page: Page;
+export class CarrosselPage extends PaginaBase {
   readonly carrossel: Locator;
   readonly slides: Locator;
   readonly primeiroBloco: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.carrossel = page
       .locator('.glide')
       .filter({ has: page.getByRole('button', { name: 'Próximo slide' }) })
@@ -19,12 +19,23 @@ export class CarrosselPage {
   }
 
   async acessar() {
-    await this.page.goto('/my/', { waitUntil: 'domcontentloaded' });
+    await this.abrir('/my/', 'domcontentloaded');
   }
 
   // O carrossel só aparece depois que o Glide inicia — com vídeos nos slides, o QA pode levar mais de 30 s
   async aguardar() {
     await this.carrossel.waitFor({ timeout: 90_000 });
+  }
+
+  // Abre a Página inicial e lê os slides do carrossel: títulos, links e vídeos
+  async lerSlides() {
+    await this.acessar();
+    await this.aguardar();
+    return {
+      titulos: (await this.slides.allInnerTexts()).map((t) => t.replace(/\s+/g, ' ').trim()),
+      links: await this.slides.locator('a').evaluateAll((as) => as.map((a) => a.getAttribute('href'))),
+      videos: await this.slides.locator('video source, video').evaluateAll((vs) => vs.map((v) => (v as HTMLVideoElement).src)),
+    };
   }
 
   slideComTitulo(titulo: string): Locator {

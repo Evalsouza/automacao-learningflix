@@ -1,8 +1,8 @@
 import { Page, Locator } from '@playwright/test';
+import { PaginaBase } from '../PaginaBase';
 
 // Sidebar → Ajuda
-export class AjudaPage {
-  readonly page: Page;
+export class AjudaPage extends PaginaBase {
   readonly titulo: Locator;
   readonly campoNome: Locator;
   readonly campoMatricula: Locator;
@@ -14,7 +14,7 @@ export class AjudaPage {
   readonly mensagemEnviado: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.titulo = page.getByRole('heading', { name: 'Ajuda', exact: true });
     this.campoNome = page.locator('#fitem_id_firstname input');
     this.campoMatricula = page.locator('#fitem_id_username input');
@@ -28,7 +28,7 @@ export class AjudaPage {
   }
 
   async acessar() {
-    await this.page.goto('/local/support/index.php');
+    await this.abrir('/local/support/index.php');
     await this.titulo.waitFor();
   }
 

@@ -1,10 +1,10 @@
 import { Page, Locator } from '@playwright/test';
+import { PaginaBase } from '../PaginaBase';
 
 type Arquivo = string | { name: string; mimeType: string; buffer: Buffer };
 
 // Administração do site → Aparência → Temas → Tema (smart_4) → aba "Carrossel da Página Inicial" (plugin local_carousel)
-export class ConfiguracaoCarrosselPage {
-  readonly page: Page;
+export class ConfiguracaoCarrosselPage extends PaginaBase {
   readonly aba: Locator;
   readonly painel: Locator;
   readonly habilitar: Locator;
@@ -15,7 +15,7 @@ export class ConfiguracaoCarrosselPage {
   readonly botaoContinuar: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.aba = page.getByRole('tab', { name: 'Carrossel da Página Inicial' });
     this.painel = page.locator('#theme_smart_frontpagecarousel');
     this.habilitar = this.painel.locator('input[type=checkbox][name="s_local_carousel_carouselenable"]');
@@ -30,13 +30,9 @@ export class ConfiguracaoCarrosselPage {
   }
 
   async acessar() {
-    await this.page.goto('/admin/settings.php?section=themesettingsmart', { waitUntil: 'domcontentloaded' });
+    await this.abrir('/admin/settings.php?section=themesettingsmart', 'domcontentloaded');
     await this.aba.click();
     await this.painel.waitFor();
-  }
-
-  mensagem(texto: string): Locator {
-    return this.page.getByText(texto, { exact: false }).first();
   }
 
   // Campo do slide pelo nome interno: title, titlecolor, text, lang, url, image
@@ -55,6 +51,17 @@ export class ConfiguracaoCarrosselPage {
   // Rótulo do campo pelo texto exato — os campos de texto usam <label>; o de imagem, <p>
   rotulo(slide: number, campo: string): Locator {
     return this.painel.locator('.form-label').getByText(`${campo} Slides ${slide}`, { exact: true });
+  }
+
+  async intervaloAtual(): Promise<number> {
+    await this.acessar();
+    return Number(await this.intervalo.inputValue());
+  }
+
+  // Quantidade de slides lida ao abrir a aba — o slide de teste, quando existe, é o último
+  async ultimoSlide(): Promise<number> {
+    await this.acessar();
+    return this.quantidadeDeSlides();
   }
 
   async quantidadeDeSlides(): Promise<number> {

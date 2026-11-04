@@ -1,10 +1,11 @@
 // Jira LFXP-1941 — Habilitar/desabilitar informações no rodapé (História LFXP-1907) — rastreabilidade em RASTREABILIDADE.md
 // Só leitura: confere a configuração atual — as 3 opções desabilitadas — e o rodapé de cada perfil
 import { test, expect } from '../../support/e2e';
+import { sessoes, semSessao } from '../../support/sessoes';
 import { opcoesRodape, padraoDasOpcoes, linksDoLogin, linksAposLogin, perfisDoRodape } from '../../fixtures/rodape';
 
 test.describe('Configuração do footer no Tema', { tag: '@dt-rodape' }, () => {
-  test.use({ storageState: '.auth/administrador.json' });
+  test.use({ storageState: sessoes.administrador });
 
   test('RD01 - "Configurações gerais" do Tema exibe as 3 opções de footer desmarcadas', async ({ tema }) => {
     await test.step('Quando acessei "Administração do site → Aparência → Temas → Tema" e a aba "Configurações gerais"', () =>
@@ -21,10 +22,10 @@ test.describe('Configuração do footer no Tema', { tag: '@dt-rodape' }, () => {
 
 test.describe('Rodapé com as opções desabilitadas', { tag: '@dt-rodape' }, () => {
   test.describe('Sem login', () => {
-    test.use({ storageState: { cookies: [], origins: [] } });
+    test.use({ storageState: semSessao });
 
-    test(`RD02 - Página de login exibe só o idioma e os direitos, sem "${linksDoLogin.join('", "')}"`, async ({ page, rodape }) => {
-      await test.step('Quando acessei a página de login', () => page.goto('/login/index.php'));
+    test(`RD02 - Página de login exibe só o idioma e os direitos, sem "${linksDoLogin.join('", "')}"`, async ({ rodape }) => {
+      await test.step('Quando acessei a página de login', () => rodape.acessar('/login/index.php'));
       await test.step('Então o rodapé exibiu o idioma e "© Desenvolvido por"', async () => {
         await rodape.irParaOFim();
         await expect(rodape.idioma).toBeVisible();
@@ -40,8 +41,8 @@ test.describe('Rodapé com as opções desabilitadas', { tag: '@dt-rodape' }, ()
     test.describe(perfil, () => {
       test.use({ storageState: sessao });
 
-      test(`${ids[i]} - "${perfil}" vê o rodapé sem "${linksAposLogin.join('" e "')}"`, async ({ page, rodape }) => {
-        await test.step('Quando acessei a "Página inicial"', () => page.goto('/my/'));
+      test(`${ids[i]} - "${perfil}" vê o rodapé sem "${linksAposLogin.join('" e "')}"`, async ({ rodape }) => {
+        await test.step('Quando acessei a "Página inicial"', () => rodape.acessar('/my/'));
         await test.step('Então o rodapé exibiu o idioma e "© Desenvolvido por"', async () => {
           await rodape.irParaOFim();
           await expect(rodape.idioma).toBeVisible();

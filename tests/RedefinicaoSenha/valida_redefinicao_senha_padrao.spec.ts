@@ -2,13 +2,14 @@
 // A redefinição padrão só aparece com a personalizada desativada: enquanto ela estiver ativa, estes testes falham.
 // "Buscar" envia e-mail de recuperação para a usuária
 import { test, expect } from '../../support/e2e';
+import { semSessao } from '../../support/sessoes';
 import { usuarios } from '../../support/usuarios';
 import { paginas } from '../../fixtures/redefinicaosenha';
 
 const motivoPadraoIndisponivel = 'Redefinição padrão não exibida: a redefinição personalizada está ativada';
 const emailDaEstudante = 'eva.souza@yopmail.com';
 
-test.use({ storageState: { cookies: [], origins: [] } });
+test.use({ storageState: semSessao });
 
 test.beforeEach(({ perdeuSenha }) => perdeuSenha.acessarPeloLogin());
 

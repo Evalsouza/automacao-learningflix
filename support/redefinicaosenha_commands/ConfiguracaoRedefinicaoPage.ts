@@ -1,8 +1,8 @@
 import { Page, Locator } from '@playwright/test';
+import { PaginaBase } from '../PaginaBase';
 
 // Administração → "Configurações - Redefinição de senha personalizada"
-export class ConfiguracaoRedefinicaoPage {
-  readonly page: Page;
+export class ConfiguracaoRedefinicaoPage extends PaginaBase {
   readonly titulo: Locator;
   readonly ativar: Locator;
   readonly campoPrimario: Locator;
@@ -10,7 +10,7 @@ export class ConfiguracaoRedefinicaoPage {
   readonly botaoSalvar: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.titulo = page.getByRole('heading', { name: 'Configurações - Redefinição de senha personalizada' });
     this.ativar = page.locator('input[type=checkbox][name=enabled]');
     this.campoPrimario = page.locator('select[name=firstfield]');
@@ -19,7 +19,7 @@ export class ConfiguracaoRedefinicaoPage {
   }
 
   async acessar() {
-    await this.page.goto('/admin/tool/custom_forgotpassword/index.php');
+    await this.abrir('/admin/tool/custom_forgotpassword/index.php');
     await this.titulo.waitFor();
   }
 

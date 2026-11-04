@@ -1,10 +1,10 @@
 import { Page, Locator } from '@playwright/test';
+import { PaginaBase } from '../PaginaBase';
 
 // Login → "Esqueci a senha" → "Perdeu a senha?"
 // Redefinição personalizada: campo primário + campo secundário configurados em "Redefinição de senha personalizada".
 // Redefinição padrão: busca pelo nome de usuário ou pelo e-mail — só aparece com a personalizada desativada
-export class PerdeuSenhaPage {
-  readonly page: Page;
+export class PerdeuSenhaPage extends PaginaBase {
   readonly titulo: Locator;
   readonly blocoPrimario: Locator;
   readonly blocoSecundario: Locator;
@@ -20,7 +20,7 @@ export class PerdeuSenhaPage {
   readonly voltarAoAcesso: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.titulo = page.getByRole('heading', { name: 'Perdeu a senha?' });
     this.blocoPrimario = page.locator('#fitem_id_firstfield');
     this.blocoSecundario = page.locator('#fitem_id_secondfield');
@@ -43,12 +43,12 @@ export class PerdeuSenhaPage {
   }
 
   async acessarPeloLogin() {
-    await this.page.goto('/login/index.php');
+    await this.abrir('/login/index.php');
     await this.page.getByRole('link', { name: 'Esqueci a senha' }).click();
   }
 
   async acessar() {
-    await this.page.goto('/login/forgot_password.php');
+    await this.abrir('/login/forgot_password.php');
   }
 
   rotuloDoCampo(bloco: Locator): Locator {

@@ -1,4 +1,5 @@
 import { Page, Locator } from '@playwright/test';
+import { PaginaBase } from '../PaginaBase';
 
 export type ConfiguracaoCampo = {
   obrigatorio?: 'Sim' | 'Não';
@@ -9,8 +10,7 @@ export type ConfiguracaoCampo = {
 const escapar = (texto: string) => texto.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 // Administração → Usuários → Contas → Campos de perfil do usuário
-export class CamposPerfilPage {
-  readonly page: Page;
+export class CamposPerfilPage extends PaginaBase {
   readonly modal: Locator;
   readonly mostrarNaPaginaDeCadastro: Locator;
   readonly obrigatorio: Locator;
@@ -20,7 +20,7 @@ export class CamposPerfilPage {
   readonly botaoCancelar: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.modal = page.getByRole('dialog');
     this.mostrarNaPaginaDeCadastro = this.modal.getByLabel('Mostrar na página de cadastro?');
     this.obrigatorio = this.modal.locator('select[name=required]');
@@ -31,7 +31,7 @@ export class CamposPerfilPage {
   }
 
   async acessar() {
-    await this.page.goto('/user/profile/index.php');
+    await this.abrir('/user/profile/index.php');
   }
 
   async editarCampo(campo: string) {

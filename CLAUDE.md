@@ -20,6 +20,12 @@ Decisão da QA (29/10/2026), para economizar tokens. O papel do Claude é **cria
 - Para agendar no Windows (uma vez): `powershell -ExecutionPolicy Bypass -File scripts\agendar-rodada-diaria.ps1` — cria as duas tarefas.
 - Suíte nova que altera configuração, cria usuário ou envia e-mail precisa da tag correspondente para entrar só na semanal.
 
+## Padrões de código
+
+- Classes de tela herdam `PaginaBase` (`support/PaginaBase.ts`) e abrem páginas com `this.abrir()`, que espera o carregamento (`'domcontentloaded'` só no Carrossel); specs não usam `page.goto` nem leem a tela direto — vira método da classe.
+- Sessões só por `sessoes.*` e `semSessao`; outro perfil no mesmo teste por `comSessao()` (`support/sessoes.ts`). Nada de `browser.newContext` nas specs.
+- Vídeos ficam bloqueados nos testes; só o módulo Carrossel usa `test.use({ bloquearVideos: false })`.
+
 ## Nunca
 
 - Ler ou citar `.env` e `.auth/` (senhas e sessões).

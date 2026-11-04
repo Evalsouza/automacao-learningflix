@@ -69,13 +69,15 @@ A organização segue o modelo da equipe — [Estrutura do Repositório](https:/
 │   ├── 📂 carrossel_commands/    # Comandos do módulo Carrossel
 │   │   ├── CarrosselPage.ts, ConfiguracaoCarrosselPage.ts
 │   │   └── imagens.ts            # Gera as imagens PNG de teste em memória
+│   ├── PaginaBase.ts             # Base das classes de tela: page, abrir(caminho) e mensagem(texto)
+│   ├── sessoes.ts                # Sessões dos perfis, semSessao, comSessao() e bloqueio de vídeos
 │   ├── commands.ts               # Comandos globais (menu do usuário, Sair)
 │   ├── 📂 reporters/
 │   │   └── resumo.ts             # Resultado da rodada no terminal
 │   ├── e2e.ts                    # Configuração global: disponibiliza as telas em todos os testes
 │   ├── usuarios.ts               # Usuários fixos dos testes
 │   ├── responsividade.ts         # Resoluções padrão da equipe
-│   └── auth.setup.ts             # Login de cada perfil, salvo para reuso
+│   └── auth.setup.ts             # Login de cada perfil, salvo para reuso (reaproveitado por 2 h)
 │
 📂 Factories/                     # Dados falsos gerados a cada execução
 │   ├── 📂 definitions/           # Define os dados possíveis por módulo
@@ -188,7 +190,9 @@ npx playwright test tests/Login/valida_visualizar_senha.spec.ts --project=deskto
 
 O ambiente de QA é lento e não aguenta logins simultâneos: os testes rodam um por vez e com tempo de espera maior.
 
-Os scripts `npm run test:*` refazem o login dos perfis antes de rodar. Com `npx playwright test ... --no-deps` o login não é refeito: se as falhas mostrarem a tela "Acesso", a sessão salva expirou — rode `npm run login:perfis`.
+Os scripts `npm run test:*` fazem o login dos perfis antes de rodar, mas reaproveitam a sessão salva há menos de 2 h — o login dos 3 perfis leva ~1,7 min. Com `npx playwright test ... --no-deps` o login não é feito. Se as falhas mostrarem a tela "Acesso", a sessão salva expirou: rode `npm run login:perfis`, que sempre faz o login de novo.
+
+Os vídeos (mp4, webm…) não são baixados nos testes: os do carrossel deixavam cada página 40 s mais lenta. O módulo Carrossel os carrega com `test.use({ bloquearVideos: false })`.
 
 ## Escrevendo testes
 
@@ -200,6 +204,8 @@ Os scripts `npm run test:*` refazem o login dos perfis antes de rodar. Com `npx 
 - **Responsividade:** toda validação tem seu arquivo `validacao_responsividade_*`, com um teste por resolução — Celular, Celular rotacionado, Tablet e Monitor.
 - **Rastreabilidade:** no `RASTREABILIDADE.md` do módulo, não dentro do teste.
 - **Comandos:** sequência repetida 3+ vezes vira método da classe de tela ou comando em `support/`.
+- **Classes de tela:** herdam `PaginaBase` (`support/PaginaBase.ts`) e abrem as páginas com `this.abrir(caminho)`, que espera os scripts da página carregarem — sem eles, o "Olho" da senha e o menu do usuário não respondem ao clique. Só o Carrossel abre com `'domcontentloaded'`, porque carrega os vídeos. Nada de `page.goto` nem leitura de tela dentro da spec: vira método da classe.
+- **Sessões:** sempre por `sessoes.administrador`, `sessoes.cliente`, `sessoes.estudante` ou `semSessao` (`support/sessoes.ts`). Outro perfil no mesmo teste: `comSessao(browser, sessoes.cliente, (pagina) => ...)`, que abre e fecha a sessão.
 - **Dados:** sem valores "mágicos" no teste — fixos em `fixtures/`, gerados em `Factories/`, usuários em `support/usuarios.ts`.
 - **Seletores:** priorize papel e nome acessível (`getByRole`) ou `data-testid`; evite classes utilitárias e índices. Se faltar um identificador estável, peça ao DEV.
 - **Estabilidade:** rode o teste mais de uma vez antes de subir.

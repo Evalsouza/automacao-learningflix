@@ -1,6 +1,7 @@
 // DT/EVT - "Acessar como visitante" — envio da Ajuda — rastreabilidade em RASTREABILIDADE.md
 // Envia um e-mail de verdade para o suporte. Desligada por padrão: rode com `npm run test:ajuda-envio`
 import { test, expect } from '../../support/e2e';
+import { semSessao } from '../../support/sessoes';
 import { assuntoAjuda } from '../../fixtures/acessovisitante';
 
 const executar = process.env.EXECUTAR_ENVIO_AJUDA === 'sim';
@@ -10,7 +11,7 @@ test.describe(
   { tag: ['@dt-acessar-como-visitante', '@envia-email'] },
   () => {
     test.skip(!executar, 'Envia e-mail para o suporte: rode com npm run test:ajuda-envio');
-    test.use({ storageState: { cookies: [], origins: [] } });
+    test.use({ storageState: semSessao });
 
     test('V20 - Envio da "Ajuda" pelo visitante exibe "Enviado com sucesso"', async ({ visitante, ajuda }) => {
       await visitante.entrarComoVisitante();

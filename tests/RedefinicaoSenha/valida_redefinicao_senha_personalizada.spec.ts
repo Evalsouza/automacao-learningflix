@@ -2,16 +2,16 @@
 // Nenhum teste salva senha nova: os positivos param na página "Redefinir senha".
 // RP08 — usuário sem o dado cadastrado — fica na suíte de configuração, com "Cidade de Nascimento" no "Campo secundário"
 import { test, expect } from '../../support/e2e';
+import { sessoes, semSessao } from '../../support/sessoes';
 import { usuariosRedefinicao } from '../../support/usuarios';
 import { lerDadosDoUsuario } from '../../support/redefinicaosenha_commands/dadosDoUsuario';
 import { mensagens, paginas, configuracaoAtual, configuracaoPrimario } from '../../fixtures/redefinicaosenha';
 import { Factories } from '../../Factories';
 
 const { evaSouza, meridaValente, anyaForger, qaAluno21 } = usuariosRedefinicao;
-const semSessao = { cookies: [], origins: [] };
 
 test.describe('CENÁRIO 1: Ativação do Reset de Senha Personalizado', { tag: '@dt-redefinicao-personalizada' }, () => {
-  test.use({ storageState: '.auth/administrador.json' });
+  test.use({ storageState: sessoes.administrador });
 
   test('RP01 - Campo "Cargo" exibido em "Dados Profissionais" de "Campos de perfil do usuário"', async ({ page, camposPerfil }) => {
     await test.step('Quando acessei "Campos de perfil do usuário"', () => camposPerfil.acessar());

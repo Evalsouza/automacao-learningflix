@@ -1,20 +1,26 @@
 import { Page, Locator } from '@playwright/test';
+import { PaginaBase } from '../PaginaBase';
 
 // Sidebar → Minha página
-export class MinhaPaginaPage {
-  readonly page: Page;
+export class MinhaPaginaPage extends PaginaBase {
   readonly titulo: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.titulo = page
       .getByRole('heading', { name: 'Minha Página' })
       .or(page.getByText('Minha Página', { exact: true }))
       .first();
   }
 
-  async acessar() {
-    await this.page.goto('/user/profile.php');
+  // Sem id, abre o perfil do próprio usuário
+  async acessar(idDoUsuario?: string) {
+    await this.abrir(idDoUsuario ? `/user/profile.php?id=${idDoUsuario}` : '/user/profile.php');
+  }
+
+  async cargoVisivel(idDoUsuario?: string): Promise<boolean> {
+    await this.acessar(idDoUsuario);
+    return (await this.valorOuVazio('Cargo')) !== '';
   }
 
   // A área principal é um elemento com papel "main", não a tag <main>

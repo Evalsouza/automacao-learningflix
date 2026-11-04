@@ -1,4 +1,5 @@
 import { Page, Locator } from '@playwright/test';
+import { PaginaBase } from '../PaginaBase';
 
 type DadosNovaConta = {
   identificacao: string;
@@ -10,8 +11,7 @@ type DadosNovaConta = {
 };
 
 // Fluxo "Criar uma conta": Verificação de idade e localização → Nova conta
-export class CriarContaPage {
-  readonly page: Page;
+export class CriarContaPage extends PaginaBase {
   readonly linkCriarConta: Locator;
   readonly tituloVerificacao: Locator;
   readonly campoIdade: Locator;
@@ -33,7 +33,7 @@ export class CriarContaPage {
   readonly mensagemMenorDigital: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.linkCriarConta = page.getByRole('link', { name: 'Criar uma conta' });
     this.tituloVerificacao = page.getByRole('heading', { name: 'Verificação de idade e localização' });
     this.campoIdade = page.getByRole('textbox', { name: 'Qual é a sua idade?' });
@@ -58,7 +58,7 @@ export class CriarContaPage {
   }
 
   async acessarPeloLogin() {
-    await this.page.goto('/login/index.php');
+    await this.abrir('/login/index.php');
     await this.linkCriarConta.click();
   }
 

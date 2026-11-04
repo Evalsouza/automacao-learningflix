@@ -3,6 +3,7 @@
 // Também troca "Habilita o Carrossel", o intervalo e a "Cor da Marca" do tema, e restaura os valores iniciais ao final.
 // Desligada por padrão: rode com `npm run test:carrossel-config`
 import { test, expect } from '../../support/e2e';
+import { sessoes, comSessao, type Sessao } from '../../support/sessoes';
 import type { Browser, Page } from '@playwright/test';
 import { existsSync } from 'fs';
 import { ConfiguracaoCarrosselPage } from '../../support/carrossel_commands/ConfiguracaoCarrosselPage';
@@ -13,47 +14,30 @@ import { mensagensCarrossel, slideDeTeste, intervaloDeTeste, corDaMarcaDeTeste, 
 
 const executar = process.env.EXECUTAR_CONFIG_CARROSSEL === 'sim';
 const inicial = { quantidade: 0, habilitado: true, intervalo: '', corDaMarca: '' };
-const corDaMarca = (page: Page) => page.locator('[name="s_theme_smart_brandcolor"]');
 
-async function comSessao<T>(browser: Browser, sessao: string, acao: (page: Page) => Promise<T>) {
-  const contexto = await browser.newContext({ storageState: sessao });
-  try {
-    return await acao(await contexto.newPage());
-  } finally {
-    await contexto.close();
-  }
-}
+// O módulo Carrossel valida os slides: os vídeos são carregados, também nas sessões separadas
+test.use({ bloquearVideos: false });
+const comVideos = <T>(browser: Browser, sessao: Sessao, acao: (page: Page) => Promise<T>) =>
+  comSessao(browser, sessao, acao, { videos: true });
 
 // O slide de teste é sempre o último e existe só se a quantidade passou da inicial
 async function slideDeTesteAtual(config: ConfiguracaoCarrosselPage) {
-  await config.acessar();
-  const n = await config.quantidadeDeSlides();
+  const n = await config.ultimoSlide();
   expect(n, 'O slide de teste não existe — o CR10 precisa rodar antes').toBeGreaterThan(inicial.quantidade);
   return n;
 }
 
-async function slidesDaEstudante(browser: Browser) {
-  return comSessao(browser, '.auth/estudante.json', async (page) => {
-    const carrossel = new CarrosselPage(page);
-    await carrossel.acessar();
-    await carrossel.aguardar();
-    return {
-      titulos: (await carrossel.slides.allInnerTexts()).map((t) => t.replace(/\s+/g, ' ').trim()),
-      links: await carrossel.slides.locator('a').evaluateAll((as) => as.map((a) => a.getAttribute('href'))),
-      videos: await carrossel.slides.locator('video source, video').evaluateAll((vs) => vs.map((v) => (v as HTMLVideoElement).src)),
-    };
-  });
-}
+const slidesDaEstudante = (browser: Browser) => comVideos(browser, sessoes.estudante, (page) => new CarrosselPage(page).lerSlides());
 
 test.describe('CASOS DE TESTE 01: configuração do Carrossel', { tag: ['@dt-carrossel', '@altera-configuracao'] }, () => {
   test.skip(!executar, 'Altera o carrossel e o tema da plataforma inteira: rode com npm run test:carrossel-config');
-  test.use({ storageState: '.auth/administrador.json' });
+  test.use({ storageState: sessoes.administrador });
   test.setTimeout(300_000);
 
   // Sem `serial`: com 1 worker os testes já rodam em ordem; depois de uma falha o afterAll restaura e o beforeAll relê
   test.beforeAll(async ({ browser }) => {
     test.setTimeout(300_000);
-    await comSessao(browser, '.auth/administrador.json', async (page) => {
+    await comVideos(browser, sessoes.administrador, async (page) => {
       const config = new ConfiguracaoCarrosselPage(page);
       await config.acessar();
       inicial.quantidade = await config.quantidadeDeSlides();
@@ -61,14 +45,14 @@ test.describe('CASOS DE TESTE 01: configuração do Carrossel', { tag: ['@dt-car
       inicial.intervalo = await config.intervalo.inputValue();
       const tema = new TemaPage(page);
       await tema.acessar();
-      inicial.corDaMarca = await corDaMarca(page).inputValue();
+      inicial.corDaMarca = await tema.corDaMarca.inputValue();
     });
   });
 
   // Remove só os slides além da quantidade inicial — do último para o primeiro — e restaura o resto
   test.afterAll(async ({ browser }) => {
     test.setTimeout(600_000);
-    await comSessao(browser, '.auth/administrador.json', async (page) => {
+    await comVideos(browser, sessoes.administrador, async (page) => {
       const config = new ConfiguracaoCarrosselPage(page);
       await config.acessar();
       for (let n = await config.quantidadeDeSlides(); n > inicial.quantidade; n--) {
@@ -81,7 +65,7 @@ test.describe('CASOS DE TESTE 01: configuração do Carrossel', { tag: ['@dt-car
       await config.salvar();
       const tema = new TemaPage(page);
       await tema.acessar();
-      await corDaMarca(page).fill(inicial.corDaMarca);
+      await tema.corDaMarca.fill(inicial.corDaMarca);
       await tema.botaoSalvar.click();
       await tema.mensagemGravada.waitFor();
     });
@@ -202,7 +186,7 @@ test.describe('CASOS DE TESTE 01: configuração do Carrossel', { tag: ['@dt-car
       await expect(config.mensagem(mensagensCarrossel.gravadas)).toBeVisible();
     });
     await test.step(`Então, na Página inicial da Estudante, o carrossel trocou de slide em até ${intervaloDeTeste} segundos`, () =>
-      comSessao(browser, '.auth/estudante.json', async (page) => {
+      comVideos(browser, sessoes.estudante, async (page) => {
         const carrossel = new CarrosselPage(page);
         await carrossel.acessar();
         await carrossel.aguardar();
@@ -224,11 +208,11 @@ test.describe('CASOS DE TESTE 01: configuração do Carrossel', { tag: ['@dt-car
       await expect(config.mensagem(mensagensCarrossel.gravadas)).toBeVisible();
     });
     for (const [perfil, sessao] of [
-      ['Administrador', '.auth/administrador.json'],
-      ['Estudante', '.auth/estudante.json'],
+      ['Administrador', sessoes.administrador],
+      ['Estudante', sessoes.estudante],
     ])
       await test.step(`Então o "${perfil}" NÃO viu o carrossel na Página inicial`, () =>
-        comSessao(browser, sessao, async (page) => {
+        comVideos(browser, sessao, async (page) => {
           const carrossel = new CarrosselPage(page);
           await carrossel.acessar();
           await expect(carrossel.primeiroBloco).toBeVisible();
@@ -239,13 +223,13 @@ test.describe('CASOS DE TESTE 01: configuração do Carrossel', { tag: ['@dt-car
   test(`CR18 - "Cor da Marca" ${corDaMarcaDeTeste} é aplicada ao tema`, async ({ browser, tema }) => {
     await test.step(`Quando alterei a "Cor da Marca" para ${corDaMarcaDeTeste} em "Configurações gerais" e cliquei em "Salvar mudanças"`, async () => {
       await tema.acessar();
-      await corDaMarca(tema.page).fill(corDaMarcaDeTeste);
+      await tema.corDaMarca.fill(corDaMarcaDeTeste);
       await tema.botaoSalvar.click();
       await tema.mensagemGravada.waitFor();
     });
     await test.step(`Então o estilo da Página inicial da Estudante passou a usar a cor ${corDaMarcaDeTeste}`, () =>
-      comSessao(browser, '.auth/estudante.json', async (page) => {
-        await page.goto('/my/', { waitUntil: 'domcontentloaded' });
+      comVideos(browser, sessoes.estudante, async (page) => {
+        await new CarrosselPage(page).acessar();
         const cor = corDaMarcaDeTeste.toLowerCase();
         const aplicada = await page.evaluate(async (procurada) => {
           const folhas = [...document.querySelectorAll<HTMLLinkElement>('link[rel=stylesheet]')].map((l) => l.href);

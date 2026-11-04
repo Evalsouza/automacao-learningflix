@@ -1,21 +1,23 @@
 import { Page, Locator } from '@playwright/test';
+import { PaginaBase } from '../PaginaBase';
 
 // Administração do site → Aparência → Temas → Tema (smart_4) → aba "Configurações gerais"
-export class TemaPage {
-  readonly page: Page;
+export class TemaPage extends PaginaBase {
   readonly abaConfiguracoesGerais: Locator;
   readonly botaoSalvar: Locator;
   readonly mensagemGravada: Locator;
+  readonly corDaMarca: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.abaConfiguracoesGerais = page.getByRole('tab', { name: 'Configurações gerais' });
     this.botaoSalvar = page.getByRole('button', { name: 'Salvar mudanças' });
     this.mensagemGravada = page.getByText('Mudanças gravadas').first();
+    this.corDaMarca = page.locator('[name="s_theme_smart_brandcolor"]');
   }
 
   async acessar() {
-    await this.page.goto('/admin/settings.php?section=themesettingsmart');
+    await this.abrir('/admin/settings.php?section=themesettingsmart');
     await this.abaConfiguracoesGerais.click();
   }
 

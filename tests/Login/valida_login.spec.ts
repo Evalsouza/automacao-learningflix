@@ -1,12 +1,13 @@
 // DT/EVT - Página de Login — rastreabilidade em RASTREABILIDADE.md
 import { test, expect } from '../../support/e2e';
+import { semSessao } from '../../support/sessoes';
 import { usuarios } from '../../support/usuarios';
 import { mensagens, paginas } from '../../fixtures/login';
 import { Factories } from '../../Factories';
 
 const { administrador, cliente, estudante } = usuarios;
 
-test.use({ storageState: { cookies: [], origins: [] } });
+test.use({ storageState: semSessao });
 
 test.beforeEach(({ login }) => login.acessar());
 

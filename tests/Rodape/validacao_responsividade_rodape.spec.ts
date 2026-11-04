@@ -1,12 +1,13 @@
 // Responsividade - Jira LFXP-1941 — rodapé — rastreabilidade em RASTREABILIDADE.md
 // O tema esconde o rodapé em telas estreitas: na página de login abaixo de 768 px e depois do login abaixo de 992 px
 import { test, expect } from '../../support/e2e';
+import { sessoes, semSessao } from '../../support/sessoes';
 import { resolucoes, temRolagemHorizontal } from '../../support/responsividade';
 import { larguraMinimaDoRodape } from '../../fixtures/rodape';
 
 const paginas = [
-  { nome: 'página de login', sessao: { cookies: [], origins: [] }, url: '/login/index.php', larguraMinima: larguraMinimaDoRodape.login },
-  { nome: '"Página inicial" da Estudante', sessao: '.auth/estudante.json', url: '/my/', larguraMinima: larguraMinimaDoRodape.aposLogin },
+  { nome: 'página de login', sessao: semSessao, url: '/login/index.php', larguraMinima: larguraMinimaDoRodape.login },
+  { nome: '"Página inicial" da Estudante', sessao: sessoes.estudante, url: '/my/', larguraMinima: larguraMinimaDoRodape.aposLogin },
 ];
 
 for (const { tipo, dispositivo, resolucao } of resolucoes) {
@@ -17,7 +18,7 @@ for (const { tipo, dispositivo, resolucao } of resolucoes) {
       test.use({ ...dispositivo, storageState: sessao });
 
       test(`Rodapé - ${tipo} ${resolucao} - ${nome}`, async ({ page, rodape }) => {
-        await test.step(`Quando acessei a ${nome}`, () => page.goto(url));
+        await test.step(`Quando acessei a ${nome}`, () => rodape.acessar(url));
         if (exibido)
           await test.step('Então, no fim da página, o idioma e "© Desenvolvido por" ficaram dentro da tela', async () => {
             await rodape.irParaOFim();

@@ -1,8 +1,8 @@
 import { Page, Locator } from '@playwright/test';
+import { PaginaBase } from '../PaginaBase';
 
 // "Acessar como visitante": página de login → Acordo de política do site → Página Inicial do visitante
-export class VisitantePage {
-  readonly page: Page;
+export class VisitantePage extends PaginaBase {
   readonly botaoAcessarComoVisitante: Locator;
   readonly tituloPolitica: Locator;
   readonly botaoSim: Locator;
@@ -17,7 +17,7 @@ export class VisitantePage {
   readonly botaoContinuar: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.botaoAcessarComoVisitante = page.getByRole('button', { name: 'Acessar como visitante' });
     this.tituloPolitica = page.getByRole('heading', { name: 'Acordo de política do site' });
     this.botaoSim = page.getByRole('button', { name: 'Sim', exact: true });
@@ -45,8 +45,12 @@ export class VisitantePage {
       .first();
   }
 
+  async acessarLogin() {
+    await this.abrir('/login/index.php');
+  }
+
   async acessarPoliticaPeloLogin() {
-    await this.page.goto('/login/index.php');
+    await this.acessarLogin();
     await this.botaoAcessarComoVisitante.click();
     await this.tituloPolitica.waitFor();
   }

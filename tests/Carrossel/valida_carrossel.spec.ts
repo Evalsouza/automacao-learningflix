@@ -1,23 +1,15 @@
 // DT/EVT - Plugin Carrossel Infinito no Layout da Página inicial — rastreabilidade em RASTREABILIDADE.md
 // Só leitura: confere a configuração e o carrossel atuais, sem alterar os slides
 import { test, expect } from '../../support/e2e';
-import type { Browser } from '@playwright/test';
+import { sessoes, comSessao } from '../../support/sessoes';
 import { ConfiguracaoCarrosselPage } from '../../support/carrossel_commands/ConfiguracaoCarrosselPage';
 import { camposDoSlide } from '../../fixtures/carrossel';
 
-async function intervaloConfigurado(browser: Browser): Promise<number> {
-  const contexto = await browser.newContext({ storageState: '.auth/administrador.json' });
-  try {
-    const config = new ConfiguracaoCarrosselPage(await contexto.newPage());
-    await config.acessar();
-    return Number(await config.intervalo.inputValue());
-  } finally {
-    await contexto.close();
-  }
-}
+// O módulo Carrossel valida os slides: os vídeos são carregados
+test.use({ bloquearVideos: false });
 
 test.describe('CASOS DE TESTE 01: configuração do Carrossel', { tag: '@dt-carrossel' }, () => {
-  test.use({ storageState: '.auth/administrador.json' });
+  test.use({ storageState: sessoes.administrador });
 
   test('CR01 - "Carrossel da Página Inicial" exibe os campos de cada slide e NÃO exibe "Alinhamento"', async ({
     configuracaoCarrossel: config,
@@ -34,8 +26,8 @@ test.describe('CASOS DE TESTE 01: configuração do Carrossel', { tag: '@dt-carr
 
 test.describe('Carrossel na Página inicial', { tag: '@dt-carrossel' }, () => {
   for (const { id, perfil, sessao } of [
-    { id: 'CR02', perfil: 'Estudante', sessao: '.auth/estudante.json' },
-    { id: 'CR03', perfil: 'Administrador', sessao: '.auth/administrador.json' },
+    { id: 'CR02', perfil: 'Estudante', sessao: sessoes.estudante },
+    { id: 'CR03', perfil: 'Administrador', sessao: sessoes.administrador },
   ]) {
     test.describe(perfil, () => {
       test.use({ storageState: sessao });
@@ -58,10 +50,11 @@ test.describe('Carrossel na Página inicial', { tag: '@dt-carrossel' }, () => {
   }
 
   test.describe('Estudante', () => {
-    test.use({ storageState: '.auth/estudante.json' });
+    test.use({ storageState: sessoes.estudante });
 
     test('CR04 - Os slides do carrossel trocam dentro do intervalo configurado', async ({ browser, carrossel }) => {
-      const intervalo = await test.step('Dado que consultei o "Intervalo (em segundos)" configurado', () => intervaloConfigurado(browser));
+      const intervalo = await test.step('Dado que consultei o "Intervalo (em segundos)" configurado', () =>
+        comSessao(browser, sessoes.administrador, (page) => new ConfiguracaoCarrosselPage(page).intervaloAtual()));
       test.setTimeout((intervalo + 120) * 1000);
       let antes = -1;
       await test.step('Quando acessei a "Página inicial" e visualizei o carrossel', async () => {

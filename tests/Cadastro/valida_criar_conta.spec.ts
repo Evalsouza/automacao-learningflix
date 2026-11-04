@@ -1,5 +1,6 @@
 // DTI/EVTI - Página Criar uma conta — rastreabilidade em RASTREABILIDADE.md
 import { test, expect } from '../../support/e2e';
+import { sessoes, semSessao, comSessao } from '../../support/sessoes';
 import { CriarContaPage } from '../../support/cadastro_commands/CriarContaPage';
 import {
   paginas,
@@ -13,11 +14,9 @@ import {
 } from '../../fixtures/cadastro';
 import { Factories } from '../../Factories';
 
-const semSessao = { cookies: [], origins: [] };
-
 test.describe('CENÁRIO 1: Cadastro de usuário com Cargo "Comum"', { tag: '@dt-criar-conta' }, () => {
   test.describe('Administrador', () => {
-    test.use({ storageState: '.auth/administrador.json' });
+    test.use({ storageState: sessoes.administrador });
 
     test('C001 - Campo "Cargo" ativo para exibição no formulário de cadastro', async ({ camposPerfil }) => {
       await test.step('Quando acessei "Campos de perfil do usuário" e editei o campo "Cargo" em "Dados Profissionais"', async () => {
@@ -37,15 +36,14 @@ test.describe('CENÁRIO 1: Cadastro de usuário com Cargo "Comum"', { tag: '@dt-
         gestores = await hierarquia.cargosGestores();
         expect(gestores.length, 'o Gerenciador de Hierarquia deve ter cargos de gestão').toBeGreaterThan(0);
       });
-      await test.step('E acessei a página "Nova conta" sem login', async () => {
-        const contexto = await browser.newContext({ storageState: semSessao });
-        const criarConta = new CriarContaPage(await contexto.newPage());
-        await criarConta.acessarPeloLogin();
-        await criarConta.verificarIdadeELocalizacao(Factories.cadastro.idadeAdulta(), pais);
-        await criarConta.tituloNovaConta.waitFor();
-        disponiveis = await criarConta.cargosDisponiveis();
-        await contexto.close();
-      });
+      await test.step('E acessei a página "Nova conta" sem login', () =>
+        comSessao(browser, semSessao, async (pagina) => {
+          const criarConta = new CriarContaPage(pagina);
+          await criarConta.acessarPeloLogin();
+          await criarConta.verificarIdadeELocalizacao(Factories.cadastro.idadeAdulta(), pais);
+          await criarConta.tituloNovaConta.waitFor();
+          disponiveis = await criarConta.cargosDisponiveis();
+        }));
       await test.step('Então nenhum cargo de gestão foi exibido no campo "Cargo"', () =>
         expect(
           disponiveis.filter((cargo) => gestores.includes(cargo)),
@@ -102,7 +100,7 @@ test.describe('CENÁRIO 1: Cadastro de usuário com Cargo "Comum"', { tag: '@dt-
   });
 
   test.describe('Estudante', () => {
-    test.use({ storageState: '.auth/estudante.json' });
+    test.use({ storageState: sessoes.estudante });
 
     test('C006 - "Minha página" exibe o Cargo e o Gestor em "Dados Profissionais"', async ({ minhaPagina }) => {
       await test.step('Quando acessei a "Minha página"', () => minhaPagina.acessar());
@@ -116,8 +114,8 @@ test.describe('CENÁRIO 1: Cadastro de usuário com Cargo "Comum"', { tag: '@dt-
 
 test.describe('CENÁRIO 2: Consulta do cadastro do usuário na página de Cadastro do usuário', { tag: '@dt-criar-conta' }, () => {
   const consultas = [
-    { id: 'C009', perfil: 'Adm Cliente', sessao: '.auth/cliente.json' },
-    { id: 'C010', perfil: 'Administrador', sessao: '.auth/administrador.json' },
+    { id: 'C009', perfil: 'Adm Cliente', sessao: sessoes.cliente },
+    { id: 'C010', perfil: 'Administrador', sessao: sessoes.administrador },
   ];
 
   for (const { id, perfil, sessao } of consultas) {
@@ -195,7 +193,7 @@ test.describe('Botão "Cancelar"', { tag: '@dt-criar-conta' }, () => {
   });
 
   test.describe('Administrador', () => {
-    test.use({ storageState: '.auth/administrador.json' });
+    test.use({ storageState: sessoes.administrador });
 
     test('CAN03 - "Cancelar" na edição do campo "Cargo" fecha sem alterar a configuração', async ({ camposPerfil }) => {
       await test.step('Quando editei o campo "Cargo" e cliquei em "Cancelar"', async () => {
@@ -213,7 +211,7 @@ test.describe('Botão "Cancelar"', { tag: '@dt-criar-conta' }, () => {
   });
 
   test.describe('Adm Cliente', () => {
-    test.use({ storageState: '.auth/cliente.json' });
+    test.use({ storageState: sessoes.cliente });
 
     test('CAN04 - "Cancelar" em "Editar usuário" fecha sem alterar o Cargo', async ({ gerenciarUsuarios }) => {
       await test.step('Quando abri "Editar usuário" de "Eva Souza" e cliquei em "Cancelar"', async () => {

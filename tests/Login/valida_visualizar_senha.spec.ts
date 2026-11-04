@@ -1,10 +1,11 @@
 // DT/EVT - Tela de Login: possibilidade de ver a senha — rastreabilidade em RASTREABILIDADE.md
 import { test, expect } from '../../support/e2e';
+import { semSessao } from '../../support/sessoes';
 import { Factories } from '../../Factories';
 
 const senha = Factories.login.senhaParaExibir();
 
-test.use({ storageState: { cookies: [], origins: [] } });
+test.use({ storageState: semSessao });
 
 test.beforeEach(({ login }) => login.acessar());
 

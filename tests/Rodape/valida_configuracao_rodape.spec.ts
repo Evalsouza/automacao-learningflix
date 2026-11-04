@@ -2,57 +2,45 @@
 // Altera as opções de footer do Tema, que valem para a plataforma inteira, e restaura os valores iniciais ao final.
 // Desligada por padrão: rode com `npm run test:rodape-config`
 import { test, expect } from '../../support/e2e';
+import { sessoes, semSessao, comSessao, type Sessao } from '../../support/sessoes';
 import type { Browser } from '@playwright/test';
 import { RodapePage } from '../../support/rodape_commands/RodapePage';
 import { TemaPage } from '../../support/rodape_commands/TemaPage';
 import { opcoesRodape, linksDoLogin, linksAposLogin, perfisDoRodape } from '../../fixtures/rodape';
 
 const executar = process.env.EXECUTAR_CONFIG_RODAPE === 'sim';
-const semSessao = { cookies: [], origins: [] };
 const estadoInicial: Record<string, boolean> = {};
 
 // Abre a página numa sessão separada e devolve se cada link apareceu no rodapé
-async function linksVisiveis(browser: Browser, sessao: string | typeof semSessao, url: string, links: string[]) {
-  const contexto = await browser.newContext({ storageState: sessao });
-  try {
-    const rodape = new RodapePage(await contexto.newPage());
-    await rodape.page.goto(url);
-    await rodape.irParaOFim();
-    await expect(rodape.direitos).toBeVisible();
-    const exibidos: Record<string, boolean> = {};
-    for (const link of links) exibidos[link] = (await rodape.link(link).count()) > 0;
-    return exibidos;
-  } finally {
-    await contexto.close();
-  }
-}
+const linksVisiveis = (browser: Browser, sessao: Sessao, url: string, links: string[]) =>
+  comSessao(browser, sessao, (pagina) => new RodapePage(pagina).linksExibidos(url, links));
 
 const todos = (links: string[], exibido: boolean) => Object.fromEntries(links.map((l) => [l, exibido]));
 
 test.describe('Habilitar e desabilitar o footer', { tag: ['@dt-rodape', '@altera-configuracao'] }, () => {
   test.skip(!executar, 'Altera uma configuração da plataforma inteira: rode com npm run test:rodape-config');
-  test.use({ storageState: '.auth/administrador.json' });
+  test.use({ storageState: sessoes.administrador });
   test.setTimeout(240_000);
 
   // Sem `serial`: com 1 worker os testes já rodam em ordem; depois de uma falha o afterAll restaura e o beforeAll relê
   test.beforeAll(async ({ browser }) => {
     test.setTimeout(300_000);
-    const contexto = await browser.newContext({ storageState: '.auth/administrador.json' });
-    const tema = new TemaPage(await contexto.newPage());
-    await tema.acessar();
-    for (const { chave } of Object.values(opcoesRodape)) estadoInicial[chave] = await tema.opcao(chave).isChecked();
-    await contexto.close();
+    await comSessao(browser, sessoes.administrador, async (pagina) => {
+      const tema = new TemaPage(pagina);
+      await tema.acessar();
+      for (const { chave } of Object.values(opcoesRodape)) estadoInicial[chave] = await tema.opcao(chave).isChecked();
+    });
   });
 
   test.afterAll(async ({ browser }) => {
     test.setTimeout(300_000);
-    const contexto = await browser.newContext({ storageState: '.auth/administrador.json' });
-    const tema = new TemaPage(await contexto.newPage());
-    await tema.acessar();
-    for (const [chave, marcado] of Object.entries(estadoInicial)) await tema.opcao(chave).setChecked(marcado);
-    await tema.botaoSalvar.click();
-    await tema.mensagemGravada.waitFor();
-    await contexto.close();
+    await comSessao(browser, sessoes.administrador, async (pagina) => {
+      const tema = new TemaPage(pagina);
+      await tema.acessar();
+      for (const [chave, marcado] of Object.entries(estadoInicial)) await tema.opcao(chave).setChecked(marcado);
+      await tema.botaoSalvar.click();
+      await tema.mensagemGravada.waitFor();
+    });
   });
 
   const casos = [
@@ -60,7 +48,7 @@ test.describe('Habilitar e desabilitar o footer', { tag: ['@dt-rodape', '@altera
       ids: ['RD10', 'RD11'],
       opcao: opcoesRodape.usuario,
       quem: 'Estudante',
-      sessao: '.auth/estudante.json',
+      sessao: sessoes.estudante,
       url: '/my/',
       links: linksAposLogin,
     },
@@ -68,7 +56,7 @@ test.describe('Habilitar e desabilitar o footer', { tag: ['@dt-rodape', '@altera
       ids: ['RD12', 'RD13'],
       opcao: opcoesRodape.administrador,
       quem: 'Administrador',
-      sessao: '.auth/administrador.json',
+      sessao: sessoes.administrador,
       url: '/my/',
       links: linksAposLogin,
     },

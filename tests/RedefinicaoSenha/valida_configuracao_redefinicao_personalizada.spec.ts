@@ -2,7 +2,9 @@
 // Altera campos de perfil e a redefinição personalizada, que valem para a plataforma inteira.
 // Ao final restaura tudo, mesmo se falhar. Desligada por padrão: rode com `npm run test:redefinicao-config`
 import { test, expect } from '../../support/e2e';
-import type { Browser } from '@playwright/test';
+import { sessoes, semSessao, comSessao } from '../../support/sessoes';
+import { PerdeuSenhaPage } from '../../support/redefinicaosenha_commands/PerdeuSenhaPage';
+import type { Browser, Page } from '@playwright/test';
 import { CamposPerfilPage, ConfiguracaoCampo } from '../../support/cadastro_commands/CamposPerfilPage';
 import { CriarContaPage } from '../../support/cadastro_commands/CriarContaPage';
 import { MinhaPaginaPage } from '../../support/cadastro_commands/MinhaPaginaPage';
@@ -25,31 +27,16 @@ import { Factories } from '../../Factories';
 
 const executar = process.env.EXECUTAR_CONFIG_REDEFINICAO === 'sim';
 const { evaSouza, rayssaLima } = usuariosRedefinicao;
-const semSessao = { cookies: [], origins: [] };
 const camposAlterados = [...new Set([...camposSecundarios, ...camposPrimarios].map((c) => c.campo))];
 
 const configuracaoInicial: Record<string, Required<ConfiguracaoCampo>> = {};
 let redefinicaoInicial = { primario: '', secundario: '' };
 
-async function comoAdministrador<T>(browser: Browser, acao: (pagina: import('@playwright/test').Page) => Promise<T>) {
-  const contexto = await browser.newContext({ storageState: '.auth/administrador.json' });
-  try {
-    return await acao(await contexto.newPage());
-  } finally {
-    await contexto.close();
-  }
-}
+const comoAdministrador = <T>(browser: Browser, acao: (pagina: Page) => Promise<T>) => comSessao(browser, sessoes.administrador, acao);
 
-async function cargoVisivel(browser: Browser, sessao: string, idDaEva: string) {
-  const contexto = await browser.newContext({ storageState: sessao });
-  try {
-    const perfil = new MinhaPaginaPage(await contexto.newPage());
-    await perfil.page.goto(sessao.includes('estudante') ? '/user/profile.php' : `/user/profile.php?id=${idDaEva}`);
-    return (await perfil.valorOuVazio('Cargo')) !== '';
-  } finally {
-    await contexto.close();
-  }
-}
+// A Estudante vê o próprio perfil; os demais perfis abrem o perfil da Eva pelo id
+const cargoVisivel = (browser: Browser, sessao: string, idDaEva: string) =>
+  comSessao(browser, sessao, (pagina) => new MinhaPaginaPage(pagina).cargoVisivel(sessao === sessoes.estudante ? undefined : idDaEva));
 
 // Sem `serial`: com 1 worker os testes já rodam em ordem, e uma falha não pula o resto. Depois de uma falha
 // o Playwright roda o afterAll (restaura) e o beforeAll lê de novo a configuração — já restaurada
@@ -58,7 +45,7 @@ test.describe(
   { tag: ['@dt-redefinicao-personalizada', '@altera-configuracao'] },
   () => {
     test.skip(!executar, 'Altera configurações da plataforma inteira: rode com npm run test:redefinicao-config');
-    test.use({ storageState: '.auth/administrador.json' });
+    test.use({ storageState: sessoes.administrador });
     test.setTimeout(180_000);
 
     test.beforeAll(async ({ browser }) => {
@@ -93,14 +80,13 @@ test.describe(
     test('RC01 - Com "Este campo é obrigatório?" = "Sim", o "Cargo" é obrigatório na "Nova conta"', async ({ browser, camposPerfil }) => {
       await test.step('Quando alterei "Este campo é obrigatório?" do "Cargo" para "Sim"', () =>
         camposPerfil.configurar('Cargo', { obrigatorio: 'Sim' }));
-      await test.step('Então o campo "Cargo" foi marcado como obrigatório na "Nova conta"', async () => {
-        const contexto = await browser.newContext({ storageState: semSessao });
-        const criarConta = new CriarContaPage(await contexto.newPage());
-        await criarConta.acessarPeloLogin();
-        await criarConta.verificarIdadeELocalizacao(Factories.cadastro.idadeAdulta(), pais);
-        await expect(criarConta.campoCargo.getByTitle('Obrigatório', { exact: true }).first()).toBeVisible();
-        await contexto.close();
-      });
+      await test.step('Então o campo "Cargo" foi marcado como obrigatório na "Nova conta"', () =>
+        comSessao(browser, semSessao, async (pagina) => {
+          const criarConta = new CriarContaPage(pagina);
+          await criarConta.acessarPeloLogin();
+          await criarConta.verificarIdadeELocalizacao(Factories.cadastro.idadeAdulta(), pais);
+          await expect(criarConta.campoCargo.getByTitle('Obrigatório', { exact: true }).first()).toBeVisible();
+        }));
     });
 
     test('RC02 - Com "Este campo é obrigatório?" = "Não", o "Cargo" NÃO é obrigatório na "Nova conta"', async ({
@@ -109,14 +95,13 @@ test.describe(
     }) => {
       await test.step('Quando alterei "Este campo é obrigatório?" do "Cargo" para "Não"', () =>
         camposPerfil.configurar('Cargo', { obrigatorio: 'Não' }));
-      await test.step('Então o campo "Cargo" NÃO foi marcado como obrigatório na "Nova conta"', async () => {
-        const contexto = await browser.newContext({ storageState: semSessao });
-        const criarConta = new CriarContaPage(await contexto.newPage());
-        await criarConta.acessarPeloLogin();
-        await criarConta.verificarIdadeELocalizacao(Factories.cadastro.idadeAdulta(), pais);
-        await expect(criarConta.campoCargo.getByTitle('Obrigatório', { exact: true })).toHaveCount(0);
-        await contexto.close();
-      });
+      await test.step('Então o campo "Cargo" NÃO foi marcado como obrigatório na "Nova conta"', () =>
+        comSessao(browser, semSessao, async (pagina) => {
+          const criarConta = new CriarContaPage(pagina);
+          await criarConta.acessarPeloLogin();
+          await criarConta.verificarIdadeELocalizacao(Factories.cadastro.idadeAdulta(), pais);
+          await expect(criarConta.campoCargo.getByTitle('Obrigatório', { exact: true })).toHaveCount(0);
+        }));
     });
 
     // Quem vê o "Cargo" no perfil da Estudante, conforme a ajuda de "Quem pode ver este campo?".
@@ -138,12 +123,12 @@ test.describe(
         await test.step(`Quando alterei "Quem pode ver este campo?" do "Cargo" para "${visibilidade}"`, () =>
           camposPerfil.configurar('Cargo', { visibilidade }));
         await test.step(`Então a Estudante ${estudante ? '' : 'NÃO '}viu o "Cargo" na própria "Minha página"`, async () =>
-          expect(await cargoVisivel(browser, '.auth/estudante.json', idDaEva)).toBe(estudante));
+          expect(await cargoVisivel(browser, sessoes.estudante, idDaEva)).toBe(estudante));
         await test.step('E o Administrador viu o "Cargo" no perfil da Estudante', async () =>
-          expect(await cargoVisivel(browser, '.auth/administrador.json', idDaEva)).toBe(true));
+          expect(await cargoVisivel(browser, sessoes.administrador, idDaEva)).toBe(true));
         if (cliente !== undefined)
           await test.step('E o Adm Cliente viu o "Cargo" no perfil da Estudante', async () =>
-            expect(await cargoVisivel(browser, '.auth/cliente.json', idDaEva)).toBe(cliente));
+            expect(await cargoVisivel(browser, sessoes.cliente, idDaEva)).toBe(cliente));
       });
     }
 
@@ -189,14 +174,13 @@ test.describe(
           await config.acessar();
           await config.definir(config.campoSecundario, campo);
         });
-        await test.step(`Então "Perdeu a senha?" exibiu os campos "CPF" e "${campo}"`, async () => {
-          const contexto = await browser.newContext({ storageState: semSessao });
-          const pagina = await contexto.newPage();
-          await pagina.goto('/login/forgot_password.php');
-          await expect(pagina.locator('#fitem_id_firstfield label').first()).toHaveText('CPF');
-          await expect(pagina.locator('#fitem_id_secondfield label').first()).toHaveText(campo);
-          await contexto.close();
-        });
+        await test.step(`Então "Perdeu a senha?" exibiu os campos "CPF" e "${campo}"`, () =>
+          comSessao(browser, semSessao, async (pagina) => {
+            const visitante = new PerdeuSenhaPage(pagina);
+            await visitante.acessar();
+            await expect(visitante.rotuloDoCampo(visitante.blocoPrimario)).toHaveText('CPF');
+            await expect(visitante.rotuloDoCampo(visitante.blocoSecundario)).toHaveText(campo);
+          }));
         void perdeuSenha;
       });
 

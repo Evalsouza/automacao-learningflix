@@ -1,19 +1,19 @@
 import { Page, Locator } from '@playwright/test';
+import { PaginaBase } from '../PaginaBase';
 
 // Administração → Gerenciar Hierarquia → aba Cargos
-export class GerenciadorHierarquiaPage {
-  readonly page: Page;
+export class GerenciadorHierarquiaPage extends PaginaBase {
   readonly titulo: Locator;
   readonly proximaPagina: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.titulo = page.getByRole('heading', { name: 'Gerenciador de Hierarquia' });
     this.proximaPagina = page.getByRole('listitem', { name: 'Próxima página' }).getByRole('button');
   }
 
   async acessarCargos() {
-    await this.page.goto('/local/hierarchy/index.php/positions');
+    await this.abrir('/local/hierarchy/index.php/positions');
     await this.page.getByRole('heading', { name: 'Gerenciar cargos' }).waitFor();
   }
 
