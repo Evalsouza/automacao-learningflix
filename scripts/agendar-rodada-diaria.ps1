@@ -6,24 +6,28 @@
 #   powershell -ExecutionPolicy Bypass -File scripts\agendar-rodada-diaria.ps1
 # As tarefas rodam com o seu usuário, quando você estiver conectado ao Windows, com a janela oculta
 # (fechar a janela interrompia a rodada). Se o computador estiver desligado no horário, rodam assim que possível.
+# Notebook suspenso ou hibernando: a tarefa o acorda, se estiver na tomada e com os temporizadores de ativação
+# ligados. Rodada interrompida é tentada de novo 1 h e 2 h depois — o script não repete a rodada que já terminou.
 # Para remover: Unregister-ScheduledTask -TaskName '<nome da tarefa>' -Confirm:$false
 
 $script = Join-Path $PSScriptRoot 'rodada-diaria.ps1'
 $projeto = Split-Path -Parent $PSScriptRoot
 
+$diasUteis = 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'
 $rodadas = @(
   @{ Nome = 'Automacao LearningFlix - Rodada diaria'; Tipo = 'diaria'; Horas = 4
-     Gatilho = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday, Tuesday, Wednesday, Thursday, Friday -At '09:03' },
+     Gatilhos = '09:03', '10:03', '11:03' | ForEach-Object { New-ScheduledTaskTrigger -Weekly -DaysOfWeek $diasUteis -At $_ } },
   @{ Nome = 'Automacao LearningFlix - Rodada semanal'; Tipo = 'semanal'; Horas = 8
-     Gatilho = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Friday -At '12:00' }
+     Gatilhos = '12:00', '13:00', '14:00' | ForEach-Object { New-ScheduledTaskTrigger -Weekly -DaysOfWeek Friday -At $_ } }
 )
 
 foreach ($rodada in $rodadas) {
   $acao = New-ScheduledTaskAction -Execute 'powershell.exe' -WorkingDirectory $projeto `
     -Argument "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$script`" -Tipo $($rodada.Tipo)"
   $config = New-ScheduledTaskSettingsSet -StartWhenAvailable -ExecutionTimeLimit (New-TimeSpan -Hours $rodada.Horas) `
-    -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -MultipleInstances IgnoreNew
-  Register-ScheduledTask -TaskName $rodada.Nome -Action $acao -Trigger $rodada.Gatilho -Settings $config `
+    -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -MultipleInstances IgnoreNew -WakeToRun `
+    -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 10)
+  Register-ScheduledTask -TaskName $rodada.Nome -Action $acao -Trigger $rodada.Gatilhos -Settings $config `
     -Description "Roda npm run test:$($rodada.Tipo) e salva o relatório em relatorios" -Force | Out-Null
   Write-Host "Tarefa '$($rodada.Nome)' agendada."
 }

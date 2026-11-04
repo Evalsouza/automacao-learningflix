@@ -10,13 +10,27 @@
 #   status.json         — início, fim, código de saída, se a rodada terminou e se foi interrompida pelo limite
 # A tarefa "Rodada diária — envio do relatório" do Claude lê essa pasta e publica no Confluence e por e-mail.
 
-param([ValidateSet('diaria', 'semanal')][string]$Tipo = 'diaria')
+param([ValidateSet('diaria', 'semanal')][string]$Tipo = 'diaria', [switch]$Forcar)
 
 $ErrorActionPreference = 'Continue'
 $projeto = Split-Path -Parent $PSScriptRoot
 $data = Get-Date -Format 'yyyy-MM-dd'
 $pasta = Join-Path $projeto ("relatorios\$data" + $(if ($Tipo -eq 'semanal') { '-semanal' } else { '' }))
+
+# A tarefa tem novas tentativas ao longo do dia: se a rodada de hoje já terminou, não roda de novo.
+# Rodada interrompida (notebook suspenso, desligado) não tem "fim" e roda de novo. -Forcar roda sempre
+$statusAnterior = Join-Path $pasta 'status.json'
+if (-not $Forcar -and (Test-Path $statusAnterior)) {
+  $anterior = Get-Content $statusAnterior -Raw | ConvertFrom-Json
+  if ($anterior.fim) { Write-Host "Rodada $Tipo de $data já terminou às $($anterior.fim)."; exit 0 }
+}
 New-Item -ItemType Directory -Force -Path $pasta | Out-Null
+
+# Avisa o Windows que há trabalho em andamento: o notebook não suspende sozinho durante a rodada.
+# Fechar a tampa ainda suspende
+Add-Type -Namespace Win32 -Name Energia -MemberDefinition '[DllImport("kernel32.dll")] public static extern uint SetThreadExecutionState(uint estado);'
+$manterAcordado = [uint32]'0x80000001'  # ES_CONTINUOUS | ES_SYSTEM_REQUIRED
+[Win32.Energia]::SetThreadExecutionState($manterAcordado) | Out-Null
 
 $status = [ordered]@{ tipo = $Tipo; data = $data; inicio = (Get-Date).ToString('s'); fim = $null; codigoSaida = $null; concluida = $false; interrompida = $null }
 $status | ConvertTo-Json | Out-File -Encoding utf8 (Join-Path $pasta 'status.json')
@@ -48,6 +62,7 @@ foreach ($arquivo in 'resumo.txt', 'resultado.json') {
 $relatorio = Join-Path $projeto 'playwright-report'
 if (Test-Path $relatorio) { Copy-Item $relatorio (Join-Path $pasta 'playwright-report') -Recurse -Force }
 
+[Win32.Energia]::SetThreadExecutionState([uint32]'0x80000000') | Out-Null  # libera a suspensão
 $status.fim = (Get-Date).ToString('s')
 $status.codigoSaida = $codigo
 $status.concluida = Test-Path (Join-Path $pasta 'resumo.txt')
