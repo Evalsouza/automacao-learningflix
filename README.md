@@ -37,10 +37,16 @@ A organização segue o modelo da equipe — [Estrutura do Repositório](https:/
 │   │   ├── valida_configuracao_rodape.spec.ts   # altera configuração — desligado por padrão
 │   │   ├── validacao_responsividade_rodape.spec.ts
 │   │   └── RASTREABILIDADE.md
-│   └── 📂 Carrossel/             # Plugin Carrossel Infinito na Página inicial
-│       ├── valida_carrossel.spec.ts
-│       ├── valida_configuracao_carrossel.spec.ts   # altera configuração — desligado por padrão
-│       ├── validacao_responsividade_carrossel.spec.ts
+│   ├── 📂 Carrossel/             # Plugin Carrossel Infinito na Página inicial
+│   │   ├── valida_carrossel.spec.ts
+│   │   ├── valida_configuracao_carrossel.spec.ts   # altera configuração — desligado por padrão
+│   │   ├── validacao_responsividade_carrossel.spec.ts
+│   │   └── RASTREABILIDADE.md
+│   └── 📂 MeusCursos/            # Bloco "Meus Cursos" e Obrigatoriedade do Curso
+│       ├── valida_meus_cursos.spec.ts
+│       ├── valida_configuracao_meus_cursos.spec.ts   # altera configuração — desligado por padrão
+│       ├── valida_meus_cursos_usuario_novo.spec.ts   # cria usuário — desligado por padrão
+│       ├── validacao_responsividade_meus_cursos.spec.ts
 │       └── RASTREABILIDADE.md
 │
 📂 fixtures/                      # Massas de dados fixas: mensagens, títulos de página
@@ -50,6 +56,7 @@ A organização segue o modelo da equipe — [Estrutura do Repositório](https:/
 │   ├── redefinicaosenha.ts
 │   ├── rodape.ts
 │   ├── carrossel.ts
+│   ├── meuscursos.ts
 │   └── 📂 arquivos/carrossel/    # vídeo de teste do carrossel (video.mp4), enviado pela QA
 │
 📂 support/                       # Comandos e utilitários reutilizáveis
@@ -69,6 +76,8 @@ A organização segue o modelo da equipe — [Estrutura do Repositório](https:/
 │   ├── 📂 carrossel_commands/    # Comandos do módulo Carrossel
 │   │   ├── CarrosselPage.ts, ConfiguracaoCarrosselPage.ts
 │   │   └── imagens.ts            # Gera as imagens PNG de teste em memória
+│   ├── 📂 meuscursos_commands/   # Comandos do módulo MeusCursos
+│   │   └── MeusCursosPage.ts, ConfiguracaoMeusCursosPage.ts
 │   ├── PaginaBase.ts             # Base das classes de tela: page, abrir(caminho) e mensagem(texto)
 │   ├── sessoes.ts                # Sessões dos perfis, semSessao, comSessao() e bloqueio de vídeos
 │   ├── commands.ts               # Comandos globais (menu do usuário, Sair)
@@ -158,6 +167,9 @@ await login.entrar(usuarios.administrador);
 | `npm run test:rodape-config` | Habilita e desabilita as opções de footer do Tema e restaura no final — use só quando necessário |
 | `npm run test:carrossel` | Só o módulo Carrossel — a suíte que altera configuração fica pulada |
 | `npm run test:carrossel-config` | Cria e remove um slide de teste, troca "Habilita o Carrossel", o intervalo e a "Cor da Marca" e restaura no final — use só quando necessário |
+| `npm run test:meus-cursos` | Só o módulo MeusCursos — as suítes de configuração e de usuário novo ficam puladas |
+| `npm run test:meus-cursos-config` | Troca "Número de cards na página" do bloco Meus Cursos e restaura no final — use só quando necessário |
+| `npm run test:meus-cursos-novo` | Cria o usuário `qa.auto3`, valida o bloco e o "Ver todos" sem cursos e o exclui — bloqueado pelo defeito do cadastro |
 | `npm run test:responsivo` | Só os testes de resolução |
 | `npm run report` | Abre o relatório da última execução |
 | `npm run lint` | ESLint |

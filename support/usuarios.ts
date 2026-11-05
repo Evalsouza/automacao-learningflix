@@ -47,3 +47,13 @@ export const novoCadastroComCargo = {
   email: 'qa.auto2@yopmail.com',
   senha: process.env.NOVO_CADASTRO_SENHA ?? '',
 };
+
+// Usuário novo da suíte do bloco "Meus Cursos": valida o bloco e o "Ver todos" sem cursos e é excluído ao final.
+// Criado pelo "Criar uma conta" — decisão da QA (05/11): fica bloqueado enquanto existir o defeito do cadastro (28/10)
+export const novoCadastroMeusCursos = {
+  nome: 'QA',
+  sobrenome: 'AUTOMAÇÃO',
+  identificacao: 'qa.auto3',
+  email: 'qa.auto3@yopmail.com',
+  senha: process.env.NOVO_CADASTRO_SENHA ?? '',
+};

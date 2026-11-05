@@ -17,6 +17,8 @@ import { RodapePage } from './rodape_commands/RodapePage';
 import { TemaPage } from './rodape_commands/TemaPage';
 import { CarrosselPage } from './carrossel_commands/CarrosselPage';
 import { ConfiguracaoCarrosselPage } from './carrossel_commands/ConfiguracaoCarrosselPage';
+import { MeusCursosPage } from './meuscursos_commands/MeusCursosPage';
+import { ConfiguracaoMeusCursosPage } from './meuscursos_commands/ConfiguracaoMeusCursosPage';
 import { bloquearVideos } from './sessoes';
 
 type Telas = {
@@ -38,6 +40,8 @@ type Telas = {
   tema: TemaPage;
   carrossel: CarrosselPage;
   configuracaoCarrossel: ConfiguracaoCarrosselPage;
+  meusCursos: MeusCursosPage;
+  configuracaoMeusCursos: ConfiguracaoMeusCursosPage;
 };
 
 type Opcoes = {
@@ -70,6 +74,8 @@ export const test = base.extend<Telas & Opcoes>({
   tema: async ({ page }, use) => use(new TemaPage(page)),
   carrossel: async ({ page }, use) => use(new CarrosselPage(page)),
   configuracaoCarrossel: async ({ page }, use) => use(new ConfiguracaoCarrosselPage(page)),
+  meusCursos: async ({ page }, use) => use(new MeusCursosPage(page)),
+  configuracaoMeusCursos: async ({ page }, use) => use(new ConfiguracaoMeusCursosPage(page)),
 });
 
 export { expect };
