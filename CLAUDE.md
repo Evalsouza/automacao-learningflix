@@ -12,6 +12,15 @@ Decisão da QA (29/10/2026), para economizar tokens. O papel do Claude é **cria
 - Checagens locais rápidas, sem navegador, podem rodar sem perguntar: `npx tsc -p .`, `npx eslint <arquivos>`, `npx prettier --write <arquivos>` e `npx playwright test <arquivo> --project=desktop --no-deps --list`.
 - Mapear telas no QA (abrir o navegador para entender a tela) também só com o "ok" da QA.
 
+## Antes de automatizar um DT/EVT
+
+A QA liberou a leitura de todo o espaço Confluence LP1 (05/11/2026), com os documentos de requisito e de teste. A automação continua sendo feita a partir do DT/EVT enviado pela QA e do sistema como está hoje, mas antes de propor os testes:
+
+1. Ache o requisito no LP1 — nome da funcionalidade, chave do Jira, links do DT/EVT; CQL `space = "LP1" AND (title ~ "..." OR text ~ "...")`. Só leitura.
+2. Se houver versões (requisito revisado, DT/EVT e DT/EVTR, histórico da página), registre como era e como está; a referência é a atual, salvo decisão da QA.
+3. Mostre à QA a análise de cobertura: regras do requisito sem caso, casos fora do requisito e divergências requisito × DT/EVT × sistema. Só então a lista de testes.
+4. O requisito e a versão usados entram no `RASTREABILIDADE.md` do módulo, na seção "Requisito × DT/EVT".
+
 ## Rodadas diária e semanal
 
 - **Diária — seg a sex, 09:03** — Agendador de Tarefas do Windows roda `scripts\rodada-diaria.ps1 -Tipo diaria`: `npm run test:diaria` (só as suítes normais) e salva em `relatorios\AAAA-MM-DD\` (`resumo.txt`, `resultado.json`, `playwright-report\`, `execucao.log`, `status.json`).

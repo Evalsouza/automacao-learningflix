@@ -183,7 +183,9 @@ O script cria (ou atualiza) as duas tarefas, "Automacao LearningFlix - Rodada di
 - **Notebook suspenso ou hibernando:** a tarefa acorda o notebook, se ele estiver na tomada e com os temporizadores de ativação ligados (Opções de energia → Configurações avançadas → Suspender → Permitir temporizadores de ativação).
 - **Durante a rodada**, o notebook não suspende sozinho. Fechar a tampa ainda suspende e interrompe a rodada.
 - **Novas tentativas:** rodada interrompida é tentada de novo 1 h e 2 h depois — diária às 10:03 e 11:03, semanal às 13:00 e 14:00. Rodada que já terminou no dia não roda de novo.
-- **Para rodar na hora:** `Start-ScheduledTask -TaskName 'Automacao LearningFlix - Rodada diaria'` (ou `- Rodada semanal`). Para repetir uma rodada que já terminou no dia: `powershell -ExecutionPolicy Bypass -File scriptsodada-diaria.ps1 -Tipo diaria -Forcar`.
+- **Andamento da rodada:** `npm run rodada:andamento` — no terminal do VS Code, mostra a porcentagem executada, quantos passaram, falharam e foram pulados, o último teste e as falhas até agora, sem interferir na rodada.
+- **Para rodar na hora:** `Start-ScheduledTask -TaskName 'Automacao LearningFlix - Rodada diaria'` (ou `- Rodada semanal`). Para repetir uma rodada que já terminou no dia: `powershell -ExecutionPolicy Bypass -File scripts
+odada-diaria.ps1 -Tipo diaria -Forcar`.
 
 Ao terminar qualquer rodada pelo terminal, aparece o **Resultado da rodada**: os testes agrupados por módulo com ✅ Passou, ❌ Falhou, ⚠️ Instável ou ⏸ Pulado/Pendente e o tempo de cada um; o detalhe de cada falha — arquivo, passo, motivo e print —; e os totais. O mesmo resumo fica salvo em `test-results/resumo.txt`. No modo UI (`npm run test:ui`) o resumo não aparece: lá o resultado é mostrado na própria janela.
 

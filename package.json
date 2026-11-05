@@ -20,6 +20,7 @@
     "test:responsivo": "playwright test --project=desktop --grep @responsivo",
     "test:diaria": "playwright test --project=desktop",
     "test:semanal": "cross-env EXECUTAR_CADASTRO_REAL=sim EXECUTAR_CONFIG_VISITANTE=sim EXECUTAR_ENVIO_AJUDA=sim EXECUTAR_CONFIG_REDEFINICAO=sim EXECUTAR_CONFIG_RODAPE=sim EXECUTAR_CONFIG_CARROSSEL=sim playwright test --project=desktop --grep \"@altera-configuracao|@cria-usuario|@envia-email\"",
+    "rodada:andamento": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/andamento-rodada.ps1",
     "login:perfis": "cross-env LOGIN_NOVO=sim playwright test --project=setup",
     "report": "playwright show-report",
     "lint": "eslint .",
