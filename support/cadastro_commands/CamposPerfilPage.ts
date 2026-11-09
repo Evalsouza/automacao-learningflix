@@ -55,6 +55,16 @@ export class CamposPerfilPage extends PaginaBase {
     return atual;
   }
 
+  // "Mostrar na página de cadastro?" e "Este campo é obrigatório?" de um campo, sem salvar
+  async lerCadastro(campo: string): Promise<{ mostrarNoCadastro: string; obrigatorio: string }> {
+    await this.acessar();
+    await this.editarCampo(campo);
+    const texto = async (lista: Locator) => (await lista.locator('option:checked').innerText()).trim();
+    const lido = { mostrarNoCadastro: await texto(this.mostrarNaPaginaDeCadastro), obrigatorio: await texto(this.obrigatorio) };
+    await this.botaoCancelar.click();
+    return lido;
+  }
+
   // Altera só o que for informado e salva
   async configurar(campo: string, configuracao: ConfiguracaoCampo) {
     await this.acessar();

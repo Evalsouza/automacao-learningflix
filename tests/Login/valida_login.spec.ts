@@ -1,6 +1,7 @@
 // DT/EVT - Página de Login — rastreabilidade em RASTREABILIDADE.md
 import { test, expect } from '../../support/e2e';
-import { semSessao } from '../../support/sessoes';
+import { semSessao, sessoes, comSessao } from '../../support/sessoes';
+import { ConfiguracaoLoginPage } from '../../support/login_commands/ConfiguracaoLoginPage';
 import { usuarios } from '../../support/usuarios';
 import { mensagens, paginas } from '../../fixtures/login';
 import { Factories } from '../../Factories';
@@ -26,6 +27,16 @@ test.describe('Acesso como Administrador', { tag: '@dt-pagina-de-login' }, () =>
     await test.step('Então fui redirecionada para a página inicial', async () => {
       await expect(page).not.toHaveURL(/\/login\//);
       await expect(menu.botaoMenu).toBeVisible();
+    });
+  });
+
+  test('C02.1 - Sair pelo perfil no menu lateral volta para a página de login', async ({ page, login, menu }) => {
+    await test.step('Quando entrei como Administrador', () => login.entrar(administrador));
+    await test.step('E fui redirecionada para a página inicial', () => expect(menu.botaoMenu).toBeVisible());
+    await test.step('E cliquei no perfil do menu lateral e em "Sair"', () => menu.sair());
+    await test.step('Então voltei para a página de login', async () => {
+      await expect(page).toHaveURL(/\/login\/index\.php/);
+      await expect(login.titulo).toBeVisible();
     });
   });
 
@@ -93,5 +104,49 @@ test.describe('Acesso por papel', { tag: '@dt-pagina-de-login' }, () => {
         await expect(menu.nomeUsuario).toContainText(usuario.nome);
       });
     });
+
+    test(`${id}.1 - Sair pelo perfil no menu lateral com o papel ${papel}`, async ({ page, login, menu }) => {
+      await test.step(`Quando entrei com o usuário ${papel}`, () => login.entrar(usuario));
+      await test.step('E fui redirecionada para a página inicial', () => expect(menu.botaoMenu).toBeVisible());
+      await test.step('E cliquei no perfil do menu lateral e em "Sair"', () => menu.sair());
+      await test.step('Então voltei para a página de login', async () => {
+        await expect(page).toHaveURL(/\/login\/index\.php/);
+        await expect(login.titulo).toBeVisible();
+      });
+    });
   }
+});
+
+test.describe('Elementos da página de login', { tag: '@dt-pagina-de-login' }, () => {
+  test('LG01 - Elementos exibidos conforme as configurações ativas na plataforma', async ({ browser, login }) => {
+    const config = await test.step('Dado que li as configurações do login como Administrador (só leitura)', () =>
+      comSessao(browser, sessoes.administrador, (page) => new ConfiguracaoLoginPage(page).ler()));
+    const exibido = (ativo: boolean) => (ativo ? 'exibido' : 'NÃO exibido');
+
+    await test.step('Então CPF, Senha e "Acessar" foram exibidos', async () => {
+      await expect(login.campoUsuario).toBeVisible();
+      await expect(login.campoSenha).toBeVisible();
+      await expect(login.botaoAcessar).toBeVisible();
+    });
+
+    const autoCadastro = config.autoCadastro !== '';
+    await test.step(`E "Criar uma conta" foi ${exibido(autoCadastro)} (Auto-cadastro: "${config.autoCadastro || 'Desativar'}")`, () =>
+      expect(login.linkCriarConta).toBeVisible({ visible: autoCadastro }));
+
+    const visitante = config.botaoVisitante === 'Mostrar';
+    await test.step(`E "Acessar como visitante" foi ${exibido(visitante)} (Botão de entrada como visitante: "${config.botaoVisitante}")`, () =>
+      expect(login.botaoVisitante).toBeVisible({ visible: visitante }));
+
+    // "Lembrar nome de usuário": o "Lembrar-me" só aparece em "Opcional" (2); em "Sim" o usuário é lembrado sem perguntar
+    const lembrar = config.lembrarUsuario === '2';
+    await test.step(`E "Lembrar-me" foi ${exibido(lembrar)} (Lembrar nome de usuário: ${config.lembrarUsuario})`, () =>
+      expect(login.checkLembrarMe).toBeVisible({ visible: lembrar }));
+
+    await test.step('E "Esqueci a senha" foi exibido, apontando para a URL configurada ou para a página da plataforma', async () => {
+      await expect(login.linkEsqueciSenha).toBeVisible();
+      // URL vazia: a plataforma usa a própria página "Perdeu a senha?"
+      const destino = config.urlEsqueciSenha || '/login/forgot_password.php';
+      expect(await login.linkEsqueciSenha.getAttribute('href')).toContain(destino);
+    });
+  });
 });

@@ -36,10 +36,30 @@ O documento não numera os casos; C01 a C14 seguem a ordem em que aparecem.
 
 | Teste | Motivo |
 |---|---|
+| C02.1 - Sair pelo perfil no menu lateral volta para a página de login | Pedido da QA (09/11) |
 | C03.1 - Sem "Lembrar-me", o usuário NÃO fica salvo após Sair | Pedido da QA: o documento só valida o "Lembrar-me" marcado |
 | P01 - Login válido com o papel Cliente | O documento cobre só o Administrador |
+| P01.1 - Sair pelo perfil no menu lateral com o papel Cliente | Pedido da QA (09/11) |
 | P02 - Login válido com o papel Estudante | O documento cobre só o Administrador |
+| P02.1 - Sair pelo perfil no menu lateral com o papel Estudante | Pedido da QA (09/11) |
+| LG01 - Elementos exibidos conforme as configurações ativas na plataforma | Pedido da QA (09/11): campos da página de login conforme o que está ativo |
 | Login - Celular / Celular rotacionado / Tablet / Monitor — `validacao_responsividade_login.spec.ts` | Responsividade é padrão da equipe; o documento não pede |
+
+**LG01 — o que é comparado** (configurações lidas como Administrador, só leitura)
+
+| Elemento da página de login | Exibido quando |
+|---|---|
+| "CPF", "Senha" e "Acessar" | Sempre |
+| "Criar uma conta" | "Auto-cadastro" (`registerauth`) diferente de "Desativar" — Gerenciar autenticação |
+| "Acessar como visitante" | "Botão de entrada como visitante" (`guestloginbutton`) = "Mostrar" — Gerenciar autenticação |
+| "Lembrar-me" | "Lembrar nome de usuário" (`rememberusername`) = "Opcional"; em "Sim" o nome é lembrado sem perguntar |
+| "Esqueci a senha" | Sempre; aponta para a "URL para 'Esqueci minha senha'" (`forgottenpasswordurl`) ou, vazia, para a página da plataforma |
+
+**Decisões tomadas com a QA (09/11)**
+
+- Ordem dos módulos: Login → Cadastro → Redefinição de Senha.
+- "Sair" pelo perfil no menu lateral (avatar no fim do menu) volta para a página de login — Administrador, Adm Cliente e Estudante.
+- Em 09/11 o "Botão de entrada como visitante" estava "Ocultar" (o esperado é "Mostrar"): provavelmente não foi restaurado depois da rodada semanal. O LG01 segue a configuração do momento.
 
 **Divergências entre documento e sistema**
 

@@ -6,9 +6,6 @@ import { sessoes, semSessao, comSessao } from '../../support/sessoes';
 import { PerdeuSenhaPage } from '../../support/redefinicaosenha_commands/PerdeuSenhaPage';
 import type { Browser, Page } from '@playwright/test';
 import { CamposPerfilPage, ConfiguracaoCampo } from '../../support/cadastro_commands/CamposPerfilPage';
-import { CriarContaPage } from '../../support/cadastro_commands/CriarContaPage';
-import { MinhaPaginaPage } from '../../support/cadastro_commands/MinhaPaginaPage';
-import { GerenciarUsuariosPage } from '../../support/cadastro_commands/GerenciarUsuariosPage';
 import { ConfiguracaoRedefinicaoPage } from '../../support/redefinicaosenha_commands/ConfiguracaoRedefinicaoPage';
 import { lerDadosDoUsuario } from '../../support/redefinicaosenha_commands/dadosDoUsuario';
 import { usuariosRedefinicao } from '../../support/usuarios';
@@ -22,7 +19,6 @@ import {
   configuracaoPrimario,
   cargoEm22Out,
 } from '../../fixtures/redefinicaosenha';
-import { pais } from '../../fixtures/cadastro';
 import { Factories } from '../../Factories';
 
 const executar = process.env.EXECUTAR_CONFIG_REDEFINICAO === 'sim';
@@ -33,10 +29,6 @@ const configuracaoInicial: Record<string, Required<ConfiguracaoCampo>> = {};
 let redefinicaoInicial = { primario: '', secundario: '' };
 
 const comoAdministrador = <T>(browser: Browser, acao: (pagina: Page) => Promise<T>) => comSessao(browser, sessoes.administrador, acao);
-
-// A Estudante vê o próprio perfil; os demais perfis abrem o perfil da Eva pelo id
-const cargoVisivel = (browser: Browser, sessao: string, idDaEva: string) =>
-  comSessao(browser, sessao, (pagina) => new MinhaPaginaPage(pagina).cargoVisivel(sessao === sessoes.estudante ? undefined : idDaEva));
 
 // Sem `serial`: com 1 worker os testes já rodam em ordem, e uma falha não pula o resto. Depois de uma falha
 // o Playwright roda o afterAll (restaura) e o beforeAll lê de novo a configuração — já restaurada
@@ -77,60 +69,7 @@ test.describe(
       });
     });
 
-    test('RC01 - Com "Este campo é obrigatório?" = "Sim", o "Cargo" é obrigatório na "Nova conta"', async ({ browser, camposPerfil }) => {
-      await test.step('Quando alterei "Este campo é obrigatório?" do "Cargo" para "Sim"', () =>
-        camposPerfil.configurar('Cargo', { obrigatorio: 'Sim' }));
-      await test.step('Então o campo "Cargo" foi marcado como obrigatório na "Nova conta"', () =>
-        comSessao(browser, semSessao, async (pagina) => {
-          const criarConta = new CriarContaPage(pagina);
-          await criarConta.acessarPeloLogin();
-          await criarConta.verificarIdadeELocalizacao(Factories.cadastro.idadeAdulta(), pais);
-          await expect(criarConta.campoCargo.getByTitle('Obrigatório', { exact: true }).first()).toBeVisible();
-        }));
-    });
-
-    test('RC02 - Com "Este campo é obrigatório?" = "Não", o "Cargo" NÃO é obrigatório na "Nova conta"', async ({
-      browser,
-      camposPerfil,
-    }) => {
-      await test.step('Quando alterei "Este campo é obrigatório?" do "Cargo" para "Não"', () =>
-        camposPerfil.configurar('Cargo', { obrigatorio: 'Não' }));
-      await test.step('Então o campo "Cargo" NÃO foi marcado como obrigatório na "Nova conta"', () =>
-        comSessao(browser, semSessao, async (pagina) => {
-          const criarConta = new CriarContaPage(pagina);
-          await criarConta.acessarPeloLogin();
-          await criarConta.verificarIdadeELocalizacao(Factories.cadastro.idadeAdulta(), pais);
-          await expect(criarConta.campoCargo.getByTitle('Obrigatório', { exact: true })).toHaveCount(0);
-        }));
-    });
-
-    // Quem vê o "Cargo" no perfil da Estudante, conforme a ajuda de "Quem pode ver este campo?".
-    // O Adm Cliente só é verificado em "Visível para todos": nas demais opções depende de ele ser "gerente"
-    const quemVe = [
-      { id: 'RC03', visibilidade: visibilidades.naoVisivel, estudante: false, cliente: undefined },
-      { id: 'RC04', visibilidade: visibilidades.usuario, estudante: true, cliente: undefined },
-      { id: 'RC05', visibilidade: visibilidades.usuarioProfessoresAdmins, estudante: true, cliente: undefined },
-      { id: 'RC06', visibilidade: visibilidades.todos, estudante: true, cliente: true },
-    ];
-    for (const { id, visibilidade, estudante, cliente } of quemVe) {
-      test(`${id} - "Quem pode ver este campo?" = "${visibilidade}": quem vê o "Cargo" no perfil`, async ({ browser, camposPerfil }) => {
-        const idDaEva = await comoAdministrador(browser, async (pagina) => {
-          const gerenciar = new GerenciarUsuariosPage(pagina);
-          await gerenciar.acessarPelaAdministracao();
-          await gerenciar.pesquisar(evaSouza.nome);
-          return gerenciar.idDoUsuario(evaSouza.nome);
-        });
-        await test.step(`Quando alterei "Quem pode ver este campo?" do "Cargo" para "${visibilidade}"`, () =>
-          camposPerfil.configurar('Cargo', { visibilidade }));
-        await test.step(`Então a Estudante ${estudante ? '' : 'NÃO '}viu o "Cargo" na própria "Minha página"`, async () =>
-          expect(await cargoVisivel(browser, sessoes.estudante, idDaEva)).toBe(estudante));
-        await test.step('E o Administrador viu o "Cargo" no perfil da Estudante', async () =>
-          expect(await cargoVisivel(browser, sessoes.administrador, idDaEva)).toBe(true));
-        if (cliente !== undefined)
-          await test.step('E o Adm Cliente viu o "Cargo" no perfil da Estudante', async () =>
-            expect(await cargoVisivel(browser, sessoes.cliente, idDaEva)).toBe(cliente));
-      });
-    }
+    // RC01 a RC06 foram para a suíte de configuração do Cadastro — decisão da QA (09/11)
 
     // Matriz: Obrigatório × visibilidade para cada campo → aparece ou não no "Campo secundário"
     let numero = 7;
@@ -242,10 +181,15 @@ test.describe(
           expect(await camposPerfil.lerConfiguracao(campo)).toEqual(configuracaoPrimario));
       });
 
-      test(`${id(1)} - "${campo}" exibido para seleção no "Campo primário"`, async ({ configuracaoRedefinicao: config }) => {
+      // Obrigatório "Sim" e visível ao usuário também valem para o "Campo secundário" (regra do RC07 a RC38) — pergunta da QA (09/11)
+      test(`${id(1)} - "${campo}" exibido para seleção no "Campo primário" e no "Campo secundário"`, async ({
+        configuracaoRedefinicao: config,
+      }) => {
         await test.step('Quando acessei "Configurações - Redefinição de senha personalizada"', () => config.acessar());
         await test.step(`Então a opção "${campo}" foi exibida no "Campo primário"`, async () =>
           expect(await config.opcoes(config.campoPrimario)).toContain(campo));
+        await test.step(`E a opção "${campo}" também foi exibida no "Campo secundário"`, async () =>
+          expect(await config.opcoes(config.campoSecundario)).toContain(campo));
       });
 
       test(`${id(2)} - Com "A informação deve ser única?" = "Não", "${campo}" NÃO aparece no "Campo primário"`, async ({
@@ -254,6 +198,22 @@ test.describe(
       }) => {
         await test.step(`Quando alterei "A informação deve ser única?" de "${campo}" para "Não"`, () =>
           camposPerfil.configurar(campo, { unica: 'Não' }));
+        await test.step(`Então a opção "${campo}" NÃO foi exibida no "Campo primário"`, async () => {
+          await config.acessar();
+          expect(await config.opcoes(config.campoPrimario)).not.toContain(campo);
+        });
+      });
+    }
+
+    // "Campo primário" exige Obrigatório = "Sim": com Única "Sim" e Obrigatório "Não" o campo NÃO aparece — pedido da QA (09/11)
+    for (const { campo } of camposPrimarios) {
+      const id = `RC${String(numero++).padStart(2, '0')}`;
+      test(`${id} - Com "A informação deve ser única?" = "Sim" e "Este campo é obrigatório?" = "Não", "${campo}" NÃO aparece no "Campo primário"`, async ({
+        camposPerfil,
+        configuracaoRedefinicao: config,
+      }) => {
+        await test.step(`Quando configurei "${campo}" com Única "Sim", Obrigatório "Não" e "${configuracaoPrimario.visibilidade}"`, () =>
+          camposPerfil.configurar(campo, { ...configuracaoPrimario, obrigatorio: 'Não' }));
         await test.step(`Então a opção "${campo}" NÃO foi exibida no "Campo primário"`, async () => {
           await config.acessar();
           expect(await config.opcoes(config.campoPrimario)).not.toContain(campo);

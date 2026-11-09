@@ -19,6 +19,7 @@ import { CarrosselPage } from './carrossel_commands/CarrosselPage';
 import { ConfiguracaoCarrosselPage } from './carrossel_commands/ConfiguracaoCarrosselPage';
 import { MeusCursosPage } from './meuscursos_commands/MeusCursosPage';
 import { ConfiguracaoMeusCursosPage } from './meuscursos_commands/ConfiguracaoMeusCursosPage';
+import { ConfiguracaoPrivacidadePage } from './cadastro_commands/ConfiguracaoPrivacidadePage';
 import { bloquearVideos } from './sessoes';
 
 type Telas = {
@@ -42,6 +43,7 @@ type Telas = {
   configuracaoCarrossel: ConfiguracaoCarrosselPage;
   meusCursos: MeusCursosPage;
   configuracaoMeusCursos: ConfiguracaoMeusCursosPage;
+  configuracaoPrivacidade: ConfiguracaoPrivacidadePage;
 };
 
 type Opcoes = {
@@ -76,6 +78,7 @@ export const test = base.extend<Telas & Opcoes>({
   configuracaoCarrossel: async ({ page }, use) => use(new ConfiguracaoCarrosselPage(page)),
   meusCursos: async ({ page }, use) => use(new MeusCursosPage(page)),
   configuracaoMeusCursos: async ({ page }, use) => use(new ConfiguracaoMeusCursosPage(page)),
+  configuracaoPrivacidade: async ({ page }, use) => use(new ConfiguracaoPrivacidadePage(page)),
 });
 
 export { expect };

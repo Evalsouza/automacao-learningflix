@@ -71,9 +71,13 @@ export class PerdeuSenhaPage extends PaginaBase {
     await bloco.locator('input:visible').first().fill(valor);
   }
 
-  async redefinir(primario: string, secundario: string) {
+  async preencherCampos(primario: string, secundario: string) {
     if (primario) await this.preencher(this.blocoPrimario, primario);
     if (secundario) await this.preencher(this.blocoSecundario, secundario);
+  }
+
+  async redefinir(primario: string, secundario: string) {
+    await this.preencherCampos(primario, secundario);
     await this.botaoEnviar.click();
   }
 

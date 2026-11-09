@@ -12,7 +12,7 @@ Arquivos: `valida_*.spec.ts` para as validações funcionais e `validacao_respon
 | Script | O que roda |
 |---|---|
 | `npm run test:redefinicao-senha` | Todo o módulo, menos a suíte de configuração |
-| `npm run test:redefinicao-config` | Só a suíte de configuração (`EXECUTAR_CONFIG_REDEFINICAO=sim`) |
+| `npm run test:redefinicao-config` | Só a suíte de configuração (`EXECUTAR_CONFIG_REDEFINICAO=sim`) — também roda na rodada semanal |
 
 ---
 
@@ -29,6 +29,8 @@ https://epicbrasil.atlassian.net/wiki/spaces/LP1/pages/4039606273
 | Configuração do "Telefone" | RP09 - "Telefone" configurado como obrigatório, único e visível para o usuário |
 | "Telefone" no "Campo primário" | RP10 - "Telefone" exibido para seleção no "Campo primário" |
 | Página "Perdeu a senha?" | RP03 - "Perdeu a senha?" exibe "CPF" e "Data de Nascimento" |
+| Obrigatórios e "Cancelar" — logo depois de abrir a página (ordem da QA, 09/11) | OBR01, OBR02, CAN01 e CAN01.1 — ver "Não cobertos pelo documento" |
+| Campos exibidos conforme a configuração | RP11 - "Perdeu a senha?" exibe só os campos configurados: o "Campo primário" e o "Campo secundário" lidos como Administrador, com os rótulos do campo de perfil, sem os campos da redefinição padrão, mais "Enviar" e "Cancelar". Com a personalizada desativada, a página padrão é coberta pelo RS01 |
 | Dados corretos | RP04 - "eva.souza" e RP05 - "qa.aluno5" com a data de nascimento do cadastro são redirecionados para "Redefinir senha" |
 | Data errada | RP06 - "qa.anya" com a data de nascimento errada NÃO altera a senha |
 | Identificação errada | RP07 - Identificação errada com a data de nascimento correta de "qa.aluno21" NÃO altera a senha |
@@ -37,12 +39,12 @@ https://epicbrasil.atlassian.net/wiki/spaces/LP1/pages/4039606273
 
 | Condição | Testes |
 |---|---|
-| "Este campo é obrigatório?" Sim / Não | RC01 e RC02 — marca de obrigatório do "Cargo" na "Nova conta" |
-| "Quem pode ver este campo?" — as 4 opções | RC03 a RC06 — quem vê o "Cargo" no perfil (estudante, administrador; cliente em "Visível para todos") |
+| ~~RC01 a RC06~~ | Movidos para a suíte de configuração do Cadastro — decisão da QA (09/11) |
 | "Campo secundário" — Obrigatório × visibilidade | RC07 a RC38 — Cargo, Unidade, Regional e Setor, 8 combinações cada |
 | Redefinição com o campo no "Campo secundário" | RC39 a RC51 — página exibe "CPF" + campo; valor do cadastro leva a "Redefinir senha"; valor errado exibe a mensagem; para o Cargo (RC42), "qa.aluno102" sem cargo também |
 | Sem dado cadastrado | RP08 - "qa.aluno102" sem "Cidade de Nascimento" cadastrada NÃO altera a senha — com "Cidade de Nascimento" no "Campo secundário" |
-| "Campo primário" — "A informação deve ser única?" | RC52 a RC60 — Telefone, Cargo e Cidade de Nascimento: configurado Sim/Sim/visível ao usuário → aparece no "Campo primário" → com "Única" = Não, some |
+| "Campo primário" — "A informação deve ser única?" | RC52 a RC60 — Telefone, Cargo e Cidade de Nascimento: configurado Sim/Sim/visível ao usuário → aparece no "Campo primário" **e também no "Campo secundário"** (RC53, RC56, RC59 — pergunta da QA, 09/11) → com "Única" = Não, some do primário |
+| "Campo primário" — "Este campo é obrigatório?" | RC61 a RC63 — Telefone, Cargo e Cidade de Nascimento com "Única" = Sim e Obrigatório = **Não** NÃO aparecem no "Campo primário" — pedido da QA (09/11) |
 
 Ao final a suíte restaura: campo primário e secundário iniciais, a configuração inicial dos campos alterados e o "Cargo" com os valores de 22/10 (Obrigatório "Não", Única "Não", "Visível para todos").
 
@@ -52,6 +54,8 @@ Ao final a suíte restaura: campo primário e secundário iniciais, a configura�
 |---|---|
 | OBR01 e OBR02 - "CPF" e "Data de Nascimento" obrigatórios em "Perdeu a senha?" | Padrão da equipe: validar campos obrigatórios |
 | CAN01 - "Cancelar" em "Perdeu a senha?" volta para a página de login | Padrão da equipe: validar "Cancelar" |
+| CAN01.1 - "Cancelar" com "CPF" e "Data de Nascimento" preenchidos volta para a página de login | Pedido da QA (09/11) |
+| RP11 - "Perdeu a senha?" exibe só os campos configurados na redefinição personalizada | Pedido da QA (09/11) |
 | Redefinição personalizada - Celular / Celular rotacionado / Tablet / Monitor — `validacao_responsividade_redefinicao_senha_personalizada.spec.ts` | Responsividade é padrão da equipe |
 
 **Decisões tomadas com a QA**

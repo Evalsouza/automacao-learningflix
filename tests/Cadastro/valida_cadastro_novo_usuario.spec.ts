@@ -7,6 +7,7 @@ import { sessoes, semSessao, comSessao } from '../../support/sessoes';
 import { CriarContaPage } from '../../support/cadastro_commands/CriarContaPage';
 import { ListaUsuariosAdminPage } from '../../support/cadastro_commands/ListaUsuariosAdminPage';
 import { GerenciarUsuariosPage } from '../../support/cadastro_commands/GerenciarUsuariosPage';
+import { GerenciadorHierarquiaPage } from '../../support/cadastro_commands/GerenciadorHierarquiaPage';
 import { novoCadastro, novoCadastroComCargo } from '../../support/usuarios';
 import { cargos, pais } from '../../fixtures/cadastro';
 import { Factories } from '../../Factories';
@@ -59,6 +60,14 @@ test.describe('CENÁRIO 1: Cadastro de usuário com Cargo "Comum" — cadastro r
         login,
         minhaPagina,
       }) => {
+        // Cargo comum, sem ser gestor — decisão da QA (09/11)
+        if (cargo)
+          await test.step(`Dado que "${cargo}" está com "Cargo Gestor" = "Não" no "Gerenciador de Hierarquia"`, () =>
+            comSessao(browser, sessoes.administrador, async (pagina) => {
+              const hierarquia = new GerenciadorHierarquiaPage(pagina);
+              await hierarquia.acessarCargos();
+              expect(await hierarquia.cargosGestores(), 'cargos de gestão').not.toContain(cargo);
+            }));
         await test.step(`Quando realizei o cadastro do usuário "${usuario.identificacao}" ${cargo ? `com o "Cargo" ${cargoEsperado}` : 'sem preencher o campo "Cargo"'}`, () =>
           comSessao(browser, semSessao, async (pagina) => {
             const criarConta = new CriarContaPage(pagina);

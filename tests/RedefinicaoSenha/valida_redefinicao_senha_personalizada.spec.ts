@@ -2,7 +2,8 @@
 // Nenhum teste salva senha nova: os positivos param na página "Redefinir senha".
 // RP08 — usuário sem o dado cadastrado — fica na suíte de configuração, com "Cidade de Nascimento" no "Campo secundário"
 import { test, expect } from '../../support/e2e';
-import { sessoes, semSessao } from '../../support/sessoes';
+import { sessoes, semSessao, comSessao } from '../../support/sessoes';
+import { ConfiguracaoRedefinicaoPage } from '../../support/redefinicaosenha_commands/ConfiguracaoRedefinicaoPage';
 import { usuariosRedefinicao } from '../../support/usuarios';
 import { lerDadosDoUsuario } from '../../support/redefinicaosenha_commands/dadosDoUsuario';
 import { mensagens, paginas, configuracaoAtual, configuracaoPrimario } from '../../fixtures/redefinicaosenha';
@@ -57,6 +58,78 @@ test.describe('CENÁRIO 2: Redefinição da senha pelo usuário', { tag: '@dt-re
     });
   });
 
+  // Ordem da QA (09/11): os obrigatórios e o "Cancelar" logo depois de abrir a página
+  for (const { id, bloco } of [
+    { id: 'OBR01', bloco: 'primario' as const },
+    { id: 'OBR02', bloco: 'secundario' as const },
+  ]) {
+    const nome = bloco === 'primario' ? configuracaoAtual.primario : configuracaoAtual.secundario;
+    test(`${id} - "${nome}" é obrigatório em "Perdeu a senha?"`, async ({ perdeuSenha }) => {
+      const campo = bloco === 'primario' ? perdeuSenha.blocoPrimario : perdeuSenha.blocoSecundario;
+      await test.step(`Quando acessei a página "${paginas.perdeuSenha}"`, () => perdeuSenha.acessar());
+      await test.step(`Então o campo "${nome}" foi marcado como obrigatório`, () =>
+        expect(perdeuSenha.marcaObrigatorio(campo)).toBeVisible());
+      await test.step('Quando cliquei em "Enviar" sem preencher os campos', () => perdeuSenha.botaoEnviar.click());
+      await test.step(`Então a mensagem "${mensagens.campoObrigatorio}" foi exibida`, () =>
+        expect(perdeuSenha.mensagemDoCampo(campo)).toHaveText(mensagens.campoObrigatorio));
+    });
+  }
+
+  test('CAN01 - "Cancelar" em "Perdeu a senha?" volta para a página de login', async ({ page, perdeuSenha }) => {
+    await test.step(`Quando acessei a página "${paginas.perdeuSenha}" e cliquei em "Cancelar"`, async () => {
+      await perdeuSenha.acessar();
+      await perdeuSenha.botaoCancelar.click();
+    });
+    await test.step('Então voltei para a página de login', () => expect(page).toHaveURL(/\/login\/index\.php/));
+  });
+
+  test(`CAN01.1 - "Cancelar" com "${configuracaoAtual.primario}" e "${configuracaoAtual.secundario}" preenchidos volta para a página de login`, async ({
+    browser,
+    page,
+    perdeuSenha,
+  }) => {
+    const dados = await test.step('Dado que consultei a data de nascimento no cadastro do usuário', () =>
+      lerDadosDoUsuario(browser, evaSouza.nome));
+    await test.step(`Quando preenchi "${configuracaoAtual.primario}" e "${configuracaoAtual.secundario}"`, async () => {
+      await perdeuSenha.acessar();
+      await perdeuSenha.preencherCampos(evaSouza.identificacao, dados.dtanasc);
+    });
+    await test.step('E cliquei em "Cancelar"', () => perdeuSenha.botaoCancelar.click());
+    await test.step('Então voltei para a página de login, sem ir para "Redefinir senha"', async () => {
+      await expect(page).toHaveURL(/\/login\/index\.php/);
+      await expect(perdeuSenha.campoNovaSenha).toHaveCount(0);
+    });
+  });
+
+  // Só leitura: a configuração é lida como Administrador e comparada com a tela — pedido da QA (09/11)
+  test('RP11 - "Perdeu a senha?" exibe só os campos configurados na redefinição personalizada', async ({ browser, perdeuSenha }) => {
+    const config = await test.step('Dado que li o "Campo primário" e o "Campo secundário" em "Redefinição de senha personalizada"', () =>
+      comSessao(browser, sessoes.administrador, async (pagina) => {
+        const configuracao = new ConfiguracaoRedefinicaoPage(pagina);
+        await configuracao.acessar();
+        return {
+          ativa: await configuracao.ativar.isChecked(),
+          primario: (await configuracao.selecionado(configuracao.campoPrimario).innerText()).trim(),
+          secundario: (await configuracao.selecionado(configuracao.campoSecundario).innerText()).trim(),
+        };
+      }));
+    await test.step('E a redefinição personalizada estava ativa — desativada, a página padrão é coberta pelo RS01', () =>
+      expect(config.ativa).toBe(true));
+    await test.step(`Quando acessei a página "${paginas.perdeuSenha}"`, () => perdeuSenha.acessar());
+    await test.step(`Então foram exibidos "${config.primario}" no primeiro campo e "${config.secundario}" no segundo`, async () => {
+      await expect(perdeuSenha.rotuloDoCampo(perdeuSenha.blocoPrimario)).toHaveText(config.primario);
+      await expect(perdeuSenha.rotuloDoCampo(perdeuSenha.blocoSecundario)).toHaveText(config.secundario);
+    });
+    await test.step('E os campos da redefinição padrão (nome de usuário e e-mail) NÃO foram exibidos', async () => {
+      await expect(perdeuSenha.campoNomeDeUsuarioPadrao).toBeHidden();
+      await expect(perdeuSenha.campoEmailPadrao).toBeHidden();
+    });
+    await test.step('E os botões "Enviar" e "Cancelar" foram exibidos', async () => {
+      await expect(perdeuSenha.botaoEnviar).toBeVisible();
+      await expect(perdeuSenha.botaoCancelar).toBeVisible();
+    });
+  });
+
   const corretos = [
     { id: 'RP04', usuario: evaSouza },
     { id: 'RP05', usuario: meridaValente },
@@ -106,31 +179,5 @@ test.describe('CENÁRIO 2: Redefinição da senha pelo usuário', { tag: '@dt-re
       await expect(perdeuSenha.mensagemErro).toBeVisible();
       await expect(perdeuSenha.campoNovaSenha).toHaveCount(0);
     });
-  });
-});
-
-test.describe('Campos obrigatórios e "Cancelar"', { tag: '@dt-redefinicao-personalizada' }, () => {
-  test.use({ storageState: semSessao });
-
-  test.beforeEach(({ perdeuSenha }) => perdeuSenha.acessar());
-
-  for (const { id, bloco } of [
-    { id: 'OBR01', bloco: 'primario' as const },
-    { id: 'OBR02', bloco: 'secundario' as const },
-  ]) {
-    const nome = bloco === 'primario' ? configuracaoAtual.primario : configuracaoAtual.secundario;
-    test(`${id} - "${nome}" é obrigatório em "Perdeu a senha?"`, async ({ perdeuSenha }) => {
-      const campo = bloco === 'primario' ? perdeuSenha.blocoPrimario : perdeuSenha.blocoSecundario;
-      await test.step(`Então o campo "${nome}" foi marcado como obrigatório`, () =>
-        expect(perdeuSenha.marcaObrigatorio(campo)).toBeVisible());
-      await test.step('Quando cliquei em "Enviar" sem preencher os campos', () => perdeuSenha.botaoEnviar.click());
-      await test.step(`Então a mensagem "${mensagens.campoObrigatorio}" foi exibida`, () =>
-        expect(perdeuSenha.mensagemDoCampo(campo)).toHaveText(mensagens.campoObrigatorio));
-    });
-  }
-
-  test('CAN01 - "Cancelar" em "Perdeu a senha?" volta para a página de login', async ({ page, perdeuSenha }) => {
-    await test.step('Quando cliquei em "Cancelar"', () => perdeuSenha.botaoCancelar.click());
-    await test.step('Então voltei para a página de login', () => expect(page).toHaveURL(/\/login\/index\.php/));
   });
 });

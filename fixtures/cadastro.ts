@@ -10,6 +10,26 @@ export const cargos = {
 
 export const pais = 'Brasil';
 
+// Países que seguem para a "Nova conta" na "Verificação de idade e localização" — rótulos da tela
+export const paisesDaVerificacao = [
+  { id: 'C003.1', pais: 'Brasil' },
+  { id: 'C003.2', pais: 'Argentina' },
+  { id: 'C003.3', pais: 'Estados Unidos da América' },
+];
+
+// Campos padrão da "Nova conta" — sempre exibidos, sem depender dos campos de perfil
+export const camposPadraoNovaConta = [
+  { campo: 'CPF', bloco: 'fitem_id_username' },
+  { campo: 'Senha', bloco: 'fitem_password' },
+  { campo: 'Confirme a senha', bloco: 'fitem_passwordconfirm' },
+  { campo: 'Endereço de e-mail', bloco: 'fitem_id_email' },
+  { campo: 'Confirmar endereço de e-mail', bloco: 'fitem_id_email2' },
+  { campo: 'Nome', bloco: 'fitem_id_firstname' },
+  { campo: 'Sobrenome', bloco: 'fitem_id_lastname' },
+  { campo: 'Cidade/Município', bloco: 'fitem_id_city' },
+  { campo: 'País', bloco: 'fitem_id_country' },
+];
+
 // Verificação de idade — a QA confirmou: 10 e 15 anos são bloqueados na página "Menor digital"; 17 anos segue para a "Nova conta"
 export const menorDigital = { titulo: 'Menor digital', mensagem: 'Você é muito jovem para criar uma conta neste site.' };
 export const verificacoesDeIdade = [

@@ -10,6 +10,8 @@ export class LoginPage extends PaginaBase {
   readonly botaoAcessar: Locator;
   readonly checkLembrarMe: Locator;
   readonly linkEsqueciSenha: Locator;
+  readonly linkCriarConta: Locator;
+  readonly botaoVisitante: Locator;
   readonly iconeOlho: Locator;
   readonly iconeOlhoExibir: Locator;
   readonly iconeOlhoEsconder: Locator;
@@ -23,6 +25,8 @@ export class LoginPage extends PaginaBase {
     this.botaoAcessar = page.getByRole('button', { name: 'Acessar', exact: true });
     this.checkLembrarMe = page.getByRole('checkbox', { name: 'Lembrar-me' });
     this.linkEsqueciSenha = page.getByRole('link', { name: 'Esqueci a senha' });
+    this.linkCriarConta = page.getByRole('link', { name: 'Criar uma conta' });
+    this.botaoVisitante = page.getByRole('button', { name: 'Acessar como visitante' });
     this.iconeOlhoExibir = page.getByRole('button', { name: 'Exibir a senha', exact: true });
     this.iconeOlhoEsconder = page.getByRole('button', { name: 'Esconder a senha', exact: true });
     this.iconeOlho = this.iconeOlhoExibir.or(this.iconeOlhoEsconder);

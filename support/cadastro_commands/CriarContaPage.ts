@@ -64,6 +64,21 @@ export class CriarContaPage extends PaginaBase {
     await this.aguardarCarregar();
   }
 
+  // Volta para a página de login e clica em "Criar uma conta" sem esperar uma página específica:
+  // a plataforma pode abrir a "Verificação", a "Nova conta" ou continuar na "Menor digital"
+  async clicarCriarContaNoLogin() {
+    await this.abrir('/login/index.php');
+    await this.linkCriarConta.click();
+    await this.tituloVerificacao.or(this.tituloNovaConta).or(this.mensagemMenorDigital).first().waitFor();
+    await this.aguardarCarregar();
+  }
+
+  // Passa pela "Verificação de idade e localização" só se ela for exibida — depende da configuração de privacidade
+  async avancarParaNovaConta(idade: string, pais: string) {
+    if (await this.tituloVerificacao.isVisible()) await this.verificarIdadeELocalizacao(idade, pais);
+    await this.tituloNovaConta.waitFor();
+  }
+
   async verificarIdadeELocalizacao(idade: string, pais: string) {
     await this.campoIdade.fill(idade);
     await this.campoPaisVerificacao.selectOption({ label: pais });
@@ -86,6 +101,23 @@ export class CriarContaPage extends PaginaBase {
 
   mensagemDoCampo(bloco: string): Locator {
     return this.page.locator(`#${bloco} .form-control-feedback`).first();
+  }
+
+  // Campos de perfil exibidos na "Nova conta": rótulo e se têm a marca de obrigatório
+  async camposDePerfilExibidos(): Promise<{ bloco: string; rotulo: string; obrigatorio: boolean }[]> {
+    const campos = await this.page.locator('[id^="fitem_id_profile_field_"]').evaluateAll((blocos) =>
+      blocos
+        .filter((bloco) => (bloco as HTMLElement).offsetParent !== null)
+        .map((bloco) => ({
+          bloco: bloco.id,
+          rotulo: (bloco.querySelector('.col-form-label label, .col-form-label p, .col-form-label legend')?.textContent ?? '')
+            .replace(/\s+/g, ' ')
+            .trim(),
+          obrigatorio: !!bloco.querySelector('[title="Obrigatório"]'),
+        })),
+    );
+    // Um campo de data traz blocos internos: fica um por rótulo
+    return campos.filter((campo, i) => campo.rotulo && campos.findIndex((c) => c.rotulo === campo.rotulo) === i);
   }
 
   async cargosDisponiveis(): Promise<string[]> {
