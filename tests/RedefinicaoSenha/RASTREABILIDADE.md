@@ -68,6 +68,8 @@ Ao final a suíte restaura: campo primário e secundário iniciais, a configura�
 
 **Divergências entre documento e sistema**
 
+- **Barra "Pergunte para a Judy" (09/11):** a plataforma ganhou um chat de IA fixo no rodapé das páginas com login. Ele cobre botões das janelas — "Cancelar" e "Salvar mudanças" de "Campos de perfil do usuário" e do "Editar usuário" — e os cliques falhavam por tempo esgotado. Sempre que a barra aparece, os testes clicam na seta para recolhê-la (`recolherJudy()` em `support/sessoes.ts`) — decisão da QA (10/11). Vale para todos os módulos, inclusive as sessões abertas com `comSessao()`.
+- RP06, RP07 e CAN01.1 estouraram o tempo em 09/11: a leitura do cadastro como Administrador, no "Editar usuário", ficou lenta com a barra da Judy cobrindo o "Cancelar" da janela.
 - **Possível defeito (RC03, 26/10):** com "Quem pode ver este campo?" = "Não visível" no "Cargo", a Estudante ainda vê "Cargo" na própria "Minha página" (`/local/user/index.php`). Pela ajuda do campo, "Não visível" esconde o campo do usuário.
 - O campo rotulado "CPF" recebe o nome de usuário (ex.: `eva.souza`), não um CPF.
 - O documento usa "Cargo" no "Campo secundário"; hoje o campo secundário é "Data de Nascimento".

@@ -138,6 +138,8 @@ Execuções de 28/10:
 
 **Divergências entre documento e sistema**
 
+- **Barra "Pergunte para a Judy" (09/11):** a plataforma ganhou um chat de IA fixo no rodapé das páginas com login. Ele cobre botões das janelas — "Cancelar" e "Salvar mudanças" de "Campos de perfil do usuário" e do "Editar usuário" — e os cliques falhavam por tempo esgotado. Sempre que a barra aparece, os testes clicam na seta para recolhê-la (`recolherJudy()` em `support/sessoes.ts`) — decisão da QA (10/11). Vale para todos os módulos, inclusive as sessões abertas com `comSessao()`.
+- **Gerenciador de Hierarquia (09/11):** são 144 cargos, 5 por página (29 páginas). O C007 e o C008.1 marcam "Cargos de Gestão" e clicam em "Filtrar" antes de ler a tabela; sem o filtro o teste estourava o tempo. Cada linha continua conferida por "Cargo Gestor = Sim".
 - Caminho do Administrador: o documento diz "Sidebar → Administração → Gerenciar usuários"; o sidebar do Administrador tem "Administração do site", não "Administração". O teste abre a página de administração direto — a mesma que o Adm Cliente acessa pelo sidebar.
 - O campo "Cargo" da "Nova conta" é um autocomplete sem rótulo acessível: o teste usa o `id` do campo — `#fitem_id_profile_field_position`. Vale pedir ao DEV um `data-testid`.
 - O objetivo do documento fala em "Plugins de Hierarquia" — mantido como está, nomenclatura da plataforma.

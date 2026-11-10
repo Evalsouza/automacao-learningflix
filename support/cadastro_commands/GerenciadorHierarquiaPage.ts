@@ -5,11 +5,17 @@ import { PaginaBase } from '../PaginaBase';
 export class GerenciadorHierarquiaPage extends PaginaBase {
   readonly titulo: Locator;
   readonly proximaPagina: Locator;
+  readonly filtroCargosDeGestao: Locator;
+  readonly botaoFiltrar: Locator;
+  readonly totalEncontrado: Locator;
 
   constructor(page: Page) {
     super(page);
     this.titulo = page.getByRole('heading', { name: 'Gerenciador de Hierarquia' });
     this.proximaPagina = page.getByRole('listitem', { name: 'Próxima página' }).getByRole('button');
+    this.filtroCargosDeGestao = page.getByLabel('Cargos de Gestão');
+    this.botaoFiltrar = page.getByRole('button', { name: 'Filtrar' });
+    this.totalEncontrado = page.getByText(/\d+ cargos? encontrados?/);
   }
 
   async acessarCargos() {
@@ -17,9 +23,15 @@ export class GerenciadorHierarquiaPage extends PaginaBase {
     await this.page.getByRole('heading', { name: 'Gerenciar cargos' }).waitFor();
   }
 
-  // Percorre todas as páginas da tabela e devolve os cargos com "Cargo Gestor" = Sim
+  // Filtra pelos "Cargos de Gestão" e percorre as páginas da tabela, devolvendo os cargos com "Cargo Gestor" = Sim.
+  // Sem o filtro eram 29 páginas de 5 cargos (144 em 09/11) e o teste estourava o tempo
   async cargosGestores(): Promise<string[]> {
     const gestores: string[] = [];
+    const totalAntes = await this.totalEncontrado.innerText();
+    await this.filtroCargosDeGestao.check();
+    await this.botaoFiltrar.click();
+    await this.aguardarCarregar();
+    await this.page.waitForFunction((antes) => !document.body.innerText.includes(antes), totalAntes);
     for (;;) {
       await this.page.locator('table tbody tr').first().waitFor();
       const linhas = await this.page

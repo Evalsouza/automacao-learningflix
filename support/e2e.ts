@@ -20,7 +20,7 @@ import { ConfiguracaoCarrosselPage } from './carrossel_commands/ConfiguracaoCarr
 import { MeusCursosPage } from './meuscursos_commands/MeusCursosPage';
 import { ConfiguracaoMeusCursosPage } from './meuscursos_commands/ConfiguracaoMeusCursosPage';
 import { ConfiguracaoPrivacidadePage } from './cadastro_commands/ConfiguracaoPrivacidadePage';
-import { bloquearVideos } from './sessoes';
+import { bloquearVideos, recolherJudy } from './sessoes';
 
 type Telas = {
   login: LoginPage;
@@ -57,6 +57,10 @@ export const test = base.extend<Telas & Opcoes>({
   context: async ({ context, bloquearVideos: bloquear }, use) => {
     if (bloquear) await bloquearVideos(context);
     await use(context);
+  },
+  page: async ({ page }, use) => {
+    await recolherJudy(page);
+    await use(page);
   },
   login: async ({ page }, use) => use(new LoginPage(page)),
   menu: async ({ page }, use) => use(new MenuUsuario(page)),
