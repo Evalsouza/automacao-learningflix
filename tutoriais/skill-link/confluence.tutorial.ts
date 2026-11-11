@@ -23,7 +23,7 @@ const TUTORIAL = TUTORIAIS[(process.env.TUTORIAL ?? 'skill-link') as keyof typeo
 if (!TUTORIAL) throw new Error(`TUTORIAL desconhecido: ${process.env.TUTORIAL}`);
 const PAGINA = TUTORIAL.pagina;
 const SECOES = process.env.SECOES ?? process.env.SECAO; // ex.: SECOES=2,3 acrescenta secoes/secao-2.xml e secao-3.xml
-const SUBSTITUIR_DESDE = process.env.SUBSTITUIR_DESDE; // ex.: 2 — troca do título "2." até o fim
+const SUBSTITUIR_DESDE = process.env.SUBSTITUIR_DESDE; // ex.: 2 — troca do título "2." até o fim; "tudo" troca o corpo inteiro
 const INFO_ADMIN_GERAL = process.env.INFO_ADMIN_GERAL === 'sim';
 const LARGURA_MAXIMA = 760; // largura de exibição no Confluence; prints menores ficam no tamanho real
 const SECO = process.env.SECO === 'sim';
@@ -94,7 +94,12 @@ test('Tutorial Skill Link — seção e prints no rascunho do Confluence', async
   let corpoBase = corpoOriginal;
   let removido = '';
   const tituloSecao = (n: string) => new RegExp(`<h2[^>]*>\\s*${n}\\.`);
-  if (SUBSTITUIR_DESDE) {
+  if (SUBSTITUIR_DESDE === 'tudo') {
+    // Troca o corpo inteiro (introdução incluída); o corpo antigo fica em "-removido.xml"
+    removido = corpoBase;
+    corpoBase = '';
+    console.log(`>> Removido o corpo inteiro: ${removido.length} caracteres (cópia em "-removido.xml")`);
+  } else if (SUBSTITUIR_DESDE) {
     const m = tituloSecao(SUBSTITUIR_DESDE).exec(corpoBase);
     if (!m) throw new Error(`Título da seção ${SUBSTITUIR_DESDE} não encontrado no rascunho. Nada foi alterado.`);
     removido = corpoBase.slice(m.index);
