@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import path from 'path';
-import { PASTA_PRINTS_JUDY, PASTA_PRINTS_SKILL_LINK } from '../caminhos';
+import { PASTA_PRINTS_JUDY, PASTA_PRINTS_LOTE, PASTA_PRINTS_SKILL_LINK } from '../caminhos';
 
 // Troca cada marcador [PRINT-NN] do RASCUNHO da página "Tutorial Skill Link" pela imagem print-NN.png,
 // enviada como anexo. Com SECAO=N, antes acrescenta ao fim do rascunho o texto de secoes/secao-N.xml
@@ -16,6 +16,7 @@ import { PASTA_PRINTS_JUDY, PASTA_PRINTS_SKILL_LINK } from '../caminhos';
 const TUTORIAIS = {
   'skill-link': { pagina: '5945294849', pasta: path.join(__dirname), prints: PASTA_PRINTS_SKILL_LINK },
   judy: { pagina: '5949030403', pasta: path.join(__dirname, '..', 'judy'), prints: PASTA_PRINTS_JUDY },
+  lote: { pagina: '5949063179', pasta: path.join(__dirname, '..', 'lote'), prints: PASTA_PRINTS_LOTE },
 };
 const TUTORIAL = TUTORIAIS[(process.env.TUTORIAL ?? 'skill-link') as keyof typeof TUTORIAIS];
 if (!TUTORIAL) throw new Error(`TUTORIAL desconhecido: ${process.env.TUTORIAL}`);
@@ -51,6 +52,17 @@ async function api<T>(metodo: string, caminho: string, corpo?: BodyInit, cabecal
 
 type PaginaV2 = { id: string; status: string; title: string; version: { number: number }; body?: { storage?: { value: string } } };
 
+// Versão publicada da página, ou "nunca publicada" (página criada só como rascunho)
+async function versaoPublicada() {
+  try {
+    const p = await api<PaginaV2>('GET', `/wiki/api/v2/pages/${PAGINA}`);
+    return p.status === 'current' ? `v${p.version.number}` : 'nunca publicada';
+  } catch (erro) {
+    if (/→ 404/.test(String(erro))) return 'nunca publicada';
+    throw erro;
+  }
+}
+
 const larguraDoPng = (arquivo: string) => readFileSync(arquivo).readUInt32BE(16); // cabeçalho IHDR
 
 function imagem(arquivo: string, nome: string) {
@@ -71,9 +83,9 @@ test('Tutorial Skill Link — seção e prints no rascunho do Confluence', async
   // 1. Lê o rascunho e a versão publicada (para provar no fim que a publicada não mudou)
   const rascunho = await api<PaginaV2>('GET', `/wiki/api/v2/pages/${PAGINA}?get-draft=true&body-format=storage`);
   if (rascunho.status !== 'draft') throw new Error(`Esperado um rascunho; a API devolveu status "${rascunho.status}". Nada foi alterado.`);
-  const publicada = await api<PaginaV2>('GET', `/wiki/api/v2/pages/${PAGINA}`);
+  const publicada = await versaoPublicada();
   const corpoOriginal = rascunho.body?.storage?.value ?? '';
-  console.log(`>> "${rascunho.title}": rascunho v${rascunho.version.number}, publicada v${publicada.version.number}`);
+  console.log(`>> "${rascunho.title}": rascunho v${rascunho.version.number}, publicada ${publicada}`);
 
   // 2. Monta o corpo: SUBSTITUIR_DESDE=N corta do título "N." até o fim (o trecho removido é salvo para
   //    conferência); SECOES=2,3 acrescenta secoes/secao-N.xml (uma vez só); INFO_ADMIN_GERAL=sim põe
@@ -159,15 +171,15 @@ test('Tutorial Skill Link — seção e prints no rascunho do Confluence', async
   const corpo = depois.body?.storage?.value ?? '';
   const semImagem = arquivos.filter((a) => !corpo.includes(`ri:filename="${a.nome}"`)).map((a) => a.nome);
   const marcadoresRestantes = PRINTS.filter((n) => corpo.includes(`[PRINT-${n}]`));
-  const publicadaDepois = await api<PaginaV2>('GET', `/wiki/api/v2/pages/${PAGINA}`);
+  const publicadaDepois = await versaoPublicada();
   if (semImagem.length || marcadoresRestantes.length) {
     throw new Error(
       `Rascunho incompleto — sem imagem: ${semImagem.join(', ') || '-'}; marcadores: ${marcadoresRestantes.join(', ') || '-'}`,
     );
   }
   if (depois.status !== 'draft') throw new Error(`Status inesperado após gravar: ${depois.status}`);
-  if (publicadaDepois.version.number !== publicada.version.number) {
-    throw new Error(`ATENÇÃO: a versão publicada mudou de v${publicada.version.number} para v${publicadaDepois.version.number}`);
+  if (publicadaDepois !== publicada) {
+    throw new Error(`ATENÇÃO: a versão publicada mudou de ${publicada} para ${publicadaDepois}`);
   }
   console.log(`>> Rascunho atualizado com ${arquivos.length} imagens. Versão publicada intacta. Revise e publique pelo Confluence.`);
 });
