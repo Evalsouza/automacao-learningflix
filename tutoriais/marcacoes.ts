@@ -37,6 +37,20 @@ export async function borrar(elementos: Locator) {
   }
 }
 
+// Borra só parte do campo (padrão: os 65% da direita), deixando o começo do valor visível
+export async function borrarParcial(elementos: Locator, fracaoVisivel = 0.35) {
+  for (const el of await elementos.all()) {
+    await el.evaluate((n: HTMLElement, fracao: number) => {
+      const r = n.getBoundingClientRect();
+      const capa = document.createElement('div');
+      capa.className = 'tutorial-borrado-parcial';
+      const esquerda = r.left + window.scrollX + r.width * fracao;
+      capa.style.cssText = `position:absolute;left:${esquerda}px;top:${r.top + window.scrollY + 2}px;width:${r.width * (1 - fracao) - 4}px;height:${r.height - 4}px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);background:rgba(40,44,52,.25);border-radius:4px;z-index:2147483646;pointer-events:none`;
+      document.body.appendChild(capa);
+    }, fracaoVisivel);
+  }
+}
+
 // Caixa do elemento em coordenadas do documento (não da janela). Se o Locator achar vários elementos,
 // devolve uma caixa só ao redor de todos — é assim que um grupo de campos recebe um único contorno
 async function caixaNoDocumento(page: Page, el: Locator): Promise<Caixa> {
@@ -169,11 +183,13 @@ export type Captura = {
   margem?: number;
   // Espera (ms) depois de rolar até o alvo — gráficos com animação de entrada
   espera?: number;
+  // true quando o print mostra a própria Judy (não confere se a barra está oculta)
+  comJudy?: boolean;
 };
 
 // Rola até o primeiro alvo, desenha as marcações, salva o PNG e remove as marcações
-export async function capturar(page: Page, { pasta, arquivo, alvos, area, ate, margem = 12, espera = 0 }: Captura) {
-  await expect(page.getByPlaceholder(/Pergunte para a Judy/), 'Barra da Judy visível no print').toBeHidden();
+export async function capturar(page: Page, { pasta, arquivo, alvos, area, ate, margem = 12, espera = 0, comJudy = false }: Captura) {
+  if (!comJudy) await expect(page.getByPlaceholder(/Pergunte para a Judy/), 'Barra da Judy visível no print').toBeHidden();
   // Um alvo pode ser um grupo (vários elementos sob um só contorno): confere cada um
   for (const alvo of alvos) {
     await expect(alvo.elemento.first(), `Alvo do ${arquivo}`).toBeVisible();

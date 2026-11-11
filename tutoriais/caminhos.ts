@@ -11,3 +11,6 @@ export const SESSAO_TUTORIAL_USUARIO = path.join(__dirname, '..', '.auth', 'tuto
 
 // PNGs da seção 1 do "Tutorial Skill Link" (print-01.png … print-08.png)
 export const PASTA_PRINTS_SKILL_LINK = path.join(__dirname, 'skill-link', 'prints');
+
+// PNGs do "Tutorial competências com a Judy" (página 5949030403)
+export const PASTA_PRINTS_JUDY = path.join(__dirname, 'judy', 'prints');

@@ -40,7 +40,10 @@
     "tutorial:skill-link:confluence": "playwright test -c tutoriais --project=confluence",
     "report": "playwright show-report",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "tutorial:judy:prints": "playwright test -c tutoriais --project=prints prints-judy-admin && playwright test -c tutoriais --project=prints-usuario usuario-judy",
+    "tutorial:judy:confluence:seco": "cross-env TUTORIAL=judy SECO=sim playwright test -c tutoriais --project=confluence",
+    "tutorial:judy:confluence": "cross-env TUTORIAL=judy playwright test -c tutoriais --project=confluence"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",

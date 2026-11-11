@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import path from 'path';
-import { PASTA_PRINTS_SKILL_LINK } from '../caminhos';
+import { PASTA_PRINTS_JUDY, PASTA_PRINTS_SKILL_LINK } from '../caminhos';
 
 // Troca cada marcador [PRINT-NN] do RASCUNHO da página "Tutorial Skill Link" pela imagem print-NN.png,
 // enviada como anexo. Com SECAO=N, antes acrescenta ao fim do rascunho o texto de secoes/secao-N.xml
@@ -12,13 +12,20 @@ import { PASTA_PRINTS_SKILL_LINK } from '../caminhos';
 //   CONFLUENCE_EMAIL=...         CONFLUENCE_API_TOKEN=...
 // Ensaio sem gravar nada no Confluence: SECO=sim (npm run tutorial:skill-link:confluence:seco)
 
-const PAGINA = '5945294849';
+// TUTORIAL=judy envia o "Tutorial competências com a Judy"; sem TUTORIAL, o "Tutorial Skill Link"
+const TUTORIAIS = {
+  'skill-link': { pagina: '5945294849', pasta: path.join(__dirname), prints: PASTA_PRINTS_SKILL_LINK },
+  judy: { pagina: '5949030403', pasta: path.join(__dirname, '..', 'judy'), prints: PASTA_PRINTS_JUDY },
+};
+const TUTORIAL = TUTORIAIS[(process.env.TUTORIAL ?? 'skill-link') as keyof typeof TUTORIAIS];
+if (!TUTORIAL) throw new Error(`TUTORIAL desconhecido: ${process.env.TUTORIAL}`);
+const PAGINA = TUTORIAL.pagina;
 const SECOES = process.env.SECOES ?? process.env.SECAO; // ex.: SECOES=2,3 acrescenta secoes/secao-2.xml e secao-3.xml
 const SUBSTITUIR_DESDE = process.env.SUBSTITUIR_DESDE; // ex.: 2 — troca do título "2." até o fim
 const INFO_ADMIN_GERAL = process.env.INFO_ADMIN_GERAL === 'sim';
 const LARGURA_MAXIMA = 760; // largura de exibição no Confluence; prints menores ficam no tamanho real
 const SECO = process.env.SECO === 'sim';
-const PASTA_COPIAS = path.join(__dirname, 'copias-rascunho'); // rascunho antes/depois, para conferência
+const PASTA_COPIAS = path.join(TUTORIAL.pasta, 'copias-rascunho'); // rascunho antes/depois, para conferência
 
 function variavel(nome: string) {
   const valor = process.env[nome];
@@ -85,7 +92,7 @@ test('Tutorial Skill Link — seção e prints no rascunho do Confluence', async
     .split(',')
     .map((x) => x.trim())
     .filter(Boolean)) {
-    const texto = readFileSync(path.join(__dirname, 'secoes', `secao-${secao}.xml`), 'utf-8').trim();
+    const texto = readFileSync(path.join(TUTORIAL.pasta, 'secoes', `secao-${secao}.xml`), 'utf-8').trim();
     if (tituloSecao(secao).test(corpoBase)) {
       console.log(`>> A seção "${secao}." já está no rascunho: não foi acrescentada de novo`);
     } else {
@@ -105,7 +112,7 @@ test('Tutorial Skill Link — seção e prints no rascunho do Confluence', async
   const PRINTS = [...new Set([...corpoBase.matchAll(/\[PRINT-(\d{2})\]/g)].map((m) => m[1]))];
   if (!PRINTS.length) throw new Error('Nenhum marcador [PRINT-NN] no rascunho: nada a fazer.');
   console.log(`>> Marcadores a trocar: ${PRINTS.join(', ')}`);
-  const arquivos = PRINTS.map((n) => ({ n, nome: `print-${n}.png`, caminho: path.join(PASTA_PRINTS_SKILL_LINK, `print-${n}.png`) }));
+  const arquivos = PRINTS.map((n) => ({ n, nome: `print-${n}.png`, caminho: path.join(TUTORIAL.prints, `print-${n}.png`) }));
   const semArquivo = arquivos.filter((a) => !existsSync(a.caminho));
   if (semArquivo.length) throw new Error(`PNGs não encontrados: ${semArquivo.map((a) => a.nome).join(', ')} — rode os prints antes`);
 
