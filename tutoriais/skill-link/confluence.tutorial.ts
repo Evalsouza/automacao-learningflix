@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import path from 'path';
-import { PASTA_PRINTS_JUDY, PASTA_PRINTS_LOTE, PASTA_PRINTS_SKILL_LINK } from '../caminhos';
+import { PASTA_PRINTS_CONVERSOR, PASTA_PRINTS_JUDY, PASTA_PRINTS_LOTE, PASTA_PRINTS_SKILL_LINK } from '../caminhos';
 
 // Troca cada marcador [PRINT-NN] do RASCUNHO da página "Tutorial Skill Link" pela imagem print-NN.png,
 // enviada como anexo. Com SECAO=N, antes acrescenta ao fim do rascunho o texto de secoes/secao-N.xml
@@ -17,6 +17,7 @@ const TUTORIAIS = {
   'skill-link': { pagina: '5945294849', pasta: path.join(__dirname), prints: PASTA_PRINTS_SKILL_LINK },
   judy: { pagina: '5949030403', pasta: path.join(__dirname, '..', 'judy'), prints: PASTA_PRINTS_JUDY },
   lote: { pagina: '5949063179', pasta: path.join(__dirname, '..', 'lote'), prints: PASTA_PRINTS_LOTE },
+  conversor: { pagina: '5950406669', pasta: path.join(__dirname, '..', 'conversor'), prints: PASTA_PRINTS_CONVERSOR },
 };
 const TUTORIAL = TUTORIAIS[(process.env.TUTORIAL ?? 'skill-link') as keyof typeof TUTORIAIS];
 if (!TUTORIAL) throw new Error(`TUTORIAL desconhecido: ${process.env.TUTORIAL}`);

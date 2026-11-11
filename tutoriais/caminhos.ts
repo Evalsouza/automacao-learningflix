@@ -17,3 +17,6 @@ export const PASTA_PRINTS_JUDY = path.join(__dirname, 'judy', 'prints');
 
 // PNGs do "Tutorial: Gerar Competências em Lote" (página 5949063179)
 export const PASTA_PRINTS_LOTE = path.join(__dirname, 'lote', 'prints');
+
+// PNGs do "Tutorial: Converter PPTX para SCORM" (página 5950406669)
+export const PASTA_PRINTS_CONVERSOR = path.join(__dirname, 'conversor', 'prints');

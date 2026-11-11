@@ -47,7 +47,10 @@
     "tutorial:lote:prints": "cross-env FASE=antes playwright test -c tutoriais --project=prints prints-lote.tutorial",
     "tutorial:lote:resultado": "cross-env FASE=depois playwright test -c tutoriais --project=prints prints-lote.tutorial",
     "tutorial:lote:confluence:seco": "cross-env TUTORIAL=lote SECO=sim playwright test -c tutoriais --project=confluence",
-    "tutorial:lote:confluence": "cross-env TUTORIAL=lote playwright test -c tutoriais --project=confluence"
+    "tutorial:lote:confluence": "cross-env TUTORIAL=lote playwright test -c tutoriais --project=confluence",
+    "tutorial:conversor:prints": "playwright test -c tutoriais --project=prints-cliente cliente-conversor.tutorial",
+    "tutorial:conversor:confluence:seco": "cross-env TUTORIAL=conversor SECO=sim playwright test -c tutoriais --project=confluence",
+    "tutorial:conversor:confluence": "cross-env TUTORIAL=conversor playwright test -c tutoriais --project=confluence"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
