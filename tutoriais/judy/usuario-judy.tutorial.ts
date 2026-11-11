@@ -3,7 +3,7 @@ import { existsSync } from 'fs';
 import { SESSAO_TUTORIAL_USUARIO, PASTA_PRINTS_JUDY as pasta } from '../caminhos';
 import { capturar } from '../marcacoes';
 
-// Tutorial competências com a Judy — uso pelo usuário final (eva.souza): print-05.png … print-13.png
+// Tutorial competências com a Judy — uso pelo usuário final (eva.souza): print-05.png … print-15.png
 // Conversa com a Judy (envia perguntas) e apaga a conversa entre as perguntas prontas, como no uso real.
 // Não altera cadastro nem configuração.
 
@@ -125,15 +125,21 @@ test('Tutorial Judy — uso pelo usuário final', async ({ page, context }) => {
   await barra.waitFor();
   await page.waitForTimeout(3000);
 
-  await test.step('Print 05 — barra Pergunte para a Judy', async () => {
-    await capturar(page, {
-      pasta,
-      arquivo: 'print-05.png',
-      area: 'tela',
-      alvos: [{ elemento: judy(page).locator('.floating-chat-center-input'), seta: 'cima' }],
-      comJudy: true,
+  // SO_EXTRAS=sim: captura só os prints 14 e 15, sem refazer os prints 05 a 13; SO_EXTRAS=15 captura só o 15
+  const extras = process.env.SO_EXTRAS;
+  const soExtras = Boolean(extras);
+  const capturaExtra = (n: string) => !extras || extras === 'sim' || extras.split(',').includes(n);
+
+  if (!soExtras)
+    await test.step('Print 05 — barra Pergunte para a Judy', async () => {
+      await capturar(page, {
+        pasta,
+        arquivo: 'print-05.png',
+        area: 'tela',
+        alvos: [{ elemento: judy(page).locator('.floating-chat-center-input'), seta: 'cima' }],
+        comJudy: true,
+      });
     });
-  });
 
   // Abre a janela (a primeira mensagem abre a conversa), expande e apaga para mostrar as perguntas prontas
   await barra.fill('Olá');
@@ -143,6 +149,23 @@ test('Tutorial Judy — uso pelo usuário final', async ({ page, context }) => {
   await page.waitForTimeout(1500);
   await apagarConversa(page);
 
+  if (!soExtras) await perguntasDoTutorial(page);
+
+  if (capturaExtra('14'))
+    await test.step('Print 14 — Como acesso a página meu curso?', async () => {
+      await apagarConversa(page);
+      await perguntaDigitada(page, 'Como acesso a página meu curso?', 'print-14.png');
+    });
+
+  if (capturaExtra('15'))
+    await test.step('Print 15 — Como fazemos para abrir a minha página no app?', async () => {
+      await apagarConversa(page);
+      await perguntaDigitada(page, 'Como fazemos para abrir a minha página no app?', 'print-15.png');
+    });
+});
+
+// Prints 06 a 13: perguntas prontas, Apagar conversa e perguntas sobre função e competência
+async function perguntasDoTutorial(page: Page) {
   await test.step('Print 06 — Judy expandida com as perguntas prontas', async () => {
     const grupo = janela(page)
       .getByText('Cursos e Competências', { exact: true })
@@ -184,4 +207,4 @@ test('Tutorial Judy — uso pelo usuário final', async ({ page, context }) => {
   await test.step('Print 13 — cursos para a competência Comunicação eficaz', async () => {
     await perguntaDigitada(page, 'Quais cursos são recomendados para a competência Comunicação eficaz?', 'print-13.png');
   });
-});
+}
