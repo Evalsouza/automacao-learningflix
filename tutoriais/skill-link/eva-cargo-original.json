@@ -1,0 +1,9 @@
+{
+  "data": "2026-11-10T21:10:44.244Z",
+  "modal": false,
+  "url": "https://qa.learningflix.net/admin/tool/usermanagement/index.php?search=eva.souza",
+  "campos": ["Cargo", "Descrição de Cargo"],
+  "ids": ["fitem_id_profile_field_position_wE4eJSbQPCBcgoE", "fitem_id_profile_field_descricao_de_cargo_xndMiBrgTELDg80"],
+  "escolhido": ["163|Analista de Qualidade"],
+  "botoes": ["Cancelar", "Cancelar", "Salvar mudanças"]
+}
