@@ -4,10 +4,11 @@ import path from 'path';
 import { SESSAO_TUTORIAL_CLIENTE, PASTA_PRINTS_SKILL_LINK as pasta } from '../caminhos';
 import { capturar, ocultarJudy } from '../marcacoes';
 
-// Tutorial Skill Link — Seção 5, associação do cargo ao usuário (Adm Cliente): print-31.png e print-32.png
+// Tutorial Skill Link — Seção 5, associação do cargo ao usuário (Adm Cliente): print-38.png e print-39.png
 //
 // ALTERA O CADASTRO DA eva.souza (aprovado pela QA em 10/11):
 //   CARGO_EVA=tutorial  → troca o cargo para "Analista de Atendimento ao Cliente" e captura os prints
+//   CARGO_EVA=print     → escolhe o cargo do tutorial só na tela, captura os prints e NÃO salva
 //   CARGO_EVA=original  → devolve o cargo anotado em eva-cargo-original.json ("Analista de Qualidade"), sem prints
 // Sem CARGO_EVA, não faz nada.
 
@@ -76,17 +77,18 @@ test.beforeAll(() => {
 test('Tutorial Skill Link — cargo da eva.souza', async ({ page, context }) => {
   test.setTimeout(6 * 60_000);
   page.setDefaultTimeout(60_000);
-  if (MODO !== 'tutorial' && MODO !== 'original') {
+  if (MODO !== 'tutorial' && MODO !== 'original' && MODO !== 'print') {
     console.log('>> Sem CARGO_EVA=tutorial|original: nada a fazer');
     return;
   }
   await ocultarJudy(context);
-  const alvo = MODO === 'tutorial' ? CARGO_TUTORIAL : cargoOriginal();
+  const alvo = MODO === 'original' ? cargoOriginal() : CARGO_TUTORIAL;
+  const capturarPrints = MODO !== 'original';
 
   const { linha, editar } = await abrirEdicao(page);
-  if (MODO === 'tutorial') {
-    await test.step('Print 31 — Editar usuário na lista de usuários', async () => {
-      await capturar(page, { pasta, arquivo: 'print-31.png', area: linha, alvos: [{ elemento: editar, seta: 'esquerda' }], margem: 16 });
+  if (capturarPrints) {
+    await test.step('Print 38 — Editar usuário na lista de usuários', async () => {
+      await capturar(page, { pasta, arquivo: 'print-38.png', area: linha, alvos: [{ elemento: editar, seta: 'esquerda' }], margem: 16 });
     });
   }
 
@@ -102,12 +104,12 @@ test('Tutorial Skill Link — cargo da eva.souza', async ({ page, context }) => 
   }
 
   const salvar = janelaEdicao(page).getByRole('button', { name: 'Salvar mudanças' });
-  if (MODO === 'tutorial') {
-    await test.step('Print 32 — campo Cargo e Salvar mudanças', async () => {
+  if (capturarPrints) {
+    await test.step('Print 39 — campo Cargo e Salvar mudanças', async () => {
       await campoCargo(page).scrollIntoViewIfNeeded();
       await capturar(page, {
         pasta,
-        arquivo: 'print-32.png',
+        arquivo: 'print-39.png',
         area: campoCargo(page).or(salvar),
         alvos: [
           { elemento: campoCargo(page), numero: 1, seta: false, ladoNumero: 'esquerda' },
@@ -118,6 +120,10 @@ test('Tutorial Skill Link — cargo da eva.souza', async ({ page, context }) => 
     });
   }
 
+  if (MODO === 'print') {
+    console.log('>> CARGO_EVA=print: prints refeitos sem salvar (cadastro da eva.souza não muda)');
+    return;
+  }
   if (!(antes.length === 1 && antes[0] === alvo)) {
     await salvar.click();
     await expect(page.locator('.modal.show')).toHaveCount(0, { timeout: 60_000 });

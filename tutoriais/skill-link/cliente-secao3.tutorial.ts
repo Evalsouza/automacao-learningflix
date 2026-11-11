@@ -13,11 +13,11 @@ import { capturar, ocultarJudy } from '../marcacoes';
 const CURSO = 325;
 // arquivo null = gera (se preciso) sem print; o SCORM do Lizza tem a mesma tela do SCORM do cliente
 const ITENS = [
-  { arquivo: 'print-17.png', rotulo: 'Curso', url: `/course/edit.php?id=${CURSO}`, atividade: false },
-  { arquivo: 'print-19.png', rotulo: 'SCORM do cliente', url: '/course/modedit.php?update=3076', atividade: true },
+  { arquivo: 'print-18.png', rotulo: 'Curso', url: `/course/edit.php?id=${CURSO}`, atividade: false },
+  { arquivo: 'print-21.png', rotulo: 'SCORM do cliente', url: '/course/modedit.php?update=3076', atividade: true },
   { arquivo: null, rotulo: 'SCORM Lizza', url: '/course/modedit.php?update=3077', atividade: true },
-  { arquivo: 'print-20.png', rotulo: 'Vídeo (Vimeo)', url: '/course/modedit.php?update=3078', atividade: true },
-  { arquivo: 'print-21.png', rotulo: 'Arquivo', url: '/course/modedit.php?update=3075', atividade: true },
+  { arquivo: 'print-26.png', rotulo: 'Vídeo (Vimeo)', url: '/course/modedit.php?update=3078', atividade: true },
+  { arquivo: 'print-28.png', rotulo: 'Arquivo', url: '/course/modedit.php?update=3075', atividade: true },
 ];
 const GERAR = process.env.GERAR === 'sim'; // sem GERAR=sim, nunca clica em "Gerar" (não gasta crédito)
 const ESPERA_GERACAO = 4 * 60_000; // Prisma em QA: a extração de SCORM e vídeo pode demorar
@@ -122,7 +122,7 @@ test('Tutorial Skill Link — prints da seção 3 (gera competências)', async (
         );
       console.log(`>> ${item.rotulo}: botões ${JSON.stringify(salvar)}`);
 
-      // Print 18 — competência expandida, com descrição (só abre a descrição; não altera nada)
+      // Print 19 — competência expandida, com descrição (só abre a descrição; não altera nada)
       if (!item.atividade) {
         const linhas = secao.locator('tbody tr').filter({ visible: true });
         const expandir = (tr: Locator) =>
@@ -151,7 +151,7 @@ test('Tutorial Skill Link — prints da seção 3 (gera competências)', async (
         const descricao = escolhida.locator('xpath=following-sibling::tr[1]');
         await capturar(page, {
           pasta,
-          arquivo: 'print-18.png',
+          arquivo: 'print-19.png',
           area: descricao.locator('xpath=following-sibling::tr[1]'),
           alvos: [{ elemento: escolhida.or(descricao), seta: false }],
           margem: 8,

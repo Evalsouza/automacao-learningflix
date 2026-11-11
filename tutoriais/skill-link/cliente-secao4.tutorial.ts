@@ -3,7 +3,7 @@ import { existsSync } from 'fs';
 import { SESSAO_TUTORIAL_CLIENTE, PASTA_PRINTS_SKILL_LINK as pasta } from '../caminhos';
 import { capturar, ocultarJudy } from '../marcacoes';
 
-// Tutorial Skill Link — Seção 4 (Visualize as competências), visão do Adm Cliente: print-22.png … print-24.png
+// Tutorial Skill Link — Seção 4 (Visualize as competências), visão do Adm Cliente: print-29.png … print-31.png
 // Só leitura: abre a janela do ícone "i" do curso 325 no Catálogo e clica em "Ver todas" / "Ver menos".
 
 const BUSCA = '/local/catalog/index.php?search=' + encodeURIComponent('Geração de Competências com Skill Link');
@@ -40,19 +40,19 @@ test('Tutorial Skill Link — seção 4 (Adm Cliente)', async ({ page, context }
   const card = page.locator('a.card-link[href*="id=325"]').first();
   const icone = page.locator('.btn-open-modal-info').filter({ visible: true }).first();
 
-  await test.step('Print 22 — ícone i no card do curso', async () => {
+  await test.step('Print 29 — ícone i no card do curso', async () => {
     await card.hover();
     await page.waitForTimeout(600);
     await capturar(page, {
       pasta,
-      arquivo: 'print-22.png',
+      arquivo: 'print-29.png',
       area: card.locator('xpath=ancestor::*[contains(@class,"card")][1]').or(card),
       alvos: [{ elemento: icone, seta: 'direita' }],
       margem: 20,
     });
   });
 
-  await test.step('Print 23 — janela com a seção Competências', async () => {
+  await test.step('Print 30 — janela com a seção Competências', async () => {
     await card.hover();
     await icone.click({ force: true });
     const janela = page.locator('.course-info-modal.show .modal-content').first();
@@ -63,7 +63,7 @@ test('Tutorial Skill Link — seção 4 (Adm Cliente)', async ({ page, context }
     const verTodas = janela.getByText('Ver todas', { exact: true });
     await capturar(page, {
       pasta,
-      arquivo: 'print-23.png',
+      arquivo: 'print-30.png',
       area: janela,
       alvos: [
         { elemento: titulo.or(etiquetas), numero: 1, seta: false, ladoNumero: 'direita' },
@@ -72,12 +72,12 @@ test('Tutorial Skill Link — seção 4 (Adm Cliente)', async ({ page, context }
       margem: 8,
     });
 
-    await test.step('Print 24 — lista aberta com Ver menos', async () => {
+    await test.step('Print 31 — lista aberta com Ver menos', async () => {
       await verTodas.click();
       await page.waitForTimeout(800);
       const verMenos = janela.getByText('Ver menos', { exact: true });
       await expect(verMenos).toBeVisible();
-      await capturar(page, { pasta, arquivo: 'print-24.png', area: janela, alvos: [{ elemento: verMenos, seta: 'direita' }], margem: 8 });
+      await capturar(page, { pasta, arquivo: 'print-31.png', area: janela, alvos: [{ elemento: verMenos, seta: 'direita' }], margem: 8 });
     });
   });
 });

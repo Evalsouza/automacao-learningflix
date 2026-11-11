@@ -5,7 +5,7 @@ import { SESSAO_TUTORIAL_USUARIO, PASTA_PRINTS_SKILL_LINK as pasta } from '../ca
 import { capturar, ocultarJudy } from '../marcacoes';
 
 // Tutorial Skill Link — Seção 6 (bloco "Cursos recomendados para seu cargo"), visão do usuário final
-// eva.souza (cargo "Analista de Qualidade"): print-33.png a print-35.png. Só leitura.
+// eva.souza (cargo "Analista de Qualidade"): print-40.png a print-42.png. Só leitura.
 
 async function abrir(page: Page, caminho: string) {
   await page.goto(caminho, { waitUntil: 'load' });
@@ -22,16 +22,16 @@ test('Tutorial Skill Link — seção 6 (usuário final)', async ({ page, contex
   page.setDefaultTimeout(60_000);
   await ocultarJudy(context);
 
-  await test.step('Print 33 — bloco na Página inicial', async () => {
+  await test.step('Print 40 — bloco na Página inicial', async () => {
     await abrir(page, '/my/');
     const titulo = page.getByText(/Cursos recomendados para (o )?seu cargo/).first();
     await expect(titulo).toBeVisible();
     const bloco = titulo.locator('xpath=ancestor::*[.//a[contains(@href,"course/view.php")]][1]');
     const verTodos = bloco.getByRole('link', { name: /Ver todos/ }).first();
     await page.waitForTimeout(1500);
-    await capturar(page, { pasta, arquivo: 'print-33.png', area: bloco, alvos: [{ elemento: verTodos, seta: 'direita' }], margem: 16 });
+    await capturar(page, { pasta, arquivo: 'print-40.png', area: bloco, alvos: [{ elemento: verTodos, seta: 'direita' }], margem: 16 });
 
-    // Print 34 — card em destaque: os dados do curso e o progresso aparecem ao passar o mouse
+    // Print 41 — card em destaque: os dados do curso e o progresso aparecem ao passar o mouse
     const card = bloco.locator('a[href*="course/view.php"]').filter({ visible: true }).first();
     await card.hover();
     await page.waitForTimeout(1200);
@@ -44,14 +44,14 @@ test('Tutorial Skill Link — seção 6 (usuário final)', async ({ page, contex
     const caixa = await aberto.boundingBox();
     if (!caixa) throw new Error('Card aberto sem área visível');
     await page.screenshot({
-      path: path.join(pasta, 'print-34.png'),
+      path: path.join(pasta, 'print-41.png'),
       clip: { x: Math.max(0, caixa.x - 16), y: Math.max(0, caixa.y - 16), width: caixa.width + 32, height: caixa.height + 32 },
       animations: 'disabled',
     });
-    console.log('>> print-34.png salvo');
+    console.log('>> print-41.png salvo');
   });
 
-  await test.step('Print 35 — página Ver todos com os filtros', async () => {
+  await test.step('Print 42 — página Ver todos com os filtros', async () => {
     await abrir(page, '/blocks/skillcourses/index.php');
     const filtros = page
       .getByText('Obrigatoriedade', { exact: true })
@@ -62,7 +62,7 @@ test('Tutorial Skill Link — seção 6 (usuário final)', async ({ page, contex
     await page.waitForTimeout(1500);
     await capturar(page, {
       pasta,
-      arquivo: 'print-35.png',
+      arquivo: 'print-42.png',
       area: filtros.or(primeiroCard),
       alvos: [{ elemento: filtros, seta: false }],
       margem: 16,

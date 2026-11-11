@@ -4,7 +4,7 @@ import path from 'path';
 import { SESSAO_TUTORIAL_CLIENTE, PASTA_PRINTS_SKILL_LINK as pasta } from '../caminhos';
 import { capturar, ocultarJudy, type Captura } from '../marcacoes';
 
-// Tutorial Skill Link — Seção 5 (cargos), visão do Adm Cliente: print-25.png … print-30.png
+// Tutorial Skill Link — Seção 5 (cargos), visão do Adm Cliente: print-32.png … print-37.png
 //
 // CONSOME CRÉDITOS E GRAVA DADOS (aprovado pela QA em 10/11): cria o cargo CARGO pelo fluxo
 // "Encontrar cargos similares no Skill Link" → "Usar esta referência" → Salvar. Se o cargo já
@@ -55,7 +55,7 @@ test('Tutorial Skill Link — seção 5 (Adm Cliente): cria o cargo', async ({ p
 
   // O cargo já foi criado em 10/11. A lista é montada por JavaScript, então não dá para conferir pelo HTML:
   // para não duplicar, só cria com CRIAR_CARGO=sim (gasta crédito e grava um cargo novo)
-  // RECAPTURAR=sim refaz os prints 25 a 29 e CANCELA no fim (não salva cargo; "Encontrar" pode gastar crédito)
+  // RECAPTURAR=sim refaz os prints 32 a 37 SEM salvar o cargo ("Encontrar" e "Usar esta referência" podem gastar crédito)
   const RECAPTURAR = process.env.RECAPTURAR === 'sim';
   if (process.env.CRIAR_CARGO !== 'sim' && !RECAPTURAR) {
     console.log(`>> Sem CRIAR_CARGO=sim ou RECAPTURAR=sim: não faz nada ("${CARGO}" já existe no QA desde 10/11)`);
@@ -73,12 +73,12 @@ test('Tutorial Skill Link — seção 5 (Adm Cliente): cria o cargo', async ({ p
     .filter({ visible: true })
     .first();
 
-  await test.step('Print 25 — aba Cargos e botão Adicionar', async () => {
+  await test.step('Print 32 — aba Cargos e botão Adicionar', async () => {
     await capturaSegura(
       page,
       {
         pasta,
-        arquivo: 'print-25.png',
+        arquivo: 'print-32.png',
         area: 'tela',
         alvos: [
           { elemento: abaCargos, numero: 1, seta: 'baixo' },
@@ -96,12 +96,12 @@ test('Tutorial Skill Link — seção 5 (Adm Cliente): cria o cargo', async ({ p
   await nome.fill(CARGO);
   const encontrar = janela.getByRole('button', { name: /Encontrar cargos similares/ });
 
-  await test.step('Print 26 — nome do cargo e Encontrar cargos similares', async () => {
+  await test.step('Print 33 — nome do cargo e Encontrar cargos similares', async () => {
     await capturaSegura(
       page,
       {
         pasta,
-        arquivo: 'print-26.png',
+        arquivo: 'print-33.png',
         area: janela,
         alvos: [
           { elemento: nome, numero: 1, seta: false, ladoNumero: 'esquerda' },
@@ -123,10 +123,10 @@ test('Tutorial Skill Link — seção 5 (Adm Cliente): cria o cargo', async ({ p
 
   // Lista sanfonada de cargos similares, logo abaixo do texto "Cargos similares encontrados"
   const tabela = janela.getByText(/similares encontrados/i).locator('xpath=following-sibling::*[1]');
-  await test.step('Print 27 — cargos similares encontrados', async () => {
+  await test.step('Print 34 — cargos similares encontrados', async () => {
     await capturaSegura(
       page,
-      { pasta, arquivo: 'print-27.png', area: janela, alvos: [{ elemento: tabela, seta: false }], margem: 8 },
+      { pasta, arquivo: 'print-34.png', area: janela, alvos: [{ elemento: tabela, seta: false }], margem: 8 },
       janela,
     );
   });
@@ -145,12 +145,12 @@ test('Tutorial Skill Link — seção 5 (Adm Cliente): cria o cargo', async ({ p
   await expect(usar).toBeVisible({ timeout: 15_000 });
   await registrar('Linha expandida', tabela);
 
-  await test.step('Print 28 — Visualizar Cargo e Usar esta referência', async () => {
+  await test.step('Print 35 — Visualizar Cargo e Usar esta referência', async () => {
     await capturaSegura(
       page,
       {
         pasta,
-        arquivo: 'print-28.png',
+        arquivo: 'print-35.png',
         area: tabela,
         alvos: [
           { elemento: visualizar, numero: 1, seta: false, ladoNumero: 'direita' },
@@ -162,7 +162,7 @@ test('Tutorial Skill Link — seção 5 (Adm Cliente): cria o cargo', async ({ p
     );
   });
 
-  await test.step('Print 29 — painel Visualizar cargo', async () => {
+  await test.step('Print 36 — painel Visualizar cargo', async () => {
     if (!(await visualizar.count())) return console.log('>> Sem botão "Visualizar cargo": print 29 pulado');
     await visualizar.click();
     // Painel com o título do cargo (h6), "Resumo do cargo", "Competências associadas" e "Distribuição por categoria"
@@ -177,7 +177,7 @@ test('Tutorial Skill Link — seção 5 (Adm Cliente): cria o cargo', async ({ p
     await registrar('Painel Visualizar cargo', painel);
     await capturaSegura(
       page,
-      { pasta, arquivo: 'print-29.png', area: painel, alvos: [{ elemento: painel, seta: false }], margem: 8, espera: 1500 },
+      { pasta, arquivo: 'print-36.png', area: painel, alvos: [{ elemento: painel, seta: false }], margem: 8, espera: 1500 },
       painel,
     );
     // Fecha só o painel (botão ao lado do título), nunca a janela "Adicionar cargo"
@@ -186,15 +186,7 @@ test('Tutorial Skill Link — seção 5 (Adm Cliente): cria o cargo', async ({ p
     await expect(janela).toContainText('Adicionar cargo');
   });
 
-  if (RECAPTURAR) {
-    const camada = page.locator('.job-preview-overlay').filter({ visible: true });
-    if (await camada.count()) await camada.first().click({ position: { x: 5, y: 5 } });
-    await janela.getByRole('button', { name: 'Cancelar' }).last().click();
-    console.log('>> RECAPTURAR: janela cancelada, nenhum cargo salvo');
-    return;
-  }
-
-  await test.step('Usar esta referência e Print 30 — descrição e competências', async () => {
+  await test.step('Usar esta referência e Print 37 — descrição e competências', async () => {
     console.log('>> Clicando em "Usar esta referência"');
     await usar.click();
     await expect(
@@ -235,7 +227,7 @@ test('Tutorial Skill Link — seção 5 (Adm Cliente): cria o cargo', async ({ p
       page,
       {
         pasta,
-        arquivo: 'print-30.png',
+        arquivo: 'print-37.png',
         area: janela,
         alvos: [
           { elemento: descricao, numero: 1, seta: false, ladoNumero: 'direita' },
@@ -246,6 +238,12 @@ test('Tutorial Skill Link — seção 5 (Adm Cliente): cria o cargo', async ({ p
       janela,
     );
   });
+
+  if (RECAPTURAR) {
+    // Não salva: ao fim do teste o navegador fecha com a janela aberta, e nada é gravado
+    console.log('>> RECAPTURAR: prints refeitos sem salvar o cargo');
+    return;
+  }
 
   await test.step('Salvar o cargo', async () => {
     await janela.getByRole('button', { name: 'Salvar', exact: true }).click();
