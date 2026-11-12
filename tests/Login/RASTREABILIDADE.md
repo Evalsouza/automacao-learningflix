@@ -1,6 +1,6 @@
 # Rastreabilidade — Módulo Login
 
-O acesso como visitante fica no módulo `AcessoVisitante/` e a redefinição de senha (C09 a C14) no módulo `RedefinicaoSenha/`, cada um com rastreabilidade própria.
+O acesso como visitante fica no módulo `VisitanteAcesso/` e a redefinição de senha (C09 a C14) no módulo `RedefinicaoSenha/`, cada um com rastreabilidade própria.
 
 Arquivos: `valida_*.spec.ts` para as validações funcionais e `validacao_responsividade_*.spec.ts` para as de resolução, um por validação.
 

@@ -1,4 +1,6 @@
-# Rastreabilidade — Módulo AcessoVisitante
+# Rastreabilidade — Módulo VisitanteAcesso
+
+Pasta renomeada de `AcessoVisitante` para `VisitanteAcesso` em 12/11/2026, para o módulo rodar por último nas rodadas (a ordem é alfabética) — decisão da QA.
 
 Arquivos: `valida_*.spec.ts` para as validações funcionais e `validacao_responsividade_*.spec.ts` para as de resolução, um por validação.
 

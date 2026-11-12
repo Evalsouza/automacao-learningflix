@@ -14,7 +14,7 @@ A organização segue o modelo da equipe — [Estrutura do Repositório](https:/
 │   │   ├── validacao_responsividade_login.spec.ts
 │   │   ├── validacao_responsividade_visualizar_senha.spec.ts
 │   │   └── RASTREABILIDADE.md    # Caso do DT/EVT → teste, decisões e pendências
-│   ├── 📂 AcessoVisitante/       # Acordo de política, Página Inicial, menu, Ajuda e botão do visitante
+│   ├── 📂 VisitanteAcesso/       # Acordo de política, Página Inicial, menu, Ajuda e botão do visitante
 │   │   ├── valida_acessar_como_visitante.spec.ts
 │   │   ├── valida_configuracao_botao_visitante.spec.ts   # altera configuração — desligado por padrão
 │   │   ├── valida_envio_ajuda_visitante.spec.ts          # envia e-mail — desligado por padrão
@@ -62,7 +62,7 @@ A organização segue o modelo da equipe — [Estrutura do Repositório](https:/
 📂 support/                       # Comandos e utilitários reutilizáveis
 │   ├── 📂 login_commands/        # Comandos do módulo Login
 │   │   └── LoginPage.ts
-│   ├── 📂 acessovisitante_commands/  # Comandos do módulo AcessoVisitante
+│   ├── 📂 acessovisitante_commands/  # Comandos do módulo VisitanteAcesso
 │   │   ├── VisitantePage.ts, AjudaPage.ts
 │   │   └── GerenciarAutenticacaoPage.ts, CursoPage.ts
 │   ├── 📂 cadastro_commands/     # Comandos do módulo Cadastro
@@ -154,7 +154,7 @@ await login.entrar(usuarios.administrador);
 | `npm test` | Roda tudo, sem janela |
 | `npm run test:visivel` | Roda tudo com o navegador aberto |
 | `npm run test:login` | Só o módulo Login |
-| `npm run test:acesso-visitante` | Só o módulo AcessoVisitante — as suítes que alteram configuração ou enviam e-mail ficam puladas |
+| `npm run test:acesso-visitante` | Só o módulo VisitanteAcesso — as suítes que alteram configuração ou enviam e-mail ficam puladas |
 | `npm run test:cadastro` | Só o módulo Cadastro — a suíte que cria usuário fica pulada |
 | `npm run test:cadastro-real` | Suíte que cria e exclui os usuários `qa.auto1` (sem Cargo) e `qa.auto2` (com Cargo), "QA AUTOMAÇÃO"; senha em `NOVO_CADASTRO_SENHA` no `.env` — use só quando necessário |
 | `npm run test:visitante-config` | Troca "Botão de entrada como visitante" para Ocultar e Mostrar e restaura Mostrar — use só quando necessário |
