@@ -55,10 +55,12 @@ O documento não numera os casos; C01 a C14 seguem a ordem em que aparecem.
 | "Lembrar-me" | "Lembrar nome de usuário" (`rememberusername`) = "Opcional"; em "Sim" o nome é lembrado sem perguntar |
 | "Esqueci a senha" | Sempre; aponta para a "URL para 'Esqueci minha senha'" (`forgottenpasswordurl`) ou, vazia, para a página da plataforma |
 
-**Decisões tomadas com a QA (09/11)**
+**Decisões tomadas com a QA (09/11 e 10/11)**
 
 - Ordem dos módulos: Login → Cadastro → Redefinição de Senha.
 - "Sair" pelo perfil no menu lateral (avatar no fim do menu) volta para a página de login — Administrador, Adm Cliente e Estudante.
+- **C01 (10/11):** confere o título "Acesso", os campos "CPF" e "Senha" e o botão "Acessar".
+- **C08 (10/11):** antes de clicar em "Esqueci a senha", o teste verifica a "Redefinição de senha personalizada" como Administrador e, se estiver habilitada, desabilita. Confere a página "Perdeu a senha?" padrão (nome de usuário e e-mail) e deixa a personalizada desabilitada: cada suíte deixa a redefinição como precisa antes de começar — as da personalizada a habilitam no início e a desabilitam no final (`garantirRedefinicaoPersonalizada()`). Roda em todas as rodadas, sem a tag `@altera-configuracao`: ambiente de QA — decisão da QA. Depende de os testes rodarem um por vez, como nas rodadas.
 - Em 09/11 o "Botão de entrada como visitante" estava "Ocultar" (o esperado é "Mostrar"): provavelmente não foi restaurado depois da rodada semanal. O LG01 segue a configuração do momento.
 
 **Divergências entre documento e sistema**

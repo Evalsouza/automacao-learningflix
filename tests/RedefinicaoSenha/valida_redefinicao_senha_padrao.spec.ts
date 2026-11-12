@@ -1,15 +1,22 @@
 // DT/EVT - Página de Login — "Esqueci a senha", redefinição padrão (C09 a C14) — rastreabilidade em RASTREABILIDADE.md
-// A redefinição padrão só aparece com a personalizada desativada: enquanto ela estiver ativa, estes testes falham.
+// A redefinição padrão só aparece com a personalizada desabilitada: a suíte a desabilita antes de começar.
 // "Buscar" envia e-mail de recuperação para a usuária
 import { test, expect } from '../../support/e2e';
 import { semSessao } from '../../support/sessoes';
 import { usuarios } from '../../support/usuarios';
 import { paginas } from '../../fixtures/redefinicaosenha';
+import { garantirRedefinicaoPersonalizada } from '../../support/redefinicaosenha_commands/ConfiguracaoRedefinicaoPage';
 
 const motivoPadraoIndisponivel = 'Redefinição padrão não exibida: a redefinição personalizada está ativada';
 const emailDaEstudante = 'eva.souza@yopmail.com';
 
 test.use({ storageState: semSessao });
+
+// A redefinição padrão só aparece com a personalizada desabilitada: desabilita antes, se estiver habilitada — decisão da QA (10/11)
+test.beforeAll(async ({ browser }) => {
+  test.setTimeout(120_000);
+  await garantirRedefinicaoPersonalizada(browser, false);
+});
 
 test.beforeEach(({ perdeuSenha }) => perdeuSenha.acessarPeloLogin());
 

@@ -1,5 +1,12 @@
-import { Page, Locator } from '@playwright/test';
+import { Page, Locator, Browser } from '@playwright/test';
 import { PaginaBase } from '../PaginaBase';
+import { sessoes, comSessao } from '../sessoes';
+
+// Cada suíte deixa a redefinição como precisa antes de começar — decisão da QA (10/11):
+// a padrão (C08 e RS) desabilita a personalizada; as da personalizada habilitam no início e desabilitam no final
+export function garantirRedefinicaoPersonalizada(browser: Browser, ativa: boolean): Promise<boolean> {
+  return comSessao(browser, sessoes.administrador, (pagina) => new ConfiguracaoRedefinicaoPage(pagina).definirAtiva(ativa));
+}
 
 // Administração → "Configurações - Redefinição de senha personalizada"
 export class ConfiguracaoRedefinicaoPage extends PaginaBase {
@@ -29,6 +36,18 @@ export class ConfiguracaoRedefinicaoPage extends PaginaBase {
 
   selecionado(lista: Locator): Locator {
     return lista.locator('option:checked');
+  }
+
+  // Habilita ou desabilita a redefinição personalizada e salva; devolve se estava habilitada antes
+  async definirAtiva(ativa: boolean): Promise<boolean> {
+    await this.acessar();
+    const estava = await this.ativar.isChecked();
+    if (estava !== ativa) {
+      await this.ativar.setChecked(ativa);
+      await this.botaoSalvar.click();
+      await this.titulo.waitFor();
+    }
+    return estava;
   }
 
   async definir(lista: Locator, opcao: string) {

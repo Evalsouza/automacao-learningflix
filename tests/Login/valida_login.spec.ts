@@ -2,6 +2,7 @@
 import { test, expect } from '../../support/e2e';
 import { semSessao, sessoes, comSessao } from '../../support/sessoes';
 import { ConfiguracaoLoginPage } from '../../support/login_commands/ConfiguracaoLoginPage';
+import { garantirRedefinicaoPersonalizada } from '../../support/redefinicaosenha_commands/ConfiguracaoRedefinicaoPage';
 import { usuarios } from '../../support/usuarios';
 import { mensagens, paginas } from '../../fixtures/login';
 import { Factories } from '../../Factories';
@@ -14,7 +15,7 @@ test.beforeEach(({ login }) => login.acessar());
 
 test.describe('Acesso como Administrador', { tag: '@dt-pagina-de-login' }, () => {
   test('C01 - Página de login exibida', async ({ login }) => {
-    await test.step('Então a página para realizar login foi exibida', async () => {
+    await test.step('Então a página de login exibiu o título "Acesso", os campos "CPF" e "Senha" e o botão "Acessar"', async () => {
       await expect(login.titulo).toBeVisible();
       await expect(login.campoUsuario).toBeVisible();
       await expect(login.campoSenha).toBeVisible();
@@ -83,10 +84,17 @@ test.describe('Acesso como Administrador', { tag: '@dt-pagina-de-login' }, () =>
     });
   }
 
-  test('C08 - Esqueci a senha redireciona para "Perdeu a senha?"', async ({ page, login }) => {
+  // A redefinição padrão só aparece com a personalizada desabilitada: o teste a desabilita, se estiver habilitada,
+  // e a deixa assim. As suítes da personalizada a habilitam quando começam — decisão da QA (10/11)
+  test('C08 - Esqueci a senha redireciona para "Perdeu a senha?"', async ({ browser, page, login, perdeuSenha }) => {
+    await test.step('Dado que verifiquei a "Redefinição de senha personalizada" e, se habilitada, desabilitei', () =>
+      garantirRedefinicaoPersonalizada(browser, false));
     await test.step('Quando cliquei em "Esqueci a senha"', () => login.linkEsqueciSenha.click());
-    await test.step('Então a página "Perdeu a senha?" foi exibida', () =>
-      expect(page.getByRole('heading', { name: paginas.perdeuSenha })).toBeVisible());
+    await test.step('Então a página "Perdeu a senha?" foi exibida, com a busca pelo nome de usuário e pelo e-mail', async () => {
+      await expect(page.getByRole('heading', { name: paginas.perdeuSenha })).toBeVisible();
+      await expect(perdeuSenha.campoNomeDeUsuarioPadrao).toBeVisible();
+      await expect(perdeuSenha.campoEmailPadrao).toBeVisible();
+    });
   });
 });
 

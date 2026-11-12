@@ -1,7 +1,14 @@
 // Responsividade - DT/EVT - Página de Login — redefinição padrão — rastreabilidade em RASTREABILIDADE.md
-// Falha enquanto a redefinição personalizada estiver ativada
+// Desabilita a redefinição personalizada antes de começar
 import { test, expect } from '../../support/e2e';
 import { resolucoes, temRolagemHorizontal } from '../../support/responsividade';
+import { garantirRedefinicaoPersonalizada } from '../../support/redefinicaosenha_commands/ConfiguracaoRedefinicaoPage';
+
+// A redefinição padrão só aparece com a personalizada desabilitada: desabilita antes, se estiver habilitada — decisão da QA (10/11)
+test.beforeAll(async ({ browser }) => {
+  test.setTimeout(120_000);
+  await garantirRedefinicaoPersonalizada(browser, false);
+});
 
 for (const { tipo, dispositivo, resolucao } of resolucoes) {
   test.describe(`Redefinição padrão - ${tipo}`, { tag: ['@responsivo', '@dt-pagina-de-login'] }, () => {

@@ -86,7 +86,12 @@ Ao final a suíte restaura: campo primário e secundário iniciais, a configura�
 
 https://epicbrasil.atlassian.net/wiki/spaces/LP1/pages/3422929997/DT+EVT+-+P+gina+de+Login
 
-A redefinição padrão só aparece com a personalizada desativada. Enquanto a personalizada estiver ativa, estes testes **falham** com a mensagem "Redefinição padrão não exibida: a redefinição personalizada está ativada".
+A redefinição padrão só aparece com a personalizada desabilitada. Desde 10/11, cada suíte deixa a redefinição como precisa antes de começar — decisão da QA:
+
+- `valida_redefinicao_senha_padrao.spec.ts`, `validacao_responsividade_redefinicao_senha_padrao.spec.ts` e o C08 do Login **desabilitam** a personalizada, se estiver habilitada, e a deixam assim;
+- `valida_redefinicao_senha_personalizada.spec.ts`, `validacao_responsividade_redefinicao_senha_personalizada.spec.ts` e a suíte de configuração **habilitam** a personalizada no início e a **desabilitam** no final.
+
+Com isso RS01 a RS04 e a responsividade da padrão deixam de ser falha esperada. RS02 e RS03 enviam o e-mail de recuperação em toda rodada diária. Funciona com os testes rodando um por vez, como nas rodadas; em paralelo, as suítes disputariam a configuração.
 
 | Caso | Teste | Arquivo |
 |---|---|---|

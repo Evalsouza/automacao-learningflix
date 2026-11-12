@@ -4,6 +4,17 @@ import { resolucoes, temRolagemHorizontal } from '../../support/responsividade';
 import { usuariosRedefinicao } from '../../support/usuarios';
 import { mensagens } from '../../fixtures/redefinicaosenha';
 import { Factories } from '../../Factories';
+import { garantirRedefinicaoPersonalizada } from '../../support/redefinicaosenha_commands/ConfiguracaoRedefinicaoPage';
+
+// Habilita a personalizada antes, se estiver desabilitada, e desabilita no final — decisão da QA (10/11)
+test.beforeAll(async ({ browser }) => {
+  test.setTimeout(120_000);
+  await garantirRedefinicaoPersonalizada(browser, true);
+});
+test.afterAll(async ({ browser }) => {
+  test.setTimeout(120_000);
+  await garantirRedefinicaoPersonalizada(browser, false);
+});
 
 for (const { tipo, dispositivo, resolucao } of resolucoes) {
   test.describe(`Redefinição personalizada - ${tipo}`, { tag: ['@responsivo', '@dt-redefinicao-personalizada'] }, () => {

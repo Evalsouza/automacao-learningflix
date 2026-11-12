@@ -6,7 +6,10 @@ import { sessoes, semSessao, comSessao } from '../../support/sessoes';
 import { PerdeuSenhaPage } from '../../support/redefinicaosenha_commands/PerdeuSenhaPage';
 import type { Browser, Page } from '@playwright/test';
 import { CamposPerfilPage, ConfiguracaoCampo } from '../../support/cadastro_commands/CamposPerfilPage';
-import { ConfiguracaoRedefinicaoPage } from '../../support/redefinicaosenha_commands/ConfiguracaoRedefinicaoPage';
+import {
+  ConfiguracaoRedefinicaoPage,
+  garantirRedefinicaoPersonalizada,
+} from '../../support/redefinicaosenha_commands/ConfiguracaoRedefinicaoPage';
 import { lerDadosDoUsuario } from '../../support/redefinicaosenha_commands/dadosDoUsuario';
 import { usuariosRedefinicao } from '../../support/usuarios';
 import {
@@ -42,6 +45,8 @@ test.describe(
 
     test.beforeAll(async ({ browser }) => {
       test.setTimeout(600_000);
+      // Habilita a personalizada antes, se estiver desabilitada — decisão da QA (10/11)
+      await garantirRedefinicaoPersonalizada(browser, true);
       await comoAdministrador(browser, async (pagina) => {
         const campos = new CamposPerfilPage(pagina);
         for (const campo of camposAlterados) configuracaoInicial[campo] = await campos.lerConfiguracao(campo);
@@ -67,6 +72,8 @@ test.describe(
         for (const [campo, configuracao] of Object.entries(configuracaoInicial)) await campos.configurar(campo, configuracao);
         await campos.configurar('Cargo', cargoEm22Out);
       });
+      // E desabilita no final, como as demais suítes da personalizada
+      await garantirRedefinicaoPersonalizada(browser, false);
     });
 
     // RC01 a RC06 foram para a suíte de configuração do Cadastro — decisão da QA (09/11)

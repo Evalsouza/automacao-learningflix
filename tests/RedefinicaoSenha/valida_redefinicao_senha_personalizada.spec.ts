@@ -3,13 +3,26 @@
 // RP08 — usuário sem o dado cadastrado — fica na suíte de configuração, com "Cidade de Nascimento" no "Campo secundário"
 import { test, expect } from '../../support/e2e';
 import { sessoes, semSessao, comSessao } from '../../support/sessoes';
-import { ConfiguracaoRedefinicaoPage } from '../../support/redefinicaosenha_commands/ConfiguracaoRedefinicaoPage';
+import {
+  ConfiguracaoRedefinicaoPage,
+  garantirRedefinicaoPersonalizada,
+} from '../../support/redefinicaosenha_commands/ConfiguracaoRedefinicaoPage';
 import { usuariosRedefinicao } from '../../support/usuarios';
 import { lerDadosDoUsuario } from '../../support/redefinicaosenha_commands/dadosDoUsuario';
 import { mensagens, paginas, configuracaoAtual, configuracaoPrimario } from '../../fixtures/redefinicaosenha';
 import { Factories } from '../../Factories';
 
 const { evaSouza, meridaValente, anyaForger, qaAluno21 } = usuariosRedefinicao;
+
+// Habilita a personalizada antes, se estiver desabilitada, e desabilita no final — decisão da QA (10/11)
+test.beforeAll(async ({ browser }) => {
+  test.setTimeout(120_000);
+  await garantirRedefinicaoPersonalizada(browser, true);
+});
+test.afterAll(async ({ browser }) => {
+  test.setTimeout(120_000);
+  await garantirRedefinicaoPersonalizada(browser, false);
+});
 
 test.describe('CENÁRIO 1: Ativação do Reset de Senha Personalizado', { tag: '@dt-redefinicao-personalizada' }, () => {
   test.use({ storageState: sessoes.administrador });
