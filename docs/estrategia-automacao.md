@@ -1,7 +1,7 @@
 # Estratégia de Automação de Testes — LearningFlix
 
-> **Rascunho v0.1 — 12/11/2026.** Itens marcados com **[QA]** dependem de decisão ou confirmação da QA.
-> Depois de aprovado, este documento é publicado no Confluence (espaço LP1, pasta da automação) e passa a ser a referência principal; as páginas "Condições Validadas", "Rastreabilidade" e "Execução Diária" ficam ligadas a ele.
+> **Versão 1.0 — aprovada pela QA em 12/11/2026.** Itens marcados com **[QA]** ainda dependem de decisão da QA (seção 17).
+> Documento principal da automação: as páginas "Condições Validadas", "Rastreabilidade" e "Execução Diária" detalham o que está resumido aqui. A cópia no projeto fica em `docs/estrategia-automacao.md`.
 
 | Item | Valor |
 |---|---|
@@ -9,7 +9,7 @@
 | Objeto de teste | LearningFlix (Moodle) — `https://qa.learningflix.net` |
 | Responsável | Eva Souza (QA) |
 | Apoio | Claude (criação e manutenção dos scripts, análise de cobertura) |
-| Aprovação | **[QA]** |
+| Aprovação | Eva Souza — 12/11/2026 |
 
 ---
 
@@ -202,7 +202,7 @@ Os módulos rodam em ordem alfabética, um teste por vez; o Visitante roda por �
 
 ## 16. Documentos relacionados
 
-- Confluence: "Condições Validadas na Automação", "Rastreabilidade da Automação", "Execução Diária da Automação".
+- Confluence: [Condições Validadas na Automação](https://epicbrasil.atlassian.net/wiki/spaces/LP1/pages/5910954005), [Rastreabilidade da Automação](https://epicbrasil.atlassian.net/wiki/spaces/LP1/pages/5902991361), [Execução Diária da Automação](https://epicbrasil.atlassian.net/wiki/spaces/LP1/pages/5912526881).
 - Projeto: `README.md`, `CLAUDE.md`, `tests/<Módulo>/RASTREABILIDADE.md`.
 
 ## 17. Pontos em aberto **[QA]**
@@ -214,3 +214,9 @@ Os módulos rodam em ordem alfabética, um teste por vez; o Visitante roda por �
 5. Testes não funcionais (desempenho, segurança) — fora do escopo ou planejar?
 6. Limite de tempo da rodada diária (passou de 230 min em 11/11).
 7. Skill de abertura de bugs no formato da equipe (seção 11).
+
+## Histórico de versões
+
+| Versão | Data | O que mudou |
+|---|---|---|
+| 1.0 | 12/11/2026 | Primeira versão, aprovada pela QA; prioridade por risco aplicada aos 264 testes; métricas por módulo no relatório da rodada |
