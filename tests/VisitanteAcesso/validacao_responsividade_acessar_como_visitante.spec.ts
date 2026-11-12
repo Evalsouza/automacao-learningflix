@@ -2,12 +2,13 @@
 import { test, expect } from '../../support/e2e';
 import { resolucoes, temRolagemHorizontal } from '../../support/responsividade';
 import { paginas, blocos } from '../../fixtures/acessovisitante';
+import { prioridade } from '../../fixtures/prioridades';
 
 for (const { tipo, dispositivo, resolucao } of resolucoes) {
   test.describe(`Acessar como visitante - ${tipo}`, { tag: ['@responsivo', '@dt-acessar-como-visitante'] }, () => {
     test.use({ ...dispositivo, storageState: { cookies: [], origins: [] } });
 
-    test(`Acessar como visitante - ${tipo} ${resolucao}`, async ({ page, login, visitante }) => {
+    test(`Acessar como visitante - ${tipo} ${resolucao}`, { tag: prioridade('VisitanteAcesso') }, async ({ page, login, visitante }) => {
       await login.acessar();
 
       await test.step('Então "Acessar como visitante" ficou dentro da tela da página de login', async () => {

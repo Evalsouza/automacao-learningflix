@@ -7,6 +7,7 @@ import type { Browser } from '@playwright/test';
 import { RodapePage } from '../../support/rodape_commands/RodapePage';
 import { TemaPage } from '../../support/rodape_commands/TemaPage';
 import { opcoesRodape, linksDoLogin, linksAposLogin, perfisDoRodape } from '../../fixtures/rodape';
+import { prioridade } from '../../fixtures/prioridades';
 
 const executar = process.env.EXECUTAR_CONFIG_RODAPE === 'sim';
 const estadoInicial: Record<string, boolean> = {};
@@ -72,35 +73,40 @@ test.describe('Habilitar e desabilitar o footer', { tag: ['@dt-rodape', '@altera
 
   for (const { ids, opcao, quem, sessao, url, links } of casos) {
     for (const [i, habilitar] of [true, false].entries()) {
-      test(`${ids[i]} - Com "${opcao.rotulo}" ${habilitar ? 'habilitada' : 'desabilitada'}, "${quem}" ${habilitar ? 'vê' : 'NÃO vê'} "${links.join('", "')}" no rodapé`, async ({
-        browser,
-        tema,
-      }) => {
-        await test.step(`Quando ${habilitar ? 'habilitei' : 'desmarquei'} "${opcao.rotulo}" e cliquei em "Salvar mudanças"`, () =>
-          tema.definir(opcao.chave, habilitar));
-        await test.step(`Então a opção "${opcao.rotulo}" ficou ${habilitar ? 'habilitada' : 'desmarcada'}`, async () => {
-          await tema.acessar();
-          if (habilitar) await expect(tema.opcao(opcao.chave)).toBeChecked();
-          else await expect(tema.opcao(opcao.chave)).not.toBeChecked();
-        });
-        await test.step(`E no rodapé de "${quem}" as opções "${links.join('", "')}" ${habilitar ? 'foram' : 'NÃO foram'} exibidas`, async () =>
-          expect(await linksVisiveis(browser, sessao, url, links)).toEqual(todos(links, habilitar)));
-      });
+      test(
+        `${ids[i]} - Com "${opcao.rotulo}" ${habilitar ? 'habilitada' : 'desabilitada'}, "${quem}" ${habilitar ? 'vê' : 'NÃO vê'} "${links.join('", "')}" no rodapé`,
+        { tag: prioridade('Rodape', ids[i]) },
+        async ({ browser, tema }) => {
+          await test.step(`Quando ${habilitar ? 'habilitei' : 'desmarquei'} "${opcao.rotulo}" e cliquei em "Salvar mudanças"`, () =>
+            tema.definir(opcao.chave, habilitar));
+          await test.step(`Então a opção "${opcao.rotulo}" ficou ${habilitar ? 'habilitada' : 'desmarcada'}`, async () => {
+            await tema.acessar();
+            if (habilitar) await expect(tema.opcao(opcao.chave)).toBeChecked();
+            else await expect(tema.opcao(opcao.chave)).not.toBeChecked();
+          });
+          await test.step(`E no rodapé de "${quem}" as opções "${links.join('", "')}" ${habilitar ? 'foram' : 'NÃO foram'} exibidas`, async () =>
+            expect(await linksVisiveis(browser, sessao, url, links)).toEqual(todos(links, habilitar)));
+        },
+      );
     }
   }
 
-  test('RD16 - Com as 3 opções habilitadas, cada perfil vê o rodapé conforme a sua permissão', async ({ browser, tema }) => {
-    await test.step('Quando habilitei as 3 opções de footer e cliquei em "Salvar mudanças"', async () => {
-      await tema.acessar();
-      for (const { chave } of Object.values(opcoesRodape)) await tema.opcao(chave).setChecked(true);
-      await tema.botaoSalvar.click();
-      await tema.mensagemGravada.waitFor();
-    });
-    for (const { perfil, sessao, opcao } of perfisDoRodape) {
-      await test.step(`Então "${perfil}" viu "${linksAposLogin.join('" e "')}" no rodapé — opção "${opcoesRodape[opcao].rotulo}"`, async () =>
-        expect(await linksVisiveis(browser, sessao, '/my/', linksAposLogin)).toEqual(todos(linksAposLogin, true)));
-    }
-    await test.step(`E a página de login exibiu "${linksDoLogin.join('", "')}" no rodapé`, async () =>
-      expect(await linksVisiveis(browser, semSessao, '/login/index.php', linksDoLogin)).toEqual(todos(linksDoLogin, true)));
-  });
+  test(
+    'RD16 - Com as 3 opções habilitadas, cada perfil vê o rodapé conforme a sua permissão',
+    { tag: prioridade('Rodape', 'RD16') },
+    async ({ browser, tema }) => {
+      await test.step('Quando habilitei as 3 opções de footer e cliquei em "Salvar mudanças"', async () => {
+        await tema.acessar();
+        for (const { chave } of Object.values(opcoesRodape)) await tema.opcao(chave).setChecked(true);
+        await tema.botaoSalvar.click();
+        await tema.mensagemGravada.waitFor();
+      });
+      for (const { perfil, sessao, opcao } of perfisDoRodape) {
+        await test.step(`Então "${perfil}" viu "${linksAposLogin.join('" e "')}" no rodapé — opção "${opcoesRodape[opcao].rotulo}"`, async () =>
+          expect(await linksVisiveis(browser, sessao, '/my/', linksAposLogin)).toEqual(todos(linksAposLogin, true)));
+      }
+      await test.step(`E a página de login exibiu "${linksDoLogin.join('", "')}" no rodapé`, async () =>
+        expect(await linksVisiveis(browser, semSessao, '/login/index.php', linksDoLogin)).toEqual(todos(linksDoLogin, true)));
+    },
+  );
 });

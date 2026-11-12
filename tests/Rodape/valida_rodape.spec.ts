@@ -3,37 +3,46 @@
 import { test, expect } from '../../support/e2e';
 import { sessoes, semSessao } from '../../support/sessoes';
 import { opcoesRodape, padraoDasOpcoes, linksDoLogin, linksAposLogin, perfisDoRodape } from '../../fixtures/rodape';
+import { prioridade } from '../../fixtures/prioridades';
 
 test.describe('Configuração do footer no Tema', { tag: '@dt-rodape' }, () => {
   test.use({ storageState: sessoes.administrador });
 
-  test('RD01 - "Configurações gerais" do Tema exibe as 3 opções de footer desmarcadas', async ({ tema }) => {
-    await test.step('Quando acessei "Administração do site → Aparência → Temas → Tema" e a aba "Configurações gerais"', () =>
-      tema.acessar());
-    for (const { rotulo, chave } of Object.values(opcoesRodape)) {
-      await test.step(`Então a opção "${rotulo}" foi exibida com "${padraoDasOpcoes}" e desmarcada`, async () => {
-        await expect(tema.blocoDaOpcao(chave)).toContainText(rotulo);
-        await expect(tema.blocoDaOpcao(chave)).toContainText(padraoDasOpcoes);
-        await expect(tema.opcao(chave)).not.toBeChecked();
-      });
-    }
-  });
+  test(
+    'RD01 - "Configurações gerais" do Tema exibe as 3 opções de footer desmarcadas',
+    { tag: prioridade('Rodape', 'RD01') },
+    async ({ tema }) => {
+      await test.step('Quando acessei "Administração do site → Aparência → Temas → Tema" e a aba "Configurações gerais"', () =>
+        tema.acessar());
+      for (const { rotulo, chave } of Object.values(opcoesRodape)) {
+        await test.step(`Então a opção "${rotulo}" foi exibida com "${padraoDasOpcoes}" e desmarcada`, async () => {
+          await expect(tema.blocoDaOpcao(chave)).toContainText(rotulo);
+          await expect(tema.blocoDaOpcao(chave)).toContainText(padraoDasOpcoes);
+          await expect(tema.opcao(chave)).not.toBeChecked();
+        });
+      }
+    },
+  );
 });
 
 test.describe('Rodapé com as opções desabilitadas', { tag: '@dt-rodape' }, () => {
   test.describe('Sem login', () => {
     test.use({ storageState: semSessao });
 
-    test(`RD02 - Página de login exibe só o idioma e os direitos, sem "${linksDoLogin.join('", "')}"`, async ({ rodape }) => {
-      await test.step('Quando acessei a página de login', () => rodape.acessar('/login/index.php'));
-      await test.step('Então o rodapé exibiu o idioma e "© Desenvolvido por"', async () => {
-        await rodape.irParaOFim();
-        await expect(rodape.idioma).toBeVisible();
-        await expect(rodape.direitos).toBeVisible();
-      });
-      for (const link of linksDoLogin)
-        await test.step(`E a opção "${link}" NÃO foi exibida`, () => expect(rodape.link(link)).toHaveCount(0));
-    });
+    test(
+      `RD02 - Página de login exibe só o idioma e os direitos, sem "${linksDoLogin.join('", "')}"`,
+      { tag: prioridade('Rodape', 'RD02') },
+      async ({ rodape }) => {
+        await test.step('Quando acessei a página de login', () => rodape.acessar('/login/index.php'));
+        await test.step('Então o rodapé exibiu o idioma e "© Desenvolvido por"', async () => {
+          await rodape.irParaOFim();
+          await expect(rodape.idioma).toBeVisible();
+          await expect(rodape.direitos).toBeVisible();
+        });
+        for (const link of linksDoLogin)
+          await test.step(`E a opção "${link}" NÃO foi exibida`, () => expect(rodape.link(link)).toHaveCount(0));
+      },
+    );
   });
 
   const ids = ['RD03', 'RD04', 'RD05'];
@@ -41,16 +50,20 @@ test.describe('Rodapé com as opções desabilitadas', { tag: '@dt-rodape' }, ()
     test.describe(perfil, () => {
       test.use({ storageState: sessao });
 
-      test(`${ids[i]} - "${perfil}" vê o rodapé sem "${linksAposLogin.join('" e "')}"`, async ({ rodape }) => {
-        await test.step('Quando acessei a "Página inicial"', () => rodape.acessar('/my/'));
-        await test.step('Então o rodapé exibiu o idioma e "© Desenvolvido por"', async () => {
-          await rodape.irParaOFim();
-          await expect(rodape.idioma).toBeVisible();
-          await expect(rodape.direitos).toBeVisible();
-        });
-        for (const link of linksAposLogin)
-          await test.step(`E a opção "${link}" NÃO foi exibida`, () => expect(rodape.link(link)).toHaveCount(0));
-      });
+      test(
+        `${ids[i]} - "${perfil}" vê o rodapé sem "${linksAposLogin.join('" e "')}"`,
+        { tag: prioridade('Rodape', ids[i]) },
+        async ({ rodape }) => {
+          await test.step('Quando acessei a "Página inicial"', () => rodape.acessar('/my/'));
+          await test.step('Então o rodapé exibiu o idioma e "© Desenvolvido por"', async () => {
+            await rodape.irParaOFim();
+            await expect(rodape.idioma).toBeVisible();
+            await expect(rodape.direitos).toBeVisible();
+          });
+          for (const link of linksAposLogin)
+            await test.step(`E a opção "${link}" NÃO foi exibida`, () => expect(rodape.link(link)).toHaveCount(0));
+        },
+      );
     });
   });
 });

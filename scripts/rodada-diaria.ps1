@@ -5,6 +5,7 @@
 # Em cada pasta:
 #   resumo.txt          — resultado da rodada (o mesmo do terminal)
 #   resultado.json      — resultado completo, para análise
+#   metricas.json       — métricas por módulo: executados, aprovação, instáveis e tempo
 #   playwright-report\  — relatório HTML com prints e vídeos (abra o index.html)
 #   execucao.log        — saída completa do comando
 #   status.json         — início, fim, código de saída, se a rodada terminou e se foi interrompida pelo limite
@@ -55,7 +56,7 @@ if ($rodada.WaitForExit($limiteMinutos * 60 * 1000)) {
   Add-Content -Encoding utf8 "$pasta\execucao.log" "`r`n*** Rodada encerrada: passou do limite de $limiteMinutos minutos ***"
 }
 
-foreach ($arquivo in 'resumo.txt', 'resultado.json') {
+foreach ($arquivo in 'resumo.txt', 'resultado.json', 'metricas.json') {
   $origem = Join-Path $projeto "test-results\$arquivo"
   if (Test-Path $origem) { Copy-Item $origem $pasta -Force }
 }

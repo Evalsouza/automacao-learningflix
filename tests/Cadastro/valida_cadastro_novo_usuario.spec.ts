@@ -12,6 +12,7 @@ import { novoCadastro, novoCadastroComCargo } from '../../support/usuarios';
 import { cargos, pais } from '../../fixtures/cadastro';
 import { Factories } from '../../Factories';
 import type { Browser } from '@playwright/test';
+import { prioridade } from '../../fixtures/prioridades';
 
 const executar = process.env.EXECUTAR_CADASTRO_REAL === 'sim';
 const nomeCompleto = (usuario: { nome: string; sobrenome: string }) => `${usuario.nome} ${usuario.sobrenome}`;
@@ -54,71 +55,74 @@ test.describe('CENÁRIO 1: Cadastro de usuário com Cargo "Comum" — cadastro r
     test.describe.serial(`Usuário "${usuario.identificacao}" ${cargo ? 'com' : 'sem'} "Cargo"`, () => {
       test.setTimeout(300_000);
 
-      test(`${ids.cadastro} - Cadastro ${cargo ? `com "Cargo" ${cargoEsperado}` : 'sem "Cargo"'} exibe o campo "Cargo" ${cargoEsperado} na "Minha página"`, async ({
-        browser,
-        page,
-        login,
-        minhaPagina,
-      }) => {
-        // Cargo comum, sem ser gestor — decisão da QA (09/11)
-        if (cargo)
-          await test.step(`Dado que "${cargo}" está com "Cargo Gestor" = "Não" no "Gerenciador de Hierarquia"`, () =>
-            comSessao(browser, sessoes.administrador, async (pagina) => {
-              const hierarquia = new GerenciadorHierarquiaPage(pagina);
-              await hierarquia.acessarCargos();
-              expect(await hierarquia.cargosGestores(), 'cargos de gestão').not.toContain(cargo);
-            }));
-        await test.step(`Quando realizei o cadastro do usuário "${usuario.identificacao}" ${cargo ? `com o "Cargo" ${cargoEsperado}` : 'sem preencher o campo "Cargo"'}`, () =>
-          comSessao(browser, semSessao, async (pagina) => {
-            const criarConta = new CriarContaPage(pagina);
-            await criarConta.acessarPeloLogin();
-            await criarConta.verificarIdadeELocalizacao(Factories.cadastro.idadeAdulta(), pais);
-            await criarConta.preencherNovaConta({ ...usuario, dataNascimento: Factories.cadastro.dataNascimentoAdulta() });
-            if (cargo) await criarConta.selecionarCargo(cargo);
-            await criarConta.botaoCriarMinhaConta.click();
-            // Se o formulário não avançar, a falha mostra as mensagens dos campos
-            await expect(criarConta.botaoCriarMinhaConta)
-              .toBeHidden()
-              .catch(async (erro) => {
-                const mensagens = await criarConta.page.locator('.form-control-feedback:visible').allInnerTexts();
-                throw new Error(`"Nova conta" não foi criada. Mensagens do formulário: ${JSON.stringify(mensagens.filter(Boolean))}
+      test(
+        `${ids.cadastro} - Cadastro ${cargo ? `com "Cargo" ${cargoEsperado}` : 'sem "Cargo"'} exibe o campo "Cargo" ${cargoEsperado} na "Minha página"`,
+        { tag: prioridade('Cadastro', ids.cadastro) },
+        async ({ browser, page, login, minhaPagina }) => {
+          // Cargo comum, sem ser gestor — decisão da QA (09/11)
+          if (cargo)
+            await test.step(`Dado que "${cargo}" está com "Cargo Gestor" = "Não" no "Gerenciador de Hierarquia"`, () =>
+              comSessao(browser, sessoes.administrador, async (pagina) => {
+                const hierarquia = new GerenciadorHierarquiaPage(pagina);
+                await hierarquia.acessarCargos();
+                expect(await hierarquia.cargosGestores(), 'cargos de gestão').not.toContain(cargo);
+              }));
+          await test.step(`Quando realizei o cadastro do usuário "${usuario.identificacao}" ${cargo ? `com o "Cargo" ${cargoEsperado}` : 'sem preencher o campo "Cargo"'}`, () =>
+            comSessao(browser, semSessao, async (pagina) => {
+              const criarConta = new CriarContaPage(pagina);
+              await criarConta.acessarPeloLogin();
+              await criarConta.verificarIdadeELocalizacao(Factories.cadastro.idadeAdulta(), pais);
+              await criarConta.preencherNovaConta({ ...usuario, dataNascimento: Factories.cadastro.dataNascimentoAdulta() });
+              if (cargo) await criarConta.selecionarCargo(cargo);
+              await criarConta.botaoCriarMinhaConta.click();
+              // Se o formulário não avançar, a falha mostra as mensagens dos campos
+              await expect(criarConta.botaoCriarMinhaConta)
+                .toBeHidden()
+                .catch(async (erro) => {
+                  const mensagens = await criarConta.page.locator('.form-control-feedback:visible').allInnerTexts();
+                  throw new Error(`"Nova conta" não foi criada. Mensagens do formulário: ${JSON.stringify(mensagens.filter(Boolean))}
 ${erro}`);
-              });
-          }));
-        await test.step('E a conta foi confirmada pelo Administrador', () =>
-          comSessao(browser, sessoes.administrador, async (pagina) => {
-            const lista = new ListaUsuariosAdminPage(pagina);
-            await lista.acessar();
-            await lista.filtrarPorNome(nome);
-            await lista.confirmarConta(usuario.email);
-          }));
-        await test.step(`E entrei com o novo usuário "${usuario.identificacao}" e a senha cadastrada`, async () => {
-          await login.acessar();
-          await login.entrar(usuario);
-          await expect(page).not.toHaveURL(/\/login\//);
-        });
-        await test.step(`Então na "Minha página" o campo "Cargo" foi exibido ${cargoEsperado}`, async () => {
-          await minhaPagina.acessar();
-          if (cargo) expect(await minhaPagina.valorOuVazio('Cargo')).toBe(cargo);
-          else expect(await minhaPagina.valorOuVazio('Cargo')).toMatch(/^(Nenhum cargo selecionado)?$/);
-        });
-      });
+                });
+            }));
+          await test.step('E a conta foi confirmada pelo Administrador', () =>
+            comSessao(browser, sessoes.administrador, async (pagina) => {
+              const lista = new ListaUsuariosAdminPage(pagina);
+              await lista.acessar();
+              await lista.filtrarPorNome(nome);
+              await lista.confirmarConta(usuario.email);
+            }));
+          await test.step(`E entrei com o novo usuário "${usuario.identificacao}" e a senha cadastrada`, async () => {
+            await login.acessar();
+            await login.entrar(usuario);
+            await expect(page).not.toHaveURL(/\/login\//);
+          });
+          await test.step(`Então na "Minha página" o campo "Cargo" foi exibido ${cargoEsperado}`, async () => {
+            await minhaPagina.acessar();
+            if (cargo) expect(await minhaPagina.valorOuVazio('Cargo')).toBe(cargo);
+            else expect(await minhaPagina.valorOuVazio('Cargo')).toMatch(/^(Nenhum cargo selecionado)?$/);
+          });
+        },
+      );
 
       for (const { id, perfil, sessao } of [
         { id: ids.cliente, perfil: 'Adm Cliente', sessao: sessoes.cliente },
         { id: ids.administrador, perfil: 'Administrador', sessao: sessoes.administrador },
       ]) {
-        test(`${id} - "${perfil}" consulta o Cargo de "${usuario.identificacao}" em "Gerenciar usuários"`, async ({ browser }) => {
-          const lido =
-            await test.step(`Quando acessei com o "${perfil}" "Gerenciar usuários", pesquisei "${usuario.email}" e abri "Editar usuário"`, () =>
-              comSessao(browser, sessao, (pagina) => new GerenciarUsuariosPage(pagina).cargoDoUsuario(usuario.email)));
-          await test.step(`Então o campo "Cargo" exibiu ${cargoEsperado}, e fechei sem salvar`, () => expect(lido).toBe(cargo));
-        });
+        test(
+          `${id} - "${perfil}" consulta o Cargo de "${usuario.identificacao}" em "Gerenciar usuários"`,
+          { tag: prioridade('Cadastro', id) },
+          async ({ browser }) => {
+            const lido =
+              await test.step(`Quando acessei com o "${perfil}" "Gerenciar usuários", pesquisei "${usuario.email}" e abri "Editar usuário"`, () =>
+                comSessao(browser, sessao, (pagina) => new GerenciarUsuariosPage(pagina).cargoDoUsuario(usuario.email)));
+            await test.step(`Então o campo "Cargo" exibiu ${cargoEsperado}, e fechei sem salvar`, () => expect(lido).toBe(cargo));
+          },
+        );
       }
     });
   }
 
-  test('C005 - E-mail de confirmação do cadastro exibe o link de confirmação', async () => {
+  test('C005 - E-mail de confirmação do cadastro exibe o link de confirmação', { tag: prioridade('Cadastro', 'C005') }, async () => {
     test.fixme(true, 'Depende da caixa de entrada do yopmail: site externo, fora do ambiente de QA');
   });
 });

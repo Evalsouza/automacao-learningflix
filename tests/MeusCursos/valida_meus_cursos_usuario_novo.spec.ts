@@ -11,6 +11,7 @@ import { textosMeusCursos, obrigatoriedades } from '../../fixtures/meuscursos';
 import { pais } from '../../fixtures/cadastro';
 import { Factories } from '../../Factories';
 import type { Browser } from '@playwright/test';
+import { prioridade } from '../../fixtures/prioridades';
 
 const executar = process.env.EXECUTAR_MEUS_CURSOS_NOVO === 'sim';
 const nomeCompleto = `${usuario.nome} ${usuario.sobrenome}`;
@@ -61,38 +62,50 @@ ${erro}`);
     await expect(login.page).not.toHaveURL(/\/login\//);
   });
 
-  test('MC20 - Sem cursos, o bloco "Meus Cursos" é exibido sem cards e com o botão "Ver todos"', async ({ meusCursos }) => {
-    await test.step(`Quando acessei a "Página inicial" com o novo usuário "${usuario.identificacao}"`, () => meusCursos.acessarHome());
-    await test.step(`Então o bloco "${textosMeusCursos.titulo}" foi exibido com o botão "${textosMeusCursos.verTodos}"`, async () => {
-      await expect(meusCursos.tituloDoBloco).toBeVisible();
-      await expect(meusCursos.verTodos).toBeVisible();
-    });
-    await test.step('E nenhum card de curso foi exibido', async () => {
-      await meusCursos.aguardarCards();
-      await expect(meusCursos.cardsDoBloco).toHaveCount(0);
-    });
-  });
-
-  test(`MC21 - Sem cursos, o "Ver todos" apresenta "${textosMeusCursos.semCursos}"`, async ({ page, meusCursos }) => {
-    await test.step('Quando cliquei em "Ver todos" no bloco "Meus Cursos"', async () => {
-      await meusCursos.acessarHome();
-      await meusCursos.verTodos.click();
-      await page.waitForURL(/\/blocks\/mycourses\/index\.php/);
-      await meusCursos.aguardarCards();
-    });
-    await test.step(`Então a página "${textosMeusCursos.titulo}" apresentou "${textosMeusCursos.semCursos}", sem cards`, async () => {
-      await expect(meusCursos.tituloDaPagina).toBeVisible();
-      await expect(meusCursos.semCursos).toBeVisible();
-      await expect(meusCursos.cardsDaPagina).toHaveCount(0);
-    });
-  });
-
-  test('MC22 - Sem cursos, "Necessário" e "Opcional" do bloco apresentam o estado sem cursos', async ({ meusCursos }) => {
-    await test.step('Dado que acessei a "Página inicial"', () => meusCursos.acessarHome());
-    for (const opcao of obrigatoriedades)
-      await test.step(`Quando selecionei "${opcao}", então nenhum curso foi exibido no lugar`, async () => {
-        await meusCursos.selecionarObrigatoriedade(opcao);
+  test(
+    'MC20 - Sem cursos, o bloco "Meus Cursos" é exibido sem cards e com o botão "Ver todos"',
+    { tag: prioridade('MeusCursos', 'MC20') },
+    async ({ meusCursos }) => {
+      await test.step(`Quando acessei a "Página inicial" com o novo usuário "${usuario.identificacao}"`, () => meusCursos.acessarHome());
+      await test.step(`Então o bloco "${textosMeusCursos.titulo}" foi exibido com o botão "${textosMeusCursos.verTodos}"`, async () => {
+        await expect(meusCursos.tituloDoBloco).toBeVisible();
+        await expect(meusCursos.verTodos).toBeVisible();
+      });
+      await test.step('E nenhum card de curso foi exibido', async () => {
+        await meusCursos.aguardarCards();
         await expect(meusCursos.cardsDoBloco).toHaveCount(0);
       });
-  });
+    },
+  );
+
+  test(
+    `MC21 - Sem cursos, o "Ver todos" apresenta "${textosMeusCursos.semCursos}"`,
+    { tag: prioridade('MeusCursos', 'MC21') },
+    async ({ page, meusCursos }) => {
+      await test.step('Quando cliquei em "Ver todos" no bloco "Meus Cursos"', async () => {
+        await meusCursos.acessarHome();
+        await meusCursos.verTodos.click();
+        await page.waitForURL(/\/blocks\/mycourses\/index\.php/);
+        await meusCursos.aguardarCards();
+      });
+      await test.step(`Então a página "${textosMeusCursos.titulo}" apresentou "${textosMeusCursos.semCursos}", sem cards`, async () => {
+        await expect(meusCursos.tituloDaPagina).toBeVisible();
+        await expect(meusCursos.semCursos).toBeVisible();
+        await expect(meusCursos.cardsDaPagina).toHaveCount(0);
+      });
+    },
+  );
+
+  test(
+    'MC22 - Sem cursos, "Necessário" e "Opcional" do bloco apresentam o estado sem cursos',
+    { tag: prioridade('MeusCursos', 'MC22') },
+    async ({ meusCursos }) => {
+      await test.step('Dado que acessei a "Página inicial"', () => meusCursos.acessarHome());
+      for (const opcao of obrigatoriedades)
+        await test.step(`Quando selecionei "${opcao}", então nenhum curso foi exibido no lugar`, async () => {
+          await meusCursos.selecionarObrigatoriedade(opcao);
+          await expect(meusCursos.cardsDoBloco).toHaveCount(0);
+        });
+    },
+  );
 });

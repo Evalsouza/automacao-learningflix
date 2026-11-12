@@ -170,6 +170,8 @@ await login.entrar(usuarios.administrador);
 | `npm run test:meus-cursos` | Só o módulo MeusCursos — as suítes de configuração e de usuário novo ficam puladas |
 | `npm run test:meus-cursos-config` | Troca "Número de cards na página" do bloco Meus Cursos e restaura no final — use só quando necessário |
 | `npm run test:meus-cursos-novo` | Cria o usuário `qa.auto3`, valida o bloco e o "Ver todos" sem cursos e o exclui — bloqueado pelo defeito do cadastro |
+| `npm run test:critico` | Só os testes de prioridade crítica — verificação rápida da plataforma |
+| `npm run test:prioridade-alta` | Testes críticos e de prioridade alta |
 | `npm run test:responsivo` | Só os testes de resolução |
 | `npm run report` | Abre o relatório da última execução |
 | `npm run lint` | ESLint |
@@ -219,6 +221,7 @@ Os vídeos (mp4, webm…) não são baixados nos testes: os do carrossel deixava
 - **Arquivo de responsividade:** `validacao_responsividade_` + nome da validação — `validacao_responsividade_login.spec.ts`, `validacao_responsividade_visualizar_senha.spec.ts`. Um por validação, para ficarem agrupados.
 - **Título do teste:** ID do caso no DT/EVT + o resultado esperado — `C02 - Login válido redireciona para a página inicial`.
 - **Passos:** um `test.step` por intenção, no formato Quando / E / Então.
+- **Prioridade por risco:** todo teste leva `{ tag: prioridade('<Módulo>', '<ID>') }` — `@critico`, `@alto`, `@medio` ou `@baixo`, definidos em `fixtures/prioridades.ts` (Estratégia de Automação, seção 9). ID novo sem regra na tabela faz a listagem falhar.
 - **Tags:** `@dt-<documento>` em todo teste; `@responsivo` para resolução. Testes que o DT/EVT não cobre não levam tag: ficam registrados no `RASTREABILIDADE.md` do módulo.
 - **Responsividade:** toda validação tem seu arquivo `validacao_responsividade_*`, com um teste por resolução — Celular, Celular rotacionado, Tablet e Monitor.
 - **Rastreabilidade:** no `RASTREABILIDADE.md` do módulo, não dentro do teste.

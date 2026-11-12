@@ -6,6 +6,8 @@ import { dirname, relative, sep } from 'node:path';
 // Também salvo, sem cores, em test-results/resumo.txt — a skill de fechamento do dia pode ler.
 
 const ARQUIVO_RESUMO = 'test-results/resumo.txt';
+// Métricas de automação por módulo (ISTQB CTAL-TAE): a rodada copia para relatorios/AAAA-MM-DD/
+const ARQUIVO_METRICAS = 'test-results/metricas.json';
 
 const cor = process.stdout.isTTY
   ? { verde: '\x1b[32m', vermelho: '\x1b[31m', amarelo: '\x1b[33m', cinza: '\x1b[90m', negrito: '\x1b[1m', fim: '\x1b[0m' }
@@ -119,6 +121,32 @@ class ResumoReporter implements Reporter {
       });
     }
 
+    // Métricas por módulo: aprovação sobre os executados (sem pulados e pendentes), instáveis e tempo
+    const metricas = [...porModulo].map(([nome, lista]) => {
+      const de = (s: Situacao) => lista.filter((t) => situacao(t) === s).length;
+      const executadosNoModulo = de('passou') + de('falhou') + de('instavel');
+      return {
+        modulo: nome,
+        total: lista.length,
+        executados: executadosNoModulo,
+        passaram: de('passou'),
+        falharam: de('falhou'),
+        instaveis: de('instavel'),
+        pulados: de('pulado') + de('pendente') + de('nao-executado'),
+        aprovacao: executadosNoModulo ? Math.round((de('passou') / executadosNoModulo) * 1000) / 10 : null,
+        tempoMs: lista.reduce((total, t) => total + t.results.reduce((s, r) => s + r.duration, 0), 0),
+      };
+    });
+    escreve();
+    escreve(`${cor.negrito}📊 MÉTRICAS DA RODADA${cor.fim}`);
+    escreve(
+      `${cor.cinza}  ${'Módulo'.padEnd(32)}${'Executados'.padStart(11)}${'Passaram'.padStart(10)}${'Falharam'.padStart(10)}${'Instáveis'.padStart(11)}${'Aprovação'.padStart(11)}${'Tempo'.padStart(10)}${cor.fim}`,
+    );
+    for (const m of metricas)
+      escreve(
+        `  ${corta(m.modulo, 30).padEnd(32)}${String(m.executados).padStart(11)}${String(m.passaram).padStart(10)}${String(m.falharam).padStart(10)}${String(m.instaveis).padStart(11)}${(m.aprovacao === null ? '—' : `${m.aprovacao}%`).padStart(11)}${duracao(m.tempoMs).padStart(10)}`,
+      );
+
     const conta = (s: Situacao) => testes.filter((t) => situacao(t) === s).length;
     const executados = testes.length - conta('nao-executado') - conta('pulado') - conta('pendente');
     escreve();
@@ -146,6 +174,27 @@ class ResumoReporter implements Reporter {
     process.stdout.write(texto + '\n');
     mkdirSync(dirname(ARQUIVO_RESUMO), { recursive: true });
     writeFileSync(ARQUIVO_RESUMO, semCores(texto), 'utf8');
+    const passaram = conta('passou');
+    writeFileSync(
+      ARQUIVO_METRICAS,
+      JSON.stringify(
+        {
+          data: new Date().toISOString(),
+          situacao: resultado.status,
+          duracaoMs: resultado.duration,
+          total: testes.length,
+          executados,
+          passaram,
+          falharam: conta('falhou'),
+          instaveis: conta('instavel'),
+          aprovacao: executados ? Math.round((passaram / executados) * 1000) / 10 : null,
+          modulos: metricas,
+        },
+        null,
+        2,
+      ),
+      'utf8',
+    );
   }
 
   printsToStdio() {

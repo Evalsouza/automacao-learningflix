@@ -21,6 +21,8 @@
     "test:carrossel-config": "cross-env EXECUTAR_CONFIG_CARROSSEL=sim playwright test tests/Carrossel/valida_configuracao_carrossel.spec.ts --project=desktop",
     "test:meus-cursos-config": "cross-env EXECUTAR_CONFIG_MEUS_CURSOS=sim playwright test tests/MeusCursos/valida_configuracao_meus_cursos.spec.ts --project=desktop",
     "test:meus-cursos-novo": "cross-env EXECUTAR_MEUS_CURSOS_NOVO=sim playwright test tests/MeusCursos/valida_meus_cursos_usuario_novo.spec.ts --project=desktop",
+    "test:critico": "playwright test --project=desktop --grep @critico",
+    "test:prioridade-alta": "playwright test --project=desktop --grep \"@critico|@alto\"",
     "test:responsivo": "playwright test --project=desktop --grep @responsivo",
     "test:diaria": "playwright test --project=desktop",
     "test:semanal": "cross-env EXECUTAR_CADASTRO_REAL=sim EXECUTAR_CONFIG_CADASTRO=sim EXECUTAR_CONFIG_VISITANTE=sim EXECUTAR_ENVIO_AJUDA=sim EXECUTAR_CONFIG_REDEFINICAO=sim EXECUTAR_CONFIG_RODAPE=sim EXECUTAR_CONFIG_CARROSSEL=sim EXECUTAR_CONFIG_MEUS_CURSOS=sim EXECUTAR_MEUS_CURSOS_NOVO=sim playwright test --project=desktop --grep \"@altera-configuracao|@cria-usuario|@envia-email\"",

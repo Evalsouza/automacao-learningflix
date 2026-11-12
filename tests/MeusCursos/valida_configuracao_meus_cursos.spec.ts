@@ -6,6 +6,7 @@ import { sessoes, comSessao } from '../../support/sessoes';
 import { ConfiguracaoMeusCursosPage } from '../../support/meuscursos_commands/ConfiguracaoMeusCursosPage';
 import { MeusCursosPage } from '../../support/meuscursos_commands/MeusCursosPage';
 import { textosMeusCursos, limitesMeusCursos } from '../../fixtures/meuscursos';
+import { prioridade } from '../../fixtures/prioridades';
 
 const executar = process.env.EXECUTAR_CONFIG_MEUS_CURSOS === 'sim';
 let valorInicial = '';
@@ -30,47 +31,52 @@ test.describe('CASOS DE TESTE 01: configuração do bloco "Meus Cursos"', { tag:
     });
   });
 
-  test(`MC10 - "Número de cards na página" do bloco é exibido com o padrão ${limitesMeusCursos.cardsPorPaginaPadrao}`, async ({
-    configuracaoMeusCursos,
-  }) => {
-    await test.step('Quando acessei a configuração do bloco "Meus Cursos" em "Plugins → Blocos"', () => configuracaoMeusCursos.acessar());
-    await test.step(`Então o campo "Número de cards na página" foi exibido com "Padrão: ${limitesMeusCursos.cardsPorPaginaPadrao}"`, async () => {
-      await expect(configuracaoMeusCursos.cardsPorPagina).toBeVisible();
-      await expect(configuracaoMeusCursos.blocoDoCampo).toContainText(`Padrão: ${limitesMeusCursos.cardsPorPaginaPadrao}`);
-    });
-  });
+  test(
+    `MC10 - "Número de cards na página" do bloco é exibido com o padrão ${limitesMeusCursos.cardsPorPaginaPadrao}`,
+    { tag: prioridade('MeusCursos', 'MC10') },
+    async ({ configuracaoMeusCursos }) => {
+      await test.step('Quando acessei a configuração do bloco "Meus Cursos" em "Plugins → Blocos"', () => configuracaoMeusCursos.acessar());
+      await test.step(`Então o campo "Número de cards na página" foi exibido com "Padrão: ${limitesMeusCursos.cardsPorPaginaPadrao}"`, async () => {
+        await expect(configuracaoMeusCursos.cardsPorPagina).toBeVisible();
+        await expect(configuracaoMeusCursos.blocoDoCampo).toContainText(`Padrão: ${limitesMeusCursos.cardsPorPaginaPadrao}`);
+      });
+    },
+  );
 
-  test(`MC11 - "Número de cards na página" abaixo de ${limitesMeusCursos.cardsPorPaginaPadrao} NÃO é salvo`, async ({
-    configuracaoMeusCursos,
-  }) => {
-    await test.step(`Quando informei "${limitesMeusCursos.abaixoDoMinimo}" e cliquei em "Salvar mudanças"`, async () => {
-      await configuracaoMeusCursos.acessar();
-      await configuracaoMeusCursos.definir(limitesMeusCursos.abaixoDoMinimo);
-    });
-    await test.step(`Então o valor NÃO foi gravado: a configuração continuou com "${valorInicial}"`, async () => {
-      await expect(configuracaoMeusCursos.page.getByText(textosMeusCursos.gravadas)).toBeHidden();
-      expect(await configuracaoMeusCursos.valorAtual()).toBe(valorInicial);
-    });
-  });
+  test(
+    `MC11 - "Número de cards na página" abaixo de ${limitesMeusCursos.cardsPorPaginaPadrao} NÃO é salvo`,
+    { tag: prioridade('MeusCursos', 'MC11') },
+    async ({ configuracaoMeusCursos }) => {
+      await test.step(`Quando informei "${limitesMeusCursos.abaixoDoMinimo}" e cliquei em "Salvar mudanças"`, async () => {
+        await configuracaoMeusCursos.acessar();
+        await configuracaoMeusCursos.definir(limitesMeusCursos.abaixoDoMinimo);
+      });
+      await test.step(`Então o valor NÃO foi gravado: a configuração continuou com "${valorInicial}"`, async () => {
+        await expect(configuracaoMeusCursos.page.getByText(textosMeusCursos.gravadas)).toBeHidden();
+        expect(await configuracaoMeusCursos.valorAtual()).toBe(valorInicial);
+      });
+    },
+  );
 
-  test(`MC12 - Com "Número de cards na página" = ${limitesMeusCursos.cardsPorPaginaDeTeste}, o "Ver todos" apresenta ${limitesMeusCursos.cardsPorPaginaDeTeste} cards por página`, async ({
-    browser,
-    configuracaoMeusCursos,
-  }) => {
-    await test.step(`Quando informei "${limitesMeusCursos.cardsPorPaginaDeTeste}" e cliquei em "Salvar mudanças"`, async () => {
-      await configuracaoMeusCursos.acessar();
-      await configuracaoMeusCursos.definir(limitesMeusCursos.cardsPorPaginaDeTeste);
-    });
-    await test.step(`Então a mensagem "${textosMeusCursos.gravadas}" foi exibida`, () =>
-      expect(configuracaoMeusCursos.page.getByText(textosMeusCursos.gravadas).first()).toBeVisible());
-    await test.step(`E o "Ver todos" da Estudante apresentou ${limitesMeusCursos.cardsPorPaginaDeTeste} cards na página 1`, () =>
-      comSessao(browser, sessoes.estudante, async (pagina) => {
-        const meusCursos = new MeusCursosPage(pagina);
-        await meusCursos.acessarHome();
-        await meusCursos.verTodos.click();
-        await pagina.waitForURL(/\/blocks\/mycourses\/index\.php/);
-        await meusCursos.aguardarCards();
-        await expect(meusCursos.cardsDaPagina).toHaveCount(limitesMeusCursos.cardsPorPaginaDeTeste);
-      }));
-  });
+  test(
+    `MC12 - Com "Número de cards na página" = ${limitesMeusCursos.cardsPorPaginaDeTeste}, o "Ver todos" apresenta ${limitesMeusCursos.cardsPorPaginaDeTeste} cards por página`,
+    { tag: prioridade('MeusCursos', 'MC12') },
+    async ({ browser, configuracaoMeusCursos }) => {
+      await test.step(`Quando informei "${limitesMeusCursos.cardsPorPaginaDeTeste}" e cliquei em "Salvar mudanças"`, async () => {
+        await configuracaoMeusCursos.acessar();
+        await configuracaoMeusCursos.definir(limitesMeusCursos.cardsPorPaginaDeTeste);
+      });
+      await test.step(`Então a mensagem "${textosMeusCursos.gravadas}" foi exibida`, () =>
+        expect(configuracaoMeusCursos.page.getByText(textosMeusCursos.gravadas).first()).toBeVisible());
+      await test.step(`E o "Ver todos" da Estudante apresentou ${limitesMeusCursos.cardsPorPaginaDeTeste} cards na página 1`, () =>
+        comSessao(browser, sessoes.estudante, async (pagina) => {
+          const meusCursos = new MeusCursosPage(pagina);
+          await meusCursos.acessarHome();
+          await meusCursos.verTodos.click();
+          await pagina.waitForURL(/\/blocks\/mycourses\/index\.php/);
+          await meusCursos.aguardarCards();
+          await expect(meusCursos.cardsDaPagina).toHaveCount(limitesMeusCursos.cardsPorPaginaDeTeste);
+        }));
+    },
+  );
 });

@@ -23,6 +23,7 @@ import {
   cargoEm22Out,
 } from '../../fixtures/redefinicaosenha';
 import { Factories } from '../../Factories';
+import { prioridade } from '../../fixtures/prioridades';
 
 const executar = process.env.EXECUTAR_CONFIG_REDEFINICAO === 'sim';
 const { evaSouza, rayssaLima } = usuariosRedefinicao;
@@ -85,19 +86,20 @@ test.describe(
         for (const visibilidade of Object.values(visibilidades)) {
           const aparece = apareceNoSecundario(obrigatorio, visibilidade);
           const id = `RC${String(numero++).padStart(2, '0')}`;
-          test(`${id} - "${campo}" com Obrigatório "${obrigatorio}" e "${visibilidade}" ${aparece ? '' : 'NÃO '}aparece no "Campo secundário"`, async ({
-            camposPerfil,
-            configuracaoRedefinicao: config,
-          }) => {
-            await test.step(`Quando configurei "${campo}" com Obrigatório "${obrigatorio}" e "${visibilidade}"`, () =>
-              camposPerfil.configurar(campo, { obrigatorio, visibilidade }));
-            await test.step(`Então "${campo}" ${aparece ? 'foi' : 'NÃO foi'} exibido no "Campo secundário"`, async () => {
-              await config.acessar();
-              const opcoes = await config.opcoes(config.campoSecundario);
-              if (aparece) expect(opcoes).toContain(campo);
-              else expect(opcoes).not.toContain(campo);
-            });
-          });
+          test(
+            `${id} - "${campo}" com Obrigatório "${obrigatorio}" e "${visibilidade}" ${aparece ? '' : 'NÃO '}aparece no "Campo secundário"`,
+            { tag: prioridade('RedefinicaoSenha', id) },
+            async ({ camposPerfil, configuracaoRedefinicao: config }) => {
+              await test.step(`Quando configurei "${campo}" com Obrigatório "${obrigatorio}" e "${visibilidade}"`, () =>
+                camposPerfil.configurar(campo, { obrigatorio, visibilidade }));
+              await test.step(`Então "${campo}" ${aparece ? 'foi' : 'NÃO foi'} exibido no "Campo secundário"`, async () => {
+                await config.acessar();
+                const opcoes = await config.opcoes(config.campoSecundario);
+                if (aparece) expect(opcoes).toContain(campo);
+                else expect(opcoes).not.toContain(campo);
+              });
+            },
+          );
         }
       }
     }
@@ -108,71 +110,79 @@ test.describe(
       numero += campo === 'Cargo' ? 4 : 3;
       const id = (n: number) => `RC${String(base + n).padStart(2, '0')}`;
 
-      test(`${id(0)} - Com "${campo}" no "Campo secundário", "Perdeu a senha?" exibe "CPF" e "${campo}"`, async ({
-        browser,
-        camposPerfil,
-        configuracaoRedefinicao: config,
-        perdeuSenha,
-      }) => {
-        await test.step(`Quando configurei "${campo}" com Obrigatório "Sim" e "${visibilidades.usuario}"`, () =>
-          camposPerfil.configurar(campo, { obrigatorio: 'Sim', visibilidade: visibilidades.usuario }));
-        await test.step(`E selecionei "${campo}" no "Campo secundário" e salvei`, async () => {
-          await config.acessar();
-          await config.definir(config.campoSecundario, campo);
-        });
-        await test.step(`Então "Perdeu a senha?" exibiu os campos "CPF" e "${campo}"`, () =>
-          comSessao(browser, semSessao, async (pagina) => {
-            const visitante = new PerdeuSenhaPage(pagina);
-            await visitante.acessar();
-            await expect(visitante.rotuloDoCampo(visitante.blocoPrimario)).toHaveText('CPF');
-            await expect(visitante.rotuloDoCampo(visitante.blocoSecundario)).toHaveText(campo);
-          }));
-        void perdeuSenha;
-      });
+      test(
+        `${id(0)} - Com "${campo}" no "Campo secundário", "Perdeu a senha?" exibe "CPF" e "${campo}"`,
+        { tag: prioridade('RedefinicaoSenha', id(0)) },
+        async ({ browser, camposPerfil, configuracaoRedefinicao: config, perdeuSenha }) => {
+          await test.step(`Quando configurei "${campo}" com Obrigatório "Sim" e "${visibilidades.usuario}"`, () =>
+            camposPerfil.configurar(campo, { obrigatorio: 'Sim', visibilidade: visibilidades.usuario }));
+          await test.step(`E selecionei "${campo}" no "Campo secundário" e salvei`, async () => {
+            await config.acessar();
+            await config.definir(config.campoSecundario, campo);
+          });
+          await test.step(`Então "Perdeu a senha?" exibiu os campos "CPF" e "${campo}"`, () =>
+            comSessao(browser, semSessao, async (pagina) => {
+              const visitante = new PerdeuSenhaPage(pagina);
+              await visitante.acessar();
+              await expect(visitante.rotuloDoCampo(visitante.blocoPrimario)).toHaveText('CPF');
+              await expect(visitante.rotuloDoCampo(visitante.blocoSecundario)).toHaveText(campo);
+            }));
+          void perdeuSenha;
+        },
+      );
 
-      test(`${id(1)} - "${evaSouza.identificacao}" com "${campo}" do cadastro é redirecionada para "${paginas.redefinir}"`, async ({
-        browser,
-        perdeuSenha,
-      }) => {
-        const dados = await test.step(`Dado que consultei "${campo}" no cadastro da usuária`, () =>
-          lerDadosDoUsuario(browser, evaSouza.nome));
-        await test.step(`Quando preenchi "${evaSouza.identificacao}" e "${campo}" correto e cliquei em "Enviar"`, async () => {
-          await perdeuSenha.acessar();
-          await perdeuSenha.redefinir(evaSouza.identificacao, dados[chave]);
-        });
-        await test.step(`Então fui redirecionada para a página "${paginas.redefinir}"`, () =>
-          expect(perdeuSenha.tituloRedefinir).toBeVisible());
-      });
+      test(
+        `${id(1)} - "${evaSouza.identificacao}" com "${campo}" do cadastro é redirecionada para "${paginas.redefinir}"`,
+        { tag: prioridade('RedefinicaoSenha', id(1)) },
+        async ({ browser, perdeuSenha }) => {
+          const dados = await test.step(`Dado que consultei "${campo}" no cadastro da usuária`, () =>
+            lerDadosDoUsuario(browser, evaSouza.nome));
+          await test.step(`Quando preenchi "${evaSouza.identificacao}" e "${campo}" correto e cliquei em "Enviar"`, async () => {
+            await perdeuSenha.acessar();
+            await perdeuSenha.redefinir(evaSouza.identificacao, dados[chave]);
+          });
+          await test.step(`Então fui redirecionada para a página "${paginas.redefinir}"`, () =>
+            expect(perdeuSenha.tituloRedefinir).toBeVisible());
+        },
+      );
 
-      test(`${id(2)} - "${evaSouza.identificacao}" com "${campo}" errado NÃO altera a senha`, async ({ browser, perdeuSenha }) => {
-        const dados = await test.step(`Dado que consultei "${campo}" no cadastro da usuária`, () =>
-          lerDadosDoUsuario(browser, evaSouza.nome));
-        await test.step(`Quando preenchi "${evaSouza.identificacao}" e "${campo}" errado e cliquei em "Enviar"`, async () => {
-          await perdeuSenha.acessar();
-          const opcoes = await perdeuSenha.blocoSecundario.locator('option').allInnerTexts();
-          const errado = Factories.redefinicao.opcaoDiferente(opcoes, dados[chave]) || `${dados[chave]} QA`;
-          await perdeuSenha.redefinir(evaSouza.identificacao, errado);
-        });
-        await test.step(`Então a mensagem "${mensagens.dadosIncorretos}" foi exibida e a senha NÃO pôde ser alterada`, async () => {
-          await expect(perdeuSenha.mensagemErro).toBeVisible();
-          await expect(perdeuSenha.campoNovaSenha).toHaveCount(0);
-        });
-      });
-
-      if (campo === 'Cargo')
-        test(`${id(3)} - "${rayssaLima.identificacao}" sem "Cargo" cadastrado NÃO altera a senha`, async ({ browser, perdeuSenha }) => {
-          await test.step('Dado que o usuário NÃO tem "Cargo" cadastrado', async () =>
-            expect((await lerDadosDoUsuario(browser, rayssaLima.nome)).position ?? '').toBe(''));
-          await test.step(`Quando preenchi "${rayssaLima.identificacao}" e um "Cargo" e cliquei em "Enviar"`, async () => {
+      test(
+        `${id(2)} - "${evaSouza.identificacao}" com "${campo}" errado NÃO altera a senha`,
+        { tag: prioridade('RedefinicaoSenha', id(2)) },
+        async ({ browser, perdeuSenha }) => {
+          const dados = await test.step(`Dado que consultei "${campo}" no cadastro da usuária`, () =>
+            lerDadosDoUsuario(browser, evaSouza.nome));
+          await test.step(`Quando preenchi "${evaSouza.identificacao}" e "${campo}" errado e cliquei em "Enviar"`, async () => {
             await perdeuSenha.acessar();
             const opcoes = await perdeuSenha.blocoSecundario.locator('option').allInnerTexts();
-            await perdeuSenha.redefinir(rayssaLima.identificacao, Factories.redefinicao.opcaoDiferente(opcoes, ''));
+            const errado = Factories.redefinicao.opcaoDiferente(opcoes, dados[chave]) || `${dados[chave]} QA`;
+            await perdeuSenha.redefinir(evaSouza.identificacao, errado);
           });
           await test.step(`Então a mensagem "${mensagens.dadosIncorretos}" foi exibida e a senha NÃO pôde ser alterada`, async () => {
             await expect(perdeuSenha.mensagemErro).toBeVisible();
             await expect(perdeuSenha.campoNovaSenha).toHaveCount(0);
           });
-        });
+        },
+      );
+
+      if (campo === 'Cargo')
+        test(
+          `${id(3)} - "${rayssaLima.identificacao}" sem "Cargo" cadastrado NÃO altera a senha`,
+          { tag: prioridade('RedefinicaoSenha', id(3)) },
+          async ({ browser, perdeuSenha }) => {
+            await test.step('Dado que o usuário NÃO tem "Cargo" cadastrado', async () =>
+              expect((await lerDadosDoUsuario(browser, rayssaLima.nome)).position ?? '').toBe(''));
+            await test.step(`Quando preenchi "${rayssaLima.identificacao}" e um "Cargo" e cliquei em "Enviar"`, async () => {
+              await perdeuSenha.acessar();
+              const opcoes = await perdeuSenha.blocoSecundario.locator('option').allInnerTexts();
+              await perdeuSenha.redefinir(rayssaLima.identificacao, Factories.redefinicao.opcaoDiferente(opcoes, ''));
+            });
+            await test.step(`Então a mensagem "${mensagens.dadosIncorretos}" foi exibida e a senha NÃO pôde ser alterada`, async () => {
+              await expect(perdeuSenha.mensagemErro).toBeVisible();
+              await expect(perdeuSenha.campoNovaSenha).toHaveCount(0);
+            });
+          },
+        );
     }
 
     // "Campo primário": obrigatório + único + visível para o usuário, professores e administradores
@@ -181,76 +191,83 @@ test.describe(
       numero += 3;
       const id = (n: number) => `RC${String(base + n).padStart(2, '0')}`;
 
-      test(`${id(0)} - "${campo}" configurado como obrigatório, único e visível para o usuário`, async ({ camposPerfil }) => {
-        await test.step(`Quando configurei "${campo}" com Obrigatório "Sim", Única "Sim" e "${configuracaoPrimario.visibilidade}"`, () =>
-          camposPerfil.configurar(campo, configuracaoPrimario));
-        await test.step('Então a configuração do campo ficou gravada', async () =>
-          expect(await camposPerfil.lerConfiguracao(campo)).toEqual(configuracaoPrimario));
-      });
+      test(
+        `${id(0)} - "${campo}" configurado como obrigatório, único e visível para o usuário`,
+        { tag: prioridade('RedefinicaoSenha', id(0)) },
+        async ({ camposPerfil }) => {
+          await test.step(`Quando configurei "${campo}" com Obrigatório "Sim", Única "Sim" e "${configuracaoPrimario.visibilidade}"`, () =>
+            camposPerfil.configurar(campo, configuracaoPrimario));
+          await test.step('Então a configuração do campo ficou gravada', async () =>
+            expect(await camposPerfil.lerConfiguracao(campo)).toEqual(configuracaoPrimario));
+        },
+      );
 
       // Obrigatório "Sim" e visível ao usuário também valem para o "Campo secundário" (regra do RC07 a RC38) — pergunta da QA (09/11)
-      test(`${id(1)} - "${campo}" exibido para seleção no "Campo primário" e no "Campo secundário"`, async ({
-        configuracaoRedefinicao: config,
-      }) => {
-        await test.step('Quando acessei "Configurações - Redefinição de senha personalizada"', () => config.acessar());
-        await test.step(`Então a opção "${campo}" foi exibida no "Campo primário"`, async () =>
-          expect(await config.opcoes(config.campoPrimario)).toContain(campo));
-        await test.step(`E a opção "${campo}" também foi exibida no "Campo secundário"`, async () =>
-          expect(await config.opcoes(config.campoSecundario)).toContain(campo));
-      });
+      test(
+        `${id(1)} - "${campo}" exibido para seleção no "Campo primário" e no "Campo secundário"`,
+        { tag: prioridade('RedefinicaoSenha', id(1)) },
+        async ({ configuracaoRedefinicao: config }) => {
+          await test.step('Quando acessei "Configurações - Redefinição de senha personalizada"', () => config.acessar());
+          await test.step(`Então a opção "${campo}" foi exibida no "Campo primário"`, async () =>
+            expect(await config.opcoes(config.campoPrimario)).toContain(campo));
+          await test.step(`E a opção "${campo}" também foi exibida no "Campo secundário"`, async () =>
+            expect(await config.opcoes(config.campoSecundario)).toContain(campo));
+        },
+      );
 
-      test(`${id(2)} - Com "A informação deve ser única?" = "Não", "${campo}" NÃO aparece no "Campo primário"`, async ({
-        camposPerfil,
-        configuracaoRedefinicao: config,
-      }) => {
-        await test.step(`Quando alterei "A informação deve ser única?" de "${campo}" para "Não"`, () =>
-          camposPerfil.configurar(campo, { unica: 'Não' }));
-        await test.step(`Então a opção "${campo}" NÃO foi exibida no "Campo primário"`, async () => {
-          await config.acessar();
-          expect(await config.opcoes(config.campoPrimario)).not.toContain(campo);
-        });
-      });
+      test(
+        `${id(2)} - Com "A informação deve ser única?" = "Não", "${campo}" NÃO aparece no "Campo primário"`,
+        { tag: prioridade('RedefinicaoSenha', id(2)) },
+        async ({ camposPerfil, configuracaoRedefinicao: config }) => {
+          await test.step(`Quando alterei "A informação deve ser única?" de "${campo}" para "Não"`, () =>
+            camposPerfil.configurar(campo, { unica: 'Não' }));
+          await test.step(`Então a opção "${campo}" NÃO foi exibida no "Campo primário"`, async () => {
+            await config.acessar();
+            expect(await config.opcoes(config.campoPrimario)).not.toContain(campo);
+          });
+        },
+      );
     }
 
     // "Campo primário" exige Obrigatório = "Sim": com Única "Sim" e Obrigatório "Não" o campo NÃO aparece — pedido da QA (09/11)
     for (const { campo } of camposPrimarios) {
       const id = `RC${String(numero++).padStart(2, '0')}`;
-      test(`${id} - Com "A informação deve ser única?" = "Sim" e "Este campo é obrigatório?" = "Não", "${campo}" NÃO aparece no "Campo primário"`, async ({
-        camposPerfil,
-        configuracaoRedefinicao: config,
-      }) => {
-        await test.step(`Quando configurei "${campo}" com Única "Sim", Obrigatório "Não" e "${configuracaoPrimario.visibilidade}"`, () =>
-          camposPerfil.configurar(campo, { ...configuracaoPrimario, obrigatorio: 'Não' }));
-        await test.step(`Então a opção "${campo}" NÃO foi exibida no "Campo primário"`, async () => {
-          await config.acessar();
-          expect(await config.opcoes(config.campoPrimario)).not.toContain(campo);
-        });
-      });
+      test(
+        `${id} - Com "A informação deve ser única?" = "Sim" e "Este campo é obrigatório?" = "Não", "${campo}" NÃO aparece no "Campo primário"`,
+        { tag: prioridade('RedefinicaoSenha', id) },
+        async ({ camposPerfil, configuracaoRedefinicao: config }) => {
+          await test.step(`Quando configurei "${campo}" com Única "Sim", Obrigatório "Não" e "${configuracaoPrimario.visibilidade}"`, () =>
+            camposPerfil.configurar(campo, { ...configuracaoPrimario, obrigatorio: 'Não' }));
+          await test.step(`Então a opção "${campo}" NÃO foi exibida no "Campo primário"`, async () => {
+            await config.acessar();
+            expect(await config.opcoes(config.campoPrimario)).not.toContain(campo);
+          });
+        },
+      );
     }
 
     // RP08 do DTI/EVTI: a data de nascimento não pode ser apagada pela tela, então o "sem dado cadastrado"
     // usa a "Cidade de Nascimento" — decisão da QA
-    test(`RP08 - "${rayssaLima.identificacao}" sem "Cidade de Nascimento" cadastrada NÃO altera a senha`, async ({
-      browser,
-      camposPerfil,
-      configuracaoRedefinicao: config,
-      perdeuSenha,
-    }) => {
-      await test.step('Dado que o usuário NÃO tem "Cidade de Nascimento" cadastrada', async () =>
-        expect((await lerDadosDoUsuario(browser, rayssaLima.nome)).city ?? '').toBe(''));
-      await test.step(`E configurei "Cidade de Nascimento" com Obrigatório "Sim" e "${visibilidades.usuario}" no "Campo secundário"`, async () => {
-        await camposPerfil.configurar('Cidade de Nascimento', { obrigatorio: 'Sim', visibilidade: visibilidades.usuario });
-        await config.acessar();
-        await config.definir(config.campoSecundario, 'Cidade de Nascimento');
-      });
-      await test.step(`Quando preenchi "${rayssaLima.identificacao}" e uma "Cidade de Nascimento" e cliquei em "Enviar"`, async () => {
-        await perdeuSenha.acessar();
-        await perdeuSenha.redefinir(rayssaLima.identificacao, Factories.redefinicao.cidade());
-      });
-      await test.step(`Então a mensagem "${mensagens.dadosIncorretos}" foi exibida e a senha NÃO pôde ser alterada`, async () => {
-        await expect(perdeuSenha.mensagemErro).toBeVisible();
-        await expect(perdeuSenha.campoNovaSenha).toHaveCount(0);
-      });
-    });
+    test(
+      `RP08 - "${rayssaLima.identificacao}" sem "Cidade de Nascimento" cadastrada NÃO altera a senha`,
+      { tag: prioridade('RedefinicaoSenha', 'RP08') },
+      async ({ browser, camposPerfil, configuracaoRedefinicao: config, perdeuSenha }) => {
+        await test.step('Dado que o usuário NÃO tem "Cidade de Nascimento" cadastrada', async () =>
+          expect((await lerDadosDoUsuario(browser, rayssaLima.nome)).city ?? '').toBe(''));
+        await test.step(`E configurei "Cidade de Nascimento" com Obrigatório "Sim" e "${visibilidades.usuario}" no "Campo secundário"`, async () => {
+          await camposPerfil.configurar('Cidade de Nascimento', { obrigatorio: 'Sim', visibilidade: visibilidades.usuario });
+          await config.acessar();
+          await config.definir(config.campoSecundario, 'Cidade de Nascimento');
+        });
+        await test.step(`Quando preenchi "${rayssaLima.identificacao}" e uma "Cidade de Nascimento" e cliquei em "Enviar"`, async () => {
+          await perdeuSenha.acessar();
+          await perdeuSenha.redefinir(rayssaLima.identificacao, Factories.redefinicao.cidade());
+        });
+        await test.step(`Então a mensagem "${mensagens.dadosIncorretos}" foi exibida e a senha NÃO pôde ser alterada`, async () => {
+          await expect(perdeuSenha.mensagemErro).toBeVisible();
+          await expect(perdeuSenha.campoNovaSenha).toHaveCount(0);
+        });
+      },
+    );
   },
 );

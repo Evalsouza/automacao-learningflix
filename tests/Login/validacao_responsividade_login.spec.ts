@@ -2,12 +2,13 @@
 import { test, expect } from '../../support/e2e';
 import { resolucoes, temRolagemHorizontal } from '../../support/responsividade';
 import { usuarios } from '../../support/usuarios';
+import { prioridade } from '../../fixtures/prioridades';
 
 for (const { tipo, dispositivo, resolucao } of resolucoes) {
   test.describe(`Login - ${tipo}`, { tag: ['@responsivo', '@dt-pagina-de-login'] }, () => {
     test.use({ ...dispositivo, storageState: { cookies: [], origins: [] } });
 
-    test(`Login - ${tipo} ${resolucao}`, async ({ page, login, menu }) => {
+    test(`Login - ${tipo} ${resolucao}`, { tag: prioridade('Login') }, async ({ page, login, menu }) => {
       await login.acessar();
 
       await test.step('Então os campos "CPF" e "Senha", o botão "Acessar" e "Esqueci a senha" ficaram dentro da tela', async () => {

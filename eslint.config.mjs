@@ -18,6 +18,8 @@ export default tseslint.config(
       ...playwright.configs['flat/recommended'].rules,
       // Os passos Quando / E / Então ficam juntos, lidos como uma frase
       'playwright/consistent-spacing-between-blocks': 'off',
+      // A prioridade vem de prioridade() em fixtures/prioridades.ts, que o TypeScript já valida (tipo Prioridade)
+      'playwright/valid-test-tags': 'off',
     },
   },
 );

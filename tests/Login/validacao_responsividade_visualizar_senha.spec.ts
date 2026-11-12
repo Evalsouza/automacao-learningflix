@@ -2,12 +2,13 @@
 import { test, expect } from '../../support/e2e';
 import { resolucoes, temRolagemHorizontal } from '../../support/responsividade';
 import { Factories } from '../../Factories';
+import { prioridade } from '../../fixtures/prioridades';
 
 for (const { tipo, dispositivo, resolucao } of resolucoes) {
   test.describe(`Visualizar senha - ${tipo}`, { tag: ['@responsivo', '@dt-ver-senha'] }, () => {
     test.use({ ...dispositivo, storageState: { cookies: [], origins: [] } });
 
-    test(`Visualizar senha - ${tipo} ${resolucao}`, async ({ page, login }) => {
+    test(`Visualizar senha - ${tipo} ${resolucao}`, { tag: prioridade('Login') }, async ({ page, login }) => {
       await login.acessar();
 
       await test.step('Então o campo "Senha" e o ícone de "Olho" ficaram dentro da tela', async () => {

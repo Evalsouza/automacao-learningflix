@@ -5,6 +5,7 @@ import { usuariosRedefinicao } from '../../support/usuarios';
 import { mensagens } from '../../fixtures/redefinicaosenha';
 import { Factories } from '../../Factories';
 import { garantirRedefinicaoPersonalizada } from '../../support/redefinicaosenha_commands/ConfiguracaoRedefinicaoPage';
+import { prioridade } from '../../fixtures/prioridades';
 
 // Habilita a personalizada antes, se estiver desabilitada, e desabilita no final — decisão da QA (10/11)
 test.beforeAll(async ({ browser }) => {
@@ -20,7 +21,7 @@ for (const { tipo, dispositivo, resolucao } of resolucoes) {
   test.describe(`Redefinição personalizada - ${tipo}`, { tag: ['@responsivo', '@dt-redefinicao-personalizada'] }, () => {
     test.use({ ...dispositivo, storageState: { cookies: [], origins: [] } });
 
-    test(`Redefinição personalizada - ${tipo} ${resolucao}`, async ({ page, perdeuSenha }) => {
+    test(`Redefinição personalizada - ${tipo} ${resolucao}`, { tag: prioridade('RedefinicaoSenha') }, async ({ page, perdeuSenha }) => {
       await perdeuSenha.acessarPeloLogin();
 
       await test.step('Então os campos de "Perdeu a senha?" e o botão "Enviar" ficaram dentro da tela', async () => {

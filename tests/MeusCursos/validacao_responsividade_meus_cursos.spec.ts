@@ -3,12 +3,13 @@ import { test, expect } from '../../support/e2e';
 import { sessoes } from '../../support/sessoes';
 import { resolucoes, temRolagemHorizontal } from '../../support/responsividade';
 import { limitesMeusCursos, obrigatoriedades } from '../../fixtures/meuscursos';
+import { prioridade } from '../../fixtures/prioridades';
 
 for (const { tipo, dispositivo, resolucao } of resolucoes) {
   test.describe(`Meus Cursos - ${tipo}`, { tag: ['@responsivo', '@dt-meus-cursos', '@dt-obrigatoriedade'] }, () => {
     test.use({ ...dispositivo, storageState: sessoes.estudante });
 
-    test(`Meus Cursos - ${tipo} ${resolucao}`, async ({ page, meusCursos }) => {
+    test(`Meus Cursos - ${tipo} ${resolucao}`, { tag: prioridade('MeusCursos') }, async ({ page, meusCursos }) => {
       await test.step('Quando acessei a "Página inicial" com a Estudante', () => meusCursos.acessarHome());
       await test.step('Então o bloco "Meus Cursos", o botão "Ver todos" e as opções de obrigatoriedade ficaram dentro da tela', async () => {
         await meusCursos.tituloDoBloco.scrollIntoViewIfNeeded();

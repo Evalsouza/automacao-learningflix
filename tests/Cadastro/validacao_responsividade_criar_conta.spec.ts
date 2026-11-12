@@ -3,12 +3,13 @@ import { test, expect } from '../../support/e2e';
 import { resolucoes, temRolagemHorizontal } from '../../support/responsividade';
 import { cargos, pais, obrigatoriosNovaConta } from '../../fixtures/cadastro';
 import { Factories } from '../../Factories';
+import { prioridade } from '../../fixtures/prioridades';
 
 for (const { tipo, dispositivo, resolucao } of resolucoes) {
   test.describe(`Criar conta - ${tipo}`, { tag: ['@responsivo', '@dt-criar-conta'] }, () => {
     test.use({ ...dispositivo, storageState: { cookies: [], origins: [] } });
 
-    test(`Criar conta - ${tipo} ${resolucao}`, async ({ page, criarConta }) => {
+    test(`Criar conta - ${tipo} ${resolucao}`, { tag: prioridade('Cadastro') }, async ({ page, criarConta }) => {
       await criarConta.acessarPeloLogin();
 
       await test.step('Então os campos da "Verificação de idade e localização" e o botão "Continuar" ficaram dentro da tela', async () => {

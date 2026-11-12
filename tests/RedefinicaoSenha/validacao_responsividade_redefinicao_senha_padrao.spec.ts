@@ -3,6 +3,7 @@
 import { test, expect } from '../../support/e2e';
 import { resolucoes, temRolagemHorizontal } from '../../support/responsividade';
 import { garantirRedefinicaoPersonalizada } from '../../support/redefinicaosenha_commands/ConfiguracaoRedefinicaoPage';
+import { prioridade } from '../../fixtures/prioridades';
 
 // A redefinição padrão só aparece com a personalizada desabilitada: desabilita antes, se estiver habilitada — decisão da QA (10/11)
 test.beforeAll(async ({ browser }) => {
@@ -14,7 +15,7 @@ for (const { tipo, dispositivo, resolucao } of resolucoes) {
   test.describe(`Redefinição padrão - ${tipo}`, { tag: ['@responsivo', '@dt-pagina-de-login'] }, () => {
     test.use({ ...dispositivo, storageState: { cookies: [], origins: [] } });
 
-    test(`Redefinição padrão - ${tipo} ${resolucao}`, async ({ page, perdeuSenha }) => {
+    test(`Redefinição padrão - ${tipo} ${resolucao}`, { tag: prioridade('RedefinicaoSenha') }, async ({ page, perdeuSenha }) => {
       await perdeuSenha.acessarPeloLogin();
 
       await test.step('Então a recuperação pelo nome de usuário e pelo e-mail ficou dentro da tela', async () => {

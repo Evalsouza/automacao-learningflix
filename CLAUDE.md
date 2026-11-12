@@ -34,6 +34,7 @@ A QA liberou a leitura de todo o espaço Confluence LP1 (05/11/2026), com os doc
 
 - Classes de tela herdam `PaginaBase` (`support/PaginaBase.ts`) e abrem páginas com `this.abrir()`, que espera o carregamento (`'domcontentloaded'` só no Carrossel); specs não usam `page.goto` nem leem a tela direto — vira método da classe.
 - Sessões só por `sessoes.*` e `semSessao`; outro perfil no mesmo teste por `comSessao()` (`support/sessoes.ts`). Nada de `browser.newContext` nas specs.
+- Todo teste novo leva a prioridade por risco: `{ tag: prioridade('<Módulo>', '<ID>') }` (`fixtures/prioridades.ts`). ID novo → incluir na tabela; na dúvida, perguntar à QA.
 - Vídeos ficam bloqueados nos testes; só o módulo Carrossel usa `test.use({ bloquearVideos: false })`.
 
 ## Nunca

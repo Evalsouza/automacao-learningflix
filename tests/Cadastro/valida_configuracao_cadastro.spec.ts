@@ -14,6 +14,7 @@ import { usuariosRedefinicao } from '../../support/usuarios';
 import { visibilidades, cargoEm22Out } from '../../fixtures/redefinicaosenha';
 import { paginas, pais } from '../../fixtures/cadastro';
 import { Factories } from '../../Factories';
+import { prioridade } from '../../fixtures/prioridades';
 
 const executar = process.env.EXECUTAR_CONFIG_CADASTRO === 'sim';
 const { evaSouza } = usuariosRedefinicao;
@@ -61,42 +62,48 @@ test.describe('Configuração do "Criar uma conta"', { tag: ['@dt-criar-conta', 
       { id: 'PRV02', ativa: false, valor: 'Não' },
     ];
     for (const { id, ativa, valor } of verificacoes) {
-      test(`${id} - "Verificação da idade de consentimento digital" = "${valor}": "Criar uma conta" ${ativa ? 'exibe' : 'NÃO exibe'} a "${paginas.verificacao}"`, async ({
-        browser,
-        configuracaoPrivacidade,
-      }) => {
-        await test.step(`Quando alterei "Verificação da idade de consentimento digital" para "${valor}" e salvei`, () =>
-          configuracaoPrivacidade.definirVerificacaoDeIdade(ativa));
-        await test.step(`Então, sem login, "Criar uma conta" ${ativa ? `exibiu a "${paginas.verificacao}"` : `foi direto para a "${paginas.novaConta}"`}`, () =>
-          comSessao(browser, semSessao, async (pagina) => {
-            const criarConta = new CriarContaPage(pagina);
-            await criarConta.clicarCriarContaNoLogin();
-            await expect(criarConta.tituloVerificacao).toBeVisible({ visible: ativa });
-            await expect(criarConta.tituloNovaConta).toBeVisible({ visible: !ativa });
-          }));
-      });
+      test(
+        `${id} - "Verificação da idade de consentimento digital" = "${valor}": "Criar uma conta" ${ativa ? 'exibe' : 'NÃO exibe'} a "${paginas.verificacao}"`,
+        { tag: prioridade('Cadastro', id) },
+        async ({ browser, configuracaoPrivacidade }) => {
+          await test.step(`Quando alterei "Verificação da idade de consentimento digital" para "${valor}" e salvei`, () =>
+            configuracaoPrivacidade.definirVerificacaoDeIdade(ativa));
+          await test.step(`Então, sem login, "Criar uma conta" ${ativa ? `exibiu a "${paginas.verificacao}"` : `foi direto para a "${paginas.novaConta}"`}`, () =>
+            comSessao(browser, semSessao, async (pagina) => {
+              const criarConta = new CriarContaPage(pagina);
+              await criarConta.clicarCriarContaNoLogin();
+              await expect(criarConta.tituloVerificacao).toBeVisible({ visible: ativa });
+              await expect(criarConta.tituloNovaConta).toBeVisible({ visible: !ativa });
+            }));
+        },
+      );
     }
   });
 
   test.describe('Campo de perfil "Cargo"', () => {
-    test('RC01 - Com "Este campo é obrigatório?" = "Sim", o "Cargo" é obrigatório na "Nova conta"', async ({ browser, camposPerfil }) => {
-      await test.step('Quando alterei "Este campo é obrigatório?" do "Cargo" para "Sim"', () =>
-        camposPerfil.configurar('Cargo', { obrigatorio: 'Sim' }));
-      await test.step('Então o campo "Cargo" foi marcado como obrigatório na "Nova conta"', () =>
-        naNovaConta(browser, (criarConta) =>
-          expect(criarConta.campoCargo.getByTitle('Obrigatório', { exact: true }).first()).toBeVisible(),
-        ));
-    });
+    test(
+      'RC01 - Com "Este campo é obrigatório?" = "Sim", o "Cargo" é obrigatório na "Nova conta"',
+      { tag: prioridade('Cadastro', 'RC01') },
+      async ({ browser, camposPerfil }) => {
+        await test.step('Quando alterei "Este campo é obrigatório?" do "Cargo" para "Sim"', () =>
+          camposPerfil.configurar('Cargo', { obrigatorio: 'Sim' }));
+        await test.step('Então o campo "Cargo" foi marcado como obrigatório na "Nova conta"', () =>
+          naNovaConta(browser, (criarConta) =>
+            expect(criarConta.campoCargo.getByTitle('Obrigatório', { exact: true }).first()).toBeVisible(),
+          ));
+      },
+    );
 
-    test('RC02 - Com "Este campo é obrigatório?" = "Não", o "Cargo" NÃO é obrigatório na "Nova conta"', async ({
-      browser,
-      camposPerfil,
-    }) => {
-      await test.step('Quando alterei "Este campo é obrigatório?" do "Cargo" para "Não"', () =>
-        camposPerfil.configurar('Cargo', { obrigatorio: 'Não' }));
-      await test.step('Então o campo "Cargo" NÃO foi marcado como obrigatório na "Nova conta"', () =>
-        naNovaConta(browser, (criarConta) => expect(criarConta.campoCargo.getByTitle('Obrigatório', { exact: true })).toHaveCount(0)));
-    });
+    test(
+      'RC02 - Com "Este campo é obrigatório?" = "Não", o "Cargo" NÃO é obrigatório na "Nova conta"',
+      { tag: prioridade('Cadastro', 'RC02') },
+      async ({ browser, camposPerfil }) => {
+        await test.step('Quando alterei "Este campo é obrigatório?" do "Cargo" para "Não"', () =>
+          camposPerfil.configurar('Cargo', { obrigatorio: 'Não' }));
+        await test.step('Então o campo "Cargo" NÃO foi marcado como obrigatório na "Nova conta"', () =>
+          naNovaConta(browser, (criarConta) => expect(criarConta.campoCargo.getByTitle('Obrigatório', { exact: true })).toHaveCount(0)));
+      },
+    );
 
     // Quem vê o "Cargo" no perfil da Estudante, conforme a ajuda de "Quem pode ver este campo?".
     // O Adm Cliente só é verificado em "Visível para todos": nas demais opções depende de ele ser "gerente".
@@ -108,23 +115,27 @@ test.describe('Configuração do "Criar uma conta"', { tag: ['@dt-criar-conta', 
       { id: 'RC06', visibilidade: visibilidades.todos, estudante: true, cliente: true },
     ];
     for (const { id, visibilidade, estudante, cliente } of quemVe) {
-      test(`${id} - "Quem pode ver este campo?" = "${visibilidade}": quem vê o "Cargo" no perfil`, async ({ browser, camposPerfil }) => {
-        const idDaEva = await comoAdministrador(browser, async (pagina) => {
-          const gerenciar = new GerenciarUsuariosPage(pagina);
-          await gerenciar.acessarPelaAdministracao();
-          await gerenciar.pesquisar(evaSouza.nome);
-          return gerenciar.idDoUsuario(evaSouza.nome);
-        });
-        await test.step(`Quando alterei "Quem pode ver este campo?" do "Cargo" para "${visibilidade}"`, () =>
-          camposPerfil.configurar('Cargo', { visibilidade }));
-        await test.step(`Então a Estudante ${estudante ? '' : 'NÃO '}viu o "Cargo" na própria "Minha página"`, async () =>
-          expect(await cargoVisivel(browser, sessoes.estudante, idDaEva)).toBe(estudante));
-        await test.step('E o Administrador viu o "Cargo" no perfil da Estudante', async () =>
-          expect(await cargoVisivel(browser, sessoes.administrador, idDaEva)).toBe(true));
-        if (cliente !== undefined)
-          await test.step('E o Adm Cliente viu o "Cargo" no perfil da Estudante', async () =>
-            expect(await cargoVisivel(browser, sessoes.cliente, idDaEva)).toBe(cliente));
-      });
+      test(
+        `${id} - "Quem pode ver este campo?" = "${visibilidade}": quem vê o "Cargo" no perfil`,
+        { tag: prioridade('Cadastro', id) },
+        async ({ browser, camposPerfil }) => {
+          const idDaEva = await comoAdministrador(browser, async (pagina) => {
+            const gerenciar = new GerenciarUsuariosPage(pagina);
+            await gerenciar.acessarPelaAdministracao();
+            await gerenciar.pesquisar(evaSouza.nome);
+            return gerenciar.idDoUsuario(evaSouza.nome);
+          });
+          await test.step(`Quando alterei "Quem pode ver este campo?" do "Cargo" para "${visibilidade}"`, () =>
+            camposPerfil.configurar('Cargo', { visibilidade }));
+          await test.step(`Então a Estudante ${estudante ? '' : 'NÃO '}viu o "Cargo" na própria "Minha página"`, async () =>
+            expect(await cargoVisivel(browser, sessoes.estudante, idDaEva)).toBe(estudante));
+          await test.step('E o Administrador viu o "Cargo" no perfil da Estudante', async () =>
+            expect(await cargoVisivel(browser, sessoes.administrador, idDaEva)).toBe(true));
+          if (cliente !== undefined)
+            await test.step('E o Adm Cliente viu o "Cargo" no perfil da Estudante', async () =>
+              expect(await cargoVisivel(browser, sessoes.cliente, idDaEva)).toBe(cliente));
+        },
+      );
     }
   });
 });

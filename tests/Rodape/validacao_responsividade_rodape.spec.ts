@@ -4,6 +4,7 @@ import { test, expect } from '../../support/e2e';
 import { sessoes, semSessao } from '../../support/sessoes';
 import { resolucoes, temRolagemHorizontal } from '../../support/responsividade';
 import { larguraMinimaDoRodape } from '../../fixtures/rodape';
+import { prioridade } from '../../fixtures/prioridades';
 
 const paginas = [
   { nome: 'página de login', sessao: semSessao, url: '/login/index.php', larguraMinima: larguraMinimaDoRodape.login },
@@ -17,7 +18,7 @@ for (const { tipo, dispositivo, resolucao } of resolucoes) {
     test.describe(`Rodapé - ${tipo} - ${nome}`, { tag: ['@responsivo', '@dt-rodape'] }, () => {
       test.use({ ...dispositivo, storageState: sessao });
 
-      test(`Rodapé - ${tipo} ${resolucao} - ${nome}`, async ({ page, rodape }) => {
+      test(`Rodapé - ${tipo} ${resolucao} - ${nome}`, { tag: prioridade('Rodape') }, async ({ page, rodape }) => {
         await test.step(`Quando acessei a ${nome}`, () => rodape.acessar(url));
         if (exibido)
           await test.step('Então, no fim da página, o idioma e "© Desenvolvido por" ficaram dentro da tela', async () => {
