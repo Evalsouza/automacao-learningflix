@@ -7,47 +7,50 @@ A organização segue o modelo da equipe — [Estrutura do Repositório](https:/
 ## Estrutura
 
 ```
-📂 tests/                         # Casos de teste (E2E), organizados por módulo
-│   ├── 📂 Login/                 # Login, autenticação, ver a senha, responsividade
-│   │   ├── valida_login.spec.ts
-│   │   ├── valida_visualizar_senha.spec.ts
-│   │   ├── validacao_responsividade_login.spec.ts
-│   │   ├── validacao_responsividade_visualizar_senha.spec.ts
-│   │   └── RASTREABILIDADE.md    # Caso do DT/EVT → teste, decisões e pendências
-│   ├── 📂 VisitanteAcesso/       # Acordo de política, Página Inicial, menu, Ajuda e botão do visitante
-│   │   ├── valida_acessar_como_visitante.spec.ts
-│   │   ├── valida_configuracao_botao_visitante.spec.ts   # altera configuração — desligado por padrão
-│   │   ├── valida_envio_ajuda_visitante.spec.ts          # envia e-mail — desligado por padrão
-│   │   ├── validacao_responsividade_acessar_como_visitante.spec.ts
-│   │   └── RASTREABILIDADE.md
-│   ├── 📂 Cadastro/              # Criar uma conta, cargo no cadastro, consulta em Gerenciar usuários
-│   │   ├── valida_criar_conta.spec.ts
-│   │   ├── valida_cadastro_novo_usuario.spec.ts   # cria usuário real — desligado por padrão
-│   │   ├── validacao_responsividade_criar_conta.spec.ts
-│   │   └── RASTREABILIDADE.md
-│   ├── 📂 RedefinicaoSenha/      # "Esqueci a senha": redefinição personalizada e padrão
-│   │   ├── valida_redefinicao_senha_personalizada.spec.ts
-│   │   ├── valida_configuracao_redefinicao_personalizada.spec.ts   # altera configuração — desligado por padrão
-│   │   ├── valida_redefinicao_senha_padrao.spec.ts                 # falha enquanto a personalizada estiver ativa
-│   │   ├── validacao_responsividade_redefinicao_senha_personalizada.spec.ts
-│   │   ├── validacao_responsividade_redefinicao_senha_padrao.spec.ts
-│   │   └── RASTREABILIDADE.md
-│   ├── 📂 Rodape/                # Jira LFXP-1941: habilitar/desabilitar informações no rodapé
-│   │   ├── valida_rodape.spec.ts
-│   │   ├── valida_configuracao_rodape.spec.ts   # altera configuração — desligado por padrão
-│   │   ├── validacao_responsividade_rodape.spec.ts
-│   │   └── RASTREABILIDADE.md
-│   ├── 📂 Carrossel/             # Plugin Carrossel Infinito na Página inicial
-│   │   ├── valida_carrossel.spec.ts
-│   │   ├── valida_configuracao_carrossel.spec.ts   # altera configuração — desligado por padrão
-│   │   ├── validacao_responsividade_carrossel.spec.ts
-│   │   └── RASTREABILIDADE.md
-│   └── 📂 MeusCursos/            # Bloco "Meus Cursos" e Obrigatoriedade do Curso
-│       ├── valida_meus_cursos.spec.ts
-│       ├── valida_configuracao_meus_cursos.spec.ts   # altera configuração — desligado por padrão
-│       ├── valida_meus_cursos_usuario_novo.spec.ts   # cria usuário — desligado por padrão
-│       ├── validacao_responsividade_meus_cursos.spec.ts
-│       └── RASTREABILIDADE.md
+📂 tests/                         # Casos de teste (E2E) por etapa do fluxo: o número fixa a ordem da rodada
+│   ├── 📂 1-PaginaDeLogin/       # Tudo o que começa na página de login — roda primeiro
+│   │   ├── 📂 1-Login/           # Login, "Sair", ver a senha, elementos conforme a configuração
+│   │   │   ├── valida_login.spec.ts
+│   │   │   ├── valida_visualizar_senha.spec.ts
+│   │   │   ├── validacao_responsividade_login.spec.ts
+│   │   │   ├── validacao_responsividade_visualizar_senha.spec.ts
+│   │   │   └── RASTREABILIDADE.md    # Caso do DT/EVT → teste, decisões e pendências
+│   │   ├── 📂 2-Cadastro/        # Criar uma conta, cargo no cadastro, consulta em Gerenciar usuários
+│   │   │   ├── valida_criar_conta.spec.ts
+│   │   │   ├── valida_configuracao_cadastro.spec.ts    # altera configuração — rodada semanal
+│   │   │   ├── valida_cadastro_novo_usuario.spec.ts    # cria usuário real — rodada semanal
+│   │   │   ├── validacao_responsividade_criar_conta.spec.ts
+│   │   │   └── RASTREABILIDADE.md
+│   │   ├── 📂 3-RedefinicaoSenha/  # "Esqueci a senha": redefinição personalizada e padrão
+│   │   │   ├── valida_redefinicao_senha_personalizada.spec.ts
+│   │   │   ├── valida_configuracao_redefinicao_personalizada.spec.ts   # altera configuração — rodada semanal
+│   │   │   ├── valida_redefinicao_senha_padrao.spec.ts
+│   │   │   ├── validacao_responsividade_redefinicao_senha_personalizada.spec.ts
+│   │   │   ├── validacao_responsividade_redefinicao_senha_padrao.spec.ts
+│   │   │   └── RASTREABILIDADE.md
+│   │   ├── 📂 4-Rodape/          # Jira LFXP-1941: rodapé — também na página de login
+│   │   │   ├── valida_rodape.spec.ts
+│   │   │   ├── valida_configuracao_rodape.spec.ts   # altera configuração — rodada semanal
+│   │   │   ├── validacao_responsividade_rodape.spec.ts
+│   │   │   └── RASTREABILIDADE.md
+│   │   └── 📂 5-Visitante/       # "Acessar como visitante": acordo de política, Página Inicial, menu, Ajuda
+│   │       ├── valida_acessar_como_visitante.spec.ts
+│   │       ├── valida_configuracao_botao_visitante.spec.ts   # altera configuração — rodada semanal
+│   │       ├── valida_envio_ajuda_visitante.spec.ts          # envia e-mail — rodada semanal
+│   │       ├── validacao_responsividade_acessar_como_visitante.spec.ts
+│   │       └── RASTREABILIDADE.md
+│   └── 📂 2-Plataforma/          # Validações dentro da plataforma — roda depois da página de login
+│       ├── 📂 1-Carrossel/       # Plugin Carrossel Infinito na Página inicial
+│       │   ├── valida_carrossel.spec.ts
+│       │   ├── valida_configuracao_carrossel.spec.ts   # altera configuração — rodada semanal
+│       │   ├── validacao_responsividade_carrossel.spec.ts
+│       │   └── RASTREABILIDADE.md
+│       └── 📂 2-MeusCursos/      # Bloco "Meus Cursos" e Obrigatoriedade do Curso
+│           ├── valida_meus_cursos.spec.ts
+│           ├── valida_configuracao_meus_cursos.spec.ts   # altera configuração — rodada semanal
+│           ├── valida_meus_cursos_usuario_novo.spec.ts   # cria usuário — rodada semanal
+│           ├── validacao_responsividade_meus_cursos.spec.ts
+│           └── RASTREABILIDADE.md
 │
 📂 fixtures/                      # Massas de dados fixas: mensagens, títulos de página
 │   ├── login.ts
@@ -62,7 +65,7 @@ A organização segue o modelo da equipe — [Estrutura do Repositório](https:/
 📂 support/                       # Comandos e utilitários reutilizáveis
 │   ├── 📂 login_commands/        # Comandos do módulo Login
 │   │   └── LoginPage.ts
-│   ├── 📂 acessovisitante_commands/  # Comandos do módulo VisitanteAcesso
+│   ├── 📂 acessovisitante_commands/  # Comandos do módulo Visitante
 │   │   ├── VisitantePage.ts, AjudaPage.ts
 │   │   └── GerenciarAutenticacaoPage.ts, CursoPage.ts
 │   ├── 📂 cadastro_commands/     # Comandos do módulo Cadastro
@@ -153,8 +156,10 @@ await login.entrar(usuarios.administrador);
 | `npm run test:ui` | Modo visual — escolha o teste e clique em ▶ |
 | `npm test` | Roda tudo, sem janela |
 | `npm run test:visivel` | Roda tudo com o navegador aberto |
+| `npm run test:pagina-de-login` | Só a etapa Página de Login: Login, Cadastro, Redefinição de Senha, Rodapé e Visitante |
+| `npm run test:plataforma` | Só a etapa Plataforma: Carrossel e Meus Cursos |
 | `npm run test:login` | Só o módulo Login |
-| `npm run test:acesso-visitante` | Só o módulo VisitanteAcesso — as suítes que alteram configuração ou enviam e-mail ficam puladas |
+| `npm run test:acesso-visitante` | Só o módulo Visitante — as suítes que alteram configuração ou enviam e-mail ficam puladas |
 | `npm run test:cadastro` | Só o módulo Cadastro — a suíte que cria usuário fica pulada |
 | `npm run test:cadastro-real` | Suíte que cria e exclui os usuários `qa.auto1` (sem Cargo) e `qa.auto2` (com Cargo), "QA AUTOMAÇÃO"; senha em `NOVO_CADASTRO_SENHA` no `.env` — use só quando necessário |
 | `npm run test:visitante-config` | Troca "Botão de entrada como visitante" para Ocultar e Mostrar e restaura Mostrar — use só quando necessário |
@@ -206,7 +211,7 @@ Ao terminar qualquer rodada pelo terminal, aparece o **Resultado da rodada**: os
 Arquivo específico:
 
 ```bash
-npx playwright test tests/Login/valida_visualizar_senha.spec.ts --project=desktop --no-deps
+npx playwright test tests/1-PaginaDeLogin/1-Login/valida_visualizar_senha.spec.ts --project=desktop --no-deps
 ```
 
 O ambiente de QA é lento e não aguenta logins simultâneos: os testes rodam um por vez e com tempo de espera maior.

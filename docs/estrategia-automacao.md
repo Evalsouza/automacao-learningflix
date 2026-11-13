@@ -150,7 +150,7 @@ Risco = impacto no usuário × probabilidade de falha. Cada teste recebe uma tag
 | Relatório | 13:00 | Publicação no Confluence e e-mail |
 | Sob demanda | Com o "sim" da QA | Só o arquivo ou módulo alterado |
 
-Os módulos rodam em ordem alfabética, um teste por vez; o Visitante roda por último.
+Os testes rodam um por vez, por etapa do fluxo: primeiro `tests/1-PaginaDeLogin/` (Login, Cadastro, Redefinição de Senha, Rodapé e Visitante), depois `tests/2-Plataforma/` (Carrossel e Meus Cursos). O número na frente de cada pasta fixa a ordem — decisão da QA (13/11). As etapas não dependem uma da outra: uma falha na página de login não pula os testes da plataforma.
 
 **Critérios de entrada:** ambiente QA no ar; login dos 3 perfis concluído no `setup`.
 **Critério de suspensão:** o `setup` falha → a rodada não executa os testes e o relatório registra a interrupção; rodada que passa do limite de tempo é encerrada.

@@ -9,7 +9,7 @@
 
 export type Prioridade = '@critico' | '@alto' | '@medio' | '@baixo';
 
-export type Modulo = 'Login' | 'Cadastro' | 'RedefinicaoSenha' | 'VisitanteAcesso' | 'Rodape' | 'Carrossel' | 'MeusCursos';
+export type Modulo = 'Login' | 'Cadastro' | 'RedefinicaoSenha' | 'Visitante' | 'Rodape' | 'Carrossel' | 'MeusCursos';
 
 type Regras = Partial<Record<Prioridade, RegExp>>;
 
@@ -33,7 +33,7 @@ const regras: Record<Modulo, Regras> = {
     '@medio': /^(RP0[129]|RP1[01]|OBR\d+|RC[0-3]\d|RC5[2-9]|RC6\d)$/,
     '@baixo': /^CAN\d+(\.\d)?$/,
   },
-  VisitanteAcesso: {
+  Visitante: {
     '@critico': /^V0[235]$/,
     '@alto': /^(V0[148]|V1[01])$/,
     '@medio': /^(V0[679]|V1[2-9]|V2\d|OBR\d+)$/,

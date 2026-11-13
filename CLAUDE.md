@@ -32,6 +32,7 @@ A QA liberou a leitura de todo o espaço Confluence LP1 (05/11/2026), com os doc
 
 ## Padrões de código
 
+- Testes ficam em `tests/<n-Etapa>/<n-Módulo>/`: `1-PaginaDeLogin` (Login, Cadastro, Redefinição de Senha, Rodapé, Visitante) e depois `2-Plataforma` (Carrossel, Meus Cursos). O número fixa a ordem da rodada — decisão da QA (13/11). Módulo novo entra na etapa onde o fluxo começa, com o próximo número; sem dependência entre etapas no Playwright.
 - Classes de tela herdam `PaginaBase` (`support/PaginaBase.ts`) e abrem páginas com `this.abrir()`, que espera o carregamento (`'domcontentloaded'` só no Carrossel); specs não usam `page.goto` nem leem a tela direto — vira método da classe.
 - Sessões só por `sessoes.*` e `semSessao`; outro perfil no mesmo teste por `comSessao()` (`support/sessoes.ts`). Nada de `browser.newContext` nas specs.
 - Todo teste novo leva a prioridade por risco: `{ tag: prioridade('<Módulo>', '<ID>') }` (`fixtures/prioridades.ts`). ID novo → incluir na tabela; na dúvida, perguntar à QA.

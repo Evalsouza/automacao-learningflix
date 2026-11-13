@@ -51,8 +51,12 @@ function situacao(teste: TestCase): Situacao {
 
 function modulo(teste: TestCase, raiz: string): string {
   if (teste.parent.project()?.name === 'setup') return 'Preparação — login dos perfis';
-  const partes = relative(raiz, teste.location.file).split(sep);
-  return partes.length > 1 ? partes[0] : 'Outros';
+  // tests/<n-Etapa>/<n-Módulo>/arquivo.spec.ts → "Página de Login › Login"; o número só fixa a ordem da rodada
+  const partes = relative(raiz, teste.location.file).split(sep).slice(0, -1);
+  if (!partes.length) return 'Outros';
+  const ETAPAS: Record<string, string> = { PaginaDeLogin: 'Página de Login', Plataforma: 'Plataforma' };
+  const nomes = partes.map((p) => p.replace(/^\d+-/, '')).map((p) => ETAPAS[p] ?? p);
+  return nomes.join(' › ');
 }
 
 class ResumoReporter implements Reporter {
@@ -140,11 +144,11 @@ class ResumoReporter implements Reporter {
     escreve();
     escreve(`${cor.negrito}📊 MÉTRICAS DA RODADA${cor.fim}`);
     escreve(
-      `${cor.cinza}  ${'Módulo'.padEnd(32)}${'Executados'.padStart(11)}${'Passaram'.padStart(10)}${'Falharam'.padStart(10)}${'Instáveis'.padStart(11)}${'Aprovação'.padStart(11)}${'Tempo'.padStart(10)}${cor.fim}`,
+      `${cor.cinza}  ${'Módulo'.padEnd(40)}${'Executados'.padStart(11)}${'Passaram'.padStart(10)}${'Falharam'.padStart(10)}${'Instáveis'.padStart(11)}${'Aprovação'.padStart(11)}${'Tempo'.padStart(10)}${cor.fim}`,
     );
     for (const m of metricas)
       escreve(
-        `  ${corta(m.modulo, 30).padEnd(32)}${String(m.executados).padStart(11)}${String(m.passaram).padStart(10)}${String(m.falharam).padStart(10)}${String(m.instaveis).padStart(11)}${(m.aprovacao === null ? '—' : `${m.aprovacao}%`).padStart(11)}${duracao(m.tempoMs).padStart(10)}`,
+        `  ${corta(m.modulo, 38).padEnd(40)}${String(m.executados).padStart(11)}${String(m.passaram).padStart(10)}${String(m.falharam).padStart(10)}${String(m.instaveis).padStart(11)}${(m.aprovacao === null ? '—' : `${m.aprovacao}%`).padStart(11)}${duracao(m.tempoMs).padStart(10)}`,
       );
 
     const conta = (s: Situacao) => testes.filter((t) => situacao(t) === s).length;
