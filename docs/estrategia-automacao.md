@@ -152,6 +152,8 @@ Risco = impacto no usuário × probabilidade de falha. Cada teste recebe uma tag
 
 Na sexta roda só a semanal, começando às 09:03: as duas rodadas no mesmo dia disputavam o ambiente, e a semanal altera configurações que a diária lê. Os testes críticos rodam todo dia útil — na diária de segunda a quinta e na semanal na sexta — decisão da QA (13/11/2026); a composição será revista conforme o mapeamento avançar.
 
+Antes dos testes, a assistente Judy passa de "Chat centralizado" para "Botão flutuante" (o chat centralizado cobre botões das janelas) e volta ao tema original no fim da rodada, mesmo com falhas — decisão da QA (13/11/2026).
+
 Os testes rodam um por vez, por etapa do fluxo: primeiro `tests/1-PaginaDeLogin/` (Login, Cadastro, Redefinição de Senha, Rodapé e Visitante), depois `tests/2-Plataforma/` (Carrossel e Meus Cursos). O número na frente de cada pasta fixa a ordem — decisão da QA (13/11). As etapas não dependem uma da outra: uma falha na página de login não pula os testes da plataforma.
 
 **Critérios de entrada:** ambiente QA no ar; login dos 3 perfis concluído no `setup`.

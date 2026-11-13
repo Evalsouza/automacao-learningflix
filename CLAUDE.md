@@ -29,6 +29,7 @@ A QA liberou a leitura de todo o espaço Confluence LP1 (05/11/2026), com os doc
 - Rodada interrompida (notebook suspenso, desligado) é tentada de novo 1 h e 2 h depois; a que já terminou no dia não roda de novo (`-Forcar` repete).
 - Para agendar no Windows (uma vez): `powershell -ExecutionPolicy Bypass -File scripts\agendar-rodada-diaria.ps1` — cria as duas tarefas.
 - Suíte nova que altera configuração, cria usuário ou envia e-mail precisa da tag correspondente para entrar só na semanal.
+- **Judy (13/11):** antes dos testes, `support/judy.setup.ts` passa o "Tema da assistente" (`s_theme_smart_ai_assistanttheme`) de "Chat centralizado" para "Botão flutuante"; o projeto `limpeza` (`support/judy.teardown.ts`) volta o tema original no fim, mesmo com falhas. Só roda com as dependências (rodadas e `npm run test:*`), não com `--no-deps`. `recolherJudy()` continua como reserva.
 
 ## Padrões de código
 

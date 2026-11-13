@@ -19,10 +19,21 @@ export async function bloquearVideos(contexto: BrowserContext) {
 
 // Barra "Pergunte para a Judy" (chat de IA, desde 09/11): fica fixa no rodapé das páginas com login e cobre
 // botões como "Cancelar" e "Salvar mudanças" das janelas. Sempre que aparece, clica na seta para recolhê-la —
-// decisão da QA (10/11). O Playwright verifica a barra antes de cada ação e de cada expect
+// decisão da QA (10/11). O Playwright verifica a barra antes de cada ação e de cada expect.
+// A seta ("Minimizar") chega desabilitada e com animação: em 12 e 13/11 o clique esperava por ela até o teste
+// estourar o tempo. Agora espera no máximo 5 s; se a barra continuar na tela, ela é escondida só nesta página
 export async function recolherJudy(page: Page) {
   const barra = page.locator('#judy-root .floating-chat-center-input');
-  await page.addLocatorHandler(barra, () => barra.locator('button').last().click(), { noWaitAfter: true });
+  const seta = barra.locator('button[title="Minimizar"]').or(barra.locator('button').last()).first();
+  await page.addLocatorHandler(
+    barra,
+    async () => {
+      await seta.click({ timeout: 5_000 }).catch(() => {});
+      if (await barra.isVisible().catch(() => false))
+        await page.evaluate(() => document.getElementById('judy-root')?.style.setProperty('display', 'none')).catch(() => {});
+    },
+    { noWaitAfter: true },
+  );
 }
 
 // Abre uma sessão separada — outro perfil ou visitante —, executa a ação e fecha a sessão, mesmo se falhar

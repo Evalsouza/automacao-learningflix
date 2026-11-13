@@ -4,6 +4,7 @@ node_modules/
 test-results/
 playwright-report/
 relatorios/
+.estado/
 tutoriais/skill-link/copias-rascunho/
 tutoriais/judy/copias-rascunho
 tutoriais/lote/copias-rascunho

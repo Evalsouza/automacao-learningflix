@@ -22,8 +22,10 @@ export default defineConfig({
     locale: 'pt-BR',
   },
   projects: [
-    // Login dos perfis: se o QA estiver lento, tenta de novo antes de deixar todos os testes sem executar
-    { name: 'setup', testDir: './support', testMatch: /auth\.setup\.ts/, retries: 2 },
+    // Login dos perfis: se o QA estiver lento, tenta de novo antes de deixar todos os testes sem executar.
+    // Depois, a Judy passa para "Botão Flutuante" (judy.setup.ts); a `limpeza` volta o tema original no fim
+    { name: 'setup', testDir: './support', testMatch: /(auth|judy)\.setup\.ts/, retries: 2, teardown: 'limpeza' },
+    { name: 'limpeza', testDir: './support', testMatch: /judy\.teardown\.ts/ },
     {
       name: 'desktop',
       use: { ...devices['Desktop Chrome'] },

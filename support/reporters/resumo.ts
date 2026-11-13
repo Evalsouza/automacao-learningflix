@@ -50,7 +50,8 @@ function situacao(teste: TestCase): Situacao {
 }
 
 function modulo(teste: TestCase, raiz: string): string {
-  if (teste.parent.project()?.name === 'setup') return 'Preparação — login dos perfis';
+  if (teste.parent.project()?.name === 'setup') return 'Preparação — login dos perfis e Judy';
+  if (teste.parent.project()?.name === 'limpeza') return 'Encerramento — tema da Judy restaurado';
   // tests/<n-Etapa>/<n-Módulo>/arquivo.spec.ts → "Página de Login › Login"; o número só fixa a ordem da rodada
   const partes = relative(raiz, teste.location.file).split(sep).slice(0, -1);
   if (!partes.length) return 'Outros';
