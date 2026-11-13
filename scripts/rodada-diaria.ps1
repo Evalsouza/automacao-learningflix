@@ -1,7 +1,7 @@
 ﻿# Rodadas da automação — rodam fora do Claude, pelo Agendador de Tarefas do Windows.
-#   -Tipo diaria  (seg a sex, 09:03): npm run test:diaria  — suítes normais, só leitura → relatorios\AAAA-MM-DD\
-#   -Tipo semanal (sexta, 12:00):    npm run test:semanal — suítes que alteram configuração, criam usuário
-#                                     ou enviam e-mail → relatorios\AAAA-MM-DD-semanal\
+#   -Tipo diaria  (seg a qui, 09:03): npm run test:diaria  — suítes normais, só leitura → relatorios\AAAA-MM-DD\
+#   -Tipo semanal (sexta, 09:03):     npm run test:semanal — suítes que alteram configuração, criam usuário
+#                                      ou enviam e-mail, mais os @critico → relatorios\AAAA-MM-DD-semanal\
 # Em cada pasta:
 #   resumo.txt          — resultado da rodada (o mesmo do terminal)
 #   resultado.json      — resultado completo, para análise

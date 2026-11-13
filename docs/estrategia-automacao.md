@@ -145,10 +145,12 @@ Risco = impacto no usuário × probabilidade de falha. Cada teste recebe uma tag
 
 | Rodada | Quando | O que roda |
 |---|---|---|
-| Diária | Seg a sex, 09:03 | Suítes normais (`npm run test:diaria`) |
-| Semanal | Sexta, 12:00 | Suítes que alteram configuração, criam usuário ou enviam e-mail (`@altera-configuracao`, `@cria-usuario`, `@envia-email`) |
+| Diária | Seg a qui, 09:03 | Suítes normais (`npm run test:diaria`) |
+| Semanal | Sexta, 09:03 | Suítes que alteram configuração, criam usuário ou enviam e-mail (`@altera-configuracao`, `@cria-usuario`, `@envia-email`), mais os `@critico` |
 | Relatório | 13:00 | Publicação no Confluence e e-mail |
 | Sob demanda | Com o "sim" da QA | Só o arquivo ou módulo alterado |
+
+Na sexta roda só a semanal, começando às 09:03: as duas rodadas no mesmo dia disputavam o ambiente, e a semanal altera configurações que a diária lê. Os testes críticos rodam todo dia útil — na diária de segunda a quinta e na semanal na sexta — decisão da QA (13/11/2026); a composição será revista conforme o mapeamento avançar.
 
 Os testes rodam um por vez, por etapa do fluxo: primeiro `tests/1-PaginaDeLogin/` (Login, Cadastro, Redefinição de Senha, Rodapé e Visitante), depois `tests/2-Plataforma/` (Carrossel e Meus Cursos). O número na frente de cada pasta fixa a ordem — decisão da QA (13/11). As etapas não dependem uma da outra: uma falha na página de login não pula os testes da plataforma.
 

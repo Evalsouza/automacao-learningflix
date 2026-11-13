@@ -1,7 +1,8 @@
 ﻿# Cria (ou atualiza) no Agendador de Tarefas do Windows as duas rodadas da automação:
-#   "Automacao LearningFlix - Rodada diaria"  — seg a sex, 09:03: suítes normais (só leitura), até 4 horas
-#   "Automacao LearningFlix - Rodada semanal" — sexta, 12:00: suítes que alteram configuração, criam usuário
-#                                                ou enviam e-mail, até 8 horas
+#   "Automacao LearningFlix - Rodada diaria"  — seg a qui, 09:03: suítes normais (só leitura), até 4 horas
+#   "Automacao LearningFlix - Rodada semanal" — sexta, 09:03: suítes que alteram configuração, criam usuário
+#                                                ou enviam e-mail, mais os testes @critico, até 8 horas
+# Na sexta roda só a semanal: as duas no mesmo dia disputavam o ambiente — decisão da QA (13/11/2026)
 # Rode uma vez, no PowerShell, a partir da pasta do projeto:
 #   powershell -ExecutionPolicy Bypass -File scripts\agendar-rodada-diaria.ps1
 # As tarefas rodam com o seu usuário, quando você estiver conectado ao Windows, com a janela oculta
@@ -13,12 +14,12 @@
 $script = Join-Path $PSScriptRoot 'rodada-diaria.ps1'
 $projeto = Split-Path -Parent $PSScriptRoot
 
-$diasUteis = 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'
+$diasDaDiaria = 'Monday', 'Tuesday', 'Wednesday', 'Thursday'
 $rodadas = @(
   @{ Nome = 'Automacao LearningFlix - Rodada diaria'; Tipo = 'diaria'; Horas = 4
-     Gatilhos = '09:03', '10:03', '11:03' | ForEach-Object { New-ScheduledTaskTrigger -Weekly -DaysOfWeek $diasUteis -At $_ } },
+     Gatilhos = '09:03', '10:03', '11:03' | ForEach-Object { New-ScheduledTaskTrigger -Weekly -DaysOfWeek $diasDaDiaria -At $_ } },
   @{ Nome = 'Automacao LearningFlix - Rodada semanal'; Tipo = 'semanal'; Horas = 8
-     Gatilhos = '12:00', '13:00', '14:00' | ForEach-Object { New-ScheduledTaskTrigger -Weekly -DaysOfWeek Friday -At $_ } }
+     Gatilhos = '09:03', '10:03', '11:03' | ForEach-Object { New-ScheduledTaskTrigger -Weekly -DaysOfWeek Friday -At $_ } }
 )
 
 foreach ($rodada in $rodadas) {

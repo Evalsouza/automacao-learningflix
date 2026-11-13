@@ -23,8 +23,8 @@ A QA liberou a leitura de todo o espaço Confluence LP1 (05/11/2026), com os doc
 
 ## Rodadas diária e semanal
 
-- **Diária — seg a sex, 09:03** — Agendador de Tarefas do Windows roda `scripts\rodada-diaria.ps1 -Tipo diaria`: `npm run test:diaria` (só as suítes normais) e salva em `relatorios\AAAA-MM-DD\` (`resumo.txt`, `resultado.json`, `playwright-report\`, `execucao.log`, `status.json`).
-- **Semanal — sexta, 12:00** — `-Tipo semanal`: `npm run test:semanal` (suítes `@altera-configuracao`, `@cria-usuario`, `@envia-email`) e salva em `relatorios\AAAA-MM-DD-semanal\`.
+- **Diária — seg a qui, 09:03** — Agendador de Tarefas do Windows roda `scripts\rodada-diaria.ps1 -Tipo diaria`: `npm run test:diaria` (só as suítes normais) e salva em `relatorios\AAAA-MM-DD\` (`resumo.txt`, `resultado.json`, `metricas.json`, `playwright-report\`, `execucao.log`, `status.json`).
+- **Semanal — sexta, 09:03** — `-Tipo semanal`: `npm run test:semanal` (suítes `@altera-configuracao`, `@cria-usuario`, `@envia-email` e os `@critico`) e salva em `relatorios\AAAA-MM-DD-semanal\`. Na sexta não há diária: as duas no mesmo dia disputavam o ambiente — decisão da QA (13/11).
 - **13:00** — tarefa agendada do Claude "Rodada diária — envio do relatório" só lê essas pastas e publica na página do Confluence "Execução Diária da Automação" e por e-mail para `config\destinatarios-relatorio.txt`. Ela não executa testes.
 - Rodada interrompida (notebook suspenso, desligado) é tentada de novo 1 h e 2 h depois; a que já terminou no dia não roda de novo (`-Forcar` repete).
 - Para agendar no Windows (uma vez): `powershell -ExecutionPolicy Bypass -File scripts\agendar-rodada-diaria.ps1` — cria as duas tarefas.

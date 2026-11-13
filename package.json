@@ -27,7 +27,7 @@
     "test:prioridade-alta": "playwright test --project=desktop --grep \"@critico|@alto\"",
     "test:responsivo": "playwright test --project=desktop --grep @responsivo",
     "test:diaria": "playwright test --project=desktop",
-    "test:semanal": "cross-env EXECUTAR_CADASTRO_REAL=sim EXECUTAR_CONFIG_CADASTRO=sim EXECUTAR_CONFIG_VISITANTE=sim EXECUTAR_ENVIO_AJUDA=sim EXECUTAR_CONFIG_REDEFINICAO=sim EXECUTAR_CONFIG_RODAPE=sim EXECUTAR_CONFIG_CARROSSEL=sim EXECUTAR_CONFIG_MEUS_CURSOS=sim EXECUTAR_MEUS_CURSOS_NOVO=sim playwright test --project=desktop --grep \"@altera-configuracao|@cria-usuario|@envia-email\"",
+    "test:semanal": "cross-env EXECUTAR_CADASTRO_REAL=sim EXECUTAR_CONFIG_CADASTRO=sim EXECUTAR_CONFIG_VISITANTE=sim EXECUTAR_ENVIO_AJUDA=sim EXECUTAR_CONFIG_REDEFINICAO=sim EXECUTAR_CONFIG_RODAPE=sim EXECUTAR_CONFIG_CARROSSEL=sim EXECUTAR_CONFIG_MEUS_CURSOS=sim EXECUTAR_MEUS_CURSOS_NOVO=sim playwright test --project=desktop --grep \"@altera-configuracao|@cria-usuario|@envia-email|@critico\"",
     "rodada:andamento": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/andamento-rodada.ps1",
     "login:perfis": "cross-env LOGIN_NOVO=sim playwright test --project=setup",
     "tutorial:login": "playwright test -c tutoriais --project=login",

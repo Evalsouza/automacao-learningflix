@@ -166,8 +166,8 @@ await login.entrar(usuarios.administrador);
 | `npm run test:ajuda-envio` | Envia a Ajuda como visitante: manda e-mail para o suporte — use só quando necessário |
 | `npm run test:redefinicao-senha` | Só o módulo RedefinicaoSenha — a suíte que altera configuração fica pulada; a redefinição padrão falha enquanto a personalizada estiver ativa |
 | `npm run test:redefinicao-config` | Altera campos de perfil e o campo primário/secundário da redefinição personalizada e restaura no final — use só quando necessário |
-| `npm run test:diaria` | Rodada diária: todos os módulos, só as suítes normais (só leitura) — roda sozinha de segunda a sexta às 09:03 |
-| `npm run test:semanal` | Rodada semanal: só as suítes que alteram configuração, criam usuário ou enviam e-mail (`@altera-configuracao`, `@cria-usuario`, `@envia-email`) — roda sozinha às sextas, 12:00 |
+| `npm run test:diaria` | Rodada diária: todos os módulos, só as suítes normais (só leitura) — roda sozinha de segunda a quinta às 09:03 |
+| `npm run test:semanal` | Rodada semanal: só as suítes que alteram configuração, criam usuário ou enviam e-mail (`@altera-configuracao`, `@cria-usuario`, `@envia-email`), mais os testes `@critico` — roda sozinha às sextas, 09:03 |
 | `npm run test:rodape` | Só o módulo Rodape — a suíte que altera configuração fica pulada |
 | `npm run test:rodape-config` | Habilita e desabilita as opções de footer do Tema e restaura no final — use só quando necessário |
 | `npm run test:carrossel` | Só o módulo Carrossel — a suíte que altera configuração fica pulada |
@@ -186,9 +186,9 @@ await login.entrar(usuarios.administrador);
 
 Durante o dia, rode só o módulo em que está trabalhando (`npm run test:<modulo>`). As rodadas completas rodam sozinhas, pelo Agendador de Tarefas do Windows (`scripts\rodada-diaria.ps1`):
 
-- **Diária — segunda a sexta, 09:03** (até 4 horas): `npm run test:diaria` — todos os módulos, só as suítes normais — e salva em `relatorios\AAAA-MM-DD\`.
-- **Semanal — sexta, 12:00** (até 8 horas): `npm run test:semanal` — as suítes que alteram configuração, criam usuário ou enviam e-mail, todas restauradas no final — e salva em `relatorios\AAAA-MM-DD-semanal\`. Ficam separadas porque são lentas no QA e, se a rodada for interrompida, a configuração pode ficar sem restaurar.
-- Em cada pasta: `resumo.txt`, `resultado.json`, `playwright-report\index.html` (prints e vídeos), `execucao.log` e `status.json`. Guarda as últimas 30 pastas.
+- **Diária — segunda a quinta, 09:03** (até 4 horas): `npm run test:diaria` — todos os módulos, só as suítes normais — e salva em `relatorios\AAAA-MM-DD\`.
+- **Semanal — sexta, 09:03** (até 8 horas): `npm run test:semanal` — as suítes que alteram configuração, criam usuário ou enviam e-mail, todas restauradas no final, mais os testes `@critico` — e salva em `relatorios\AAAA-MM-DD-semanal\`. Ficam separadas porque são lentas no QA e, se a rodada for interrompida, a configuração pode ficar sem restaurar. Na sexta não há diária: as duas no mesmo dia disputavam o ambiente — decisão da QA (13/11/2026).
+- Em cada pasta: `resumo.txt`, `resultado.json`, `metricas.json`, `playwright-report\index.html` (prints e vídeos), `execucao.log` e `status.json`. Guarda as últimas 30 pastas.
 - **13:00 — tarefa do Claude "Rodada diária — envio do relatório"** só lê essas pastas (não executa testes) e publica cada rodada no topo da página do Confluence [Execução Diária da Automação](https://epicbrasil.atlassian.net/wiki/spaces/LP1/pages/5912526881) e por e-mail para os endereços de `config/destinatarios-relatorio.txt` — um por linha; para incluir ou remover alguém, edite esse arquivo. O e-mail traz o caminho do `index.html` no computador da QA: o conector do Outlook não envia anexos.
 
 Para agendar no Windows (uma vez, no PowerShell, na pasta do projeto):
