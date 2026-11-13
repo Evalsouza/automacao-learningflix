@@ -1,6 +1,6 @@
 # Estratégia de Automação de Testes — LearningFlix
 
-> **Versão 1.0 — aprovada pela QA em 12/11/2026.** Itens marcados com **[QA]** ainda dependem de decisão da QA (seção 17).
+> **Versão 1.1 — 13/11/2026** (versão 1.0 aprovada pela QA em 12/11/2026). Itens marcados com **[QA]** ainda dependem de decisão da QA (seção 17).
 > Documento principal da automação: as páginas "Condições Validadas", "Rastreabilidade" e "Execução Diária" detalham o que está resumido aqui. A cópia no projeto fica em `docs/estrategia-automacao.md`.
 
 | Item | Valor |
@@ -95,10 +95,10 @@ Não é automatizado: avaliação visual subjetiva, testes exploratórios, casos
 
 | Camada da gTAA | No projeto |
 |---|---|
-| Definição dos testes | `tests/<Módulo>/*.spec.ts` — passos Dado/Quando/Então (`test.step`), IDs do DT/EVT no título, tags `@dt-*` |
+| Definição dos testes | `tests/<n-Etapa>/<n-Módulo>/*.spec.ts` — etapas `1-PaginaDeLogin` e `2-Plataforma`, o número fixa a ordem da rodada; passos Dado/Quando/Então (`test.step`), IDs do DT/EVT no título, tags `@dt-*` e de prioridade |
 | Adaptação (interface com o sistema) | Classes de tela em `support/*_commands/`, herdando `PaginaBase`; sessões em `support/sessoes.ts` |
 | Dados de teste | `fixtures/` (textos e regras da tela), `support/usuarios.ts`, `Factories` (dados gerados) |
-| Execução | Playwright, 1 worker, sem retry; projeto `setup` faz o login dos perfis |
+| Execução | Playwright, 1 worker, sem retry; projeto `setup` faz o login dos perfis e passa a Judy para "Botão flutuante"; projeto `limpeza` volta o tema original da Judy no fim da rodada, mesmo com falhas |
 | Relatório | Resumo por módulo e métricas (`support/reporters/resumo.ts`), HTML com prints, vídeo e trace |
 
 Padrões de código: specs não acessam a tela direto (vira método da classe); páginas abertas com `abrir()`, que espera o carregamento; outro perfil no mesmo teste por `comSessao()`; vídeos bloqueados (exceto Carrossel); barra da Judy recolhida automaticamente. Checagens a cada mudança: `tsc`, ESLint, Prettier e `--list`.
@@ -182,6 +182,7 @@ Os testes rodam um por vez, por etapa do fluxo: primeiro `tests/1-PaginaDeLogin/
 
 - Repositório git único. A pasta `automacao-learningflix` fica sempre no `main` — é a usada pelas rodadas.
 - Tutoriais são feitos na pasta `automacao-learningflix-tutoriais` (branch `tutoriais`) e juntados no `main` ao final.
+- Evidências de documento de teste são feitas na pasta `automacao-learningflix-evidencias`, um branch `evidencia/<documento>` por documento; quando viram teste automatizado, são juntadas no `main`.
 - Commit só com o "ok" da QA; o push é feito pela QA.
 - **[QA]** Proposta: revisão das mudanças por pull request antes de entrar no `main`.
 
@@ -203,11 +204,13 @@ Os testes rodam um por vez, por etapa do fluxo: primeiro `tests/1-PaginaDeLogin/
 | Massa de dados alterada (cargos, datas, usuários) | Dados lidos do cadastro na hora do teste |
 | Rodada passa do limite de tempo | **[QA]** Rever o limite e usar a prioridade por risco para ordenar |
 | Testes dependem da execução em sequência | Mantido 1 worker; registrado nas suítes que dependem da ordem |
+| Mudança no projeto durante uma rodada (ex.: pastas movidas em 13/11 durante a diária — "Cannot find module") | Não mexer na pasta principal entre 09:03 e o fim da rodada; trabalho novo em pastas separadas (tutoriais, evidências) |
+| Correção que trava os testes (ex.: em 13/11 o clique na seta da Judy esperava um botão desabilitado e a semanal inteira estourou o tempo) | Esperas com limite curto e alternativa sem bloquear; preparação que nunca falha a rodada; análise do contexto de erro da rodada |
 
 ## 16. Documentos relacionados
 
 - Confluence: [Condições Validadas na Automação](https://epicbrasil.atlassian.net/wiki/spaces/LP1/pages/5910954005), [Rastreabilidade da Automação](https://epicbrasil.atlassian.net/wiki/spaces/LP1/pages/5902991361), [Execução Diária da Automação](https://epicbrasil.atlassian.net/wiki/spaces/LP1/pages/5912526881).
-- Projeto: `README.md`, `CLAUDE.md`, `tests/<Módulo>/RASTREABILIDADE.md`.
+- Projeto: `README.md`, `CLAUDE.md`, `tests/<n-Etapa>/<n-Módulo>/RASTREABILIDADE.md`.
 
 ## 17. Pontos em aberto **[QA]**
 
@@ -224,3 +227,4 @@ Os testes rodam um por vez, por etapa do fluxo: primeiro `tests/1-PaginaDeLogin/
 | Versão | Data | O que mudou |
 |---|---|---|
 | 1.0 | 12/11/2026 | Primeira versão, aprovada pela QA; prioridade por risco aplicada aos 264 testes; métricas por módulo no relatório da rodada |
+| 1.1 | 13/11/2026 | Testes organizados por etapa (Página de Login e depois Plataforma); diária de segunda a quinta e semanal na sexta às 09:03 com os críticos; Judy em "Botão flutuante" durante a rodada; pasta de evidências; riscos da semanal de 13/11 |
