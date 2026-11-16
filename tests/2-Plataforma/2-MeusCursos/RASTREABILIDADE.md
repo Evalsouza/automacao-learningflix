@@ -97,6 +97,7 @@ Arquivos: `valida_*.spec.ts` para as validações funcionais e `validacao_respon
 
 **Divergências entre documentos e sistema**
 
+- A configuração "Número de cards na página" (`block_mycourses | per_page`) é aberta pela página do bloco, `/admin/settings.php?section=blocksettingmycourses`. Até 13/11 o teste usava a busca da administração (`query=block_mycourses`), que deixou de listar esse campo — MC10 a MC12 falharam na semanal de 13/11 por isso; não era defeito da plataforma (16/11).
 - Ambiente e massa do DT/EVT: `smart4-qa.leobr.net` e `smart4-homolog.leobr.net`; os testes rodam em `qa.learningflix.net`.
 - O DT/EVT chama a configuração de "aba"; na tela é o campo "Número de cards na página" (`block_mycourses | per_page`).
 - O DT/EVT diz "08(nove) Cards" no caso da paginação — erro de digitação.

@@ -44,12 +44,6 @@ export const falhasConhecidas: FalhaConhecida[] = [
     motivo: '"Cancelar" da Ajuda não limpa o formulário',
     desde: '28/10/2026',
   },
-  ...['MC10', 'MC11', 'MC12'].map((id) => ({
-    modulo: 'MeusCursos' as const,
-    id,
-    motivo: 'Campo "Número de cards na página" não aparece mais na administração — mapeamento pendente',
-    desde: '13/11/2026',
-  })),
 ];
 
 // Critério de saída — Estratégia de Automação, seção 10

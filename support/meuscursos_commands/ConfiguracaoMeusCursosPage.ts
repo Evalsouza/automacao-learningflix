@@ -14,9 +14,10 @@ export class ConfiguracaoMeusCursosPage extends PaginaBase {
     this.botaoSalvar = page.getByRole('button', { name: 'Salvar mudanças' });
   }
 
-  // A configuração é aberta pela busca da administração, que mostra o campo do bloco com "Salvar mudanças"
+  // Página de configurações do bloco (Plugins → Blocos → Meus Cursos → Configurações). Até 13/11 o teste usava a
+  // busca da administração (query=block_mycourses), que deixou de listar este campo
   async acessar() {
-    await this.abrir('/admin/search.php?query=block_mycourses');
+    await this.abrir('/admin/settings.php?section=blocksettingmycourses');
     await this.cardsPorPagina.waitFor();
   }
 
