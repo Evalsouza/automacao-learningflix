@@ -1,6 +1,6 @@
 # Estratégia de Automação de Testes — LearningFlix
 
-> **Versão 1.1 — 13/11/2026** (versão 1.0 aprovada pela QA em 12/11/2026). Itens marcados com **[QA]** ainda dependem de decisão da QA (seção 17).
+> **Versão 1.2 — 16/11/2026** (versão 1.0 aprovada pela QA em 12/11/2026). Itens marcados com **[QA]** ainda dependem de decisão da QA (seção 17).
 > Documento principal da automação: as páginas "Condições Validadas", "Rastreabilidade" e "Execução Diária" detalham o que está resumido aqui. A cópia no projeto fica em `docs/estrategia-automacao.md`.
 
 | Item | Valor |
@@ -158,7 +158,7 @@ Os testes rodam um por vez, por etapa do fluxo: primeiro `tests/1-PaginaDeLogin/
 
 **Critérios de entrada:** ambiente QA no ar; login dos 3 perfis concluído no `setup`.
 **Critério de suspensão:** o `setup` falha → a rodada não executa os testes e o relatório registra a interrupção; rodada que passa do limite de tempo é encerrada.
-**Critérios de saída:** todos os testes executados; cada falha classificada como defeito, falha esperada (configuração do ambiente), instabilidade ou manutenção do teste. **[QA]** Meta de aprovação para a regressão.
+**Critérios de saída (aprovados pela QA em 16/11/2026):** a rodada é **APROVADA** quando os testes `@critico` passam 100% e o total passa 95% ou mais. A conta usa os testes executados (sem pulados e pendentes) e deixa de fora as **falhas conhecidas** — possíveis defeitos e defeitos registrados em `fixtures/falhas-conhecidas.ts`; testes instáveis contam como falha. O relatório mostra o bloco "🎯 CRITÉRIO DE SAÍDA", marca cada falha como **NOVA** ou **conhecida** e avisa quando uma falha conhecida passa (revisar a lista). Rodada interrompida não é avaliada.
 
 ## 11. Gestão de defeitos
 
@@ -172,7 +172,7 @@ Os testes rodam um por vez, por etapa do fluxo: primeiro `tests/1-PaginaDeLogin/
 | Métrica | Fonte |
 |---|---|
 | Executados, aprovados, falhos e instáveis por módulo | Resumo da rodada e `metricas.json` (desde 12/11) |
-| Taxa de aprovação (aprovados ÷ executados) | Idem |
+| Taxa de aprovação (aprovados ÷ executados) e critério de saída (críticos e geral, sem as falhas conhecidas) | Idem — bloco "🎯 CRITÉRIO DE SAÍDA" e `criterioDeSaida` no `metricas.json` (desde 16/11) |
 | Tempo de execução por módulo e da rodada | Idem |
 | Cobertura de casos do DT/EVT automatizados | `RASTREABILIDADE.md` de cada módulo **[QA]** consolidar por módulo |
 | Defeitos encontrados pela automação | Seção "Possíveis defeitos" — passa ao Jira com a skill de bugs |
@@ -215,7 +215,7 @@ Os testes rodam um por vez, por etapa do fluxo: primeiro `tests/1-PaginaDeLogin/
 ## 17. Pontos em aberto **[QA]**
 
 1. ~~Aprovar a prioridade por risco (seção 9)~~ — aprovada e aplicada em 12/11.
-2. Meta de aprovação da regressão (seção 10).
+2. ~~Meta de aprovação da regressão (seção 10)~~ — críticos 100% e geral 95%, sem as falhas conhecidas (16/11).
 3. Incluir a técnica de teste nas condições do Confluence (seção 6).
 4. Revisão por pull request (seção 13).
 5. Testes não funcionais (desempenho, segurança) — fora do escopo ou planejar?
@@ -228,3 +228,4 @@ Os testes rodam um por vez, por etapa do fluxo: primeiro `tests/1-PaginaDeLogin/
 |---|---|---|
 | 1.0 | 12/11/2026 | Primeira versão, aprovada pela QA; prioridade por risco aplicada aos 264 testes; métricas por módulo no relatório da rodada |
 | 1.1 | 13/11/2026 | Testes organizados por etapa (Página de Login e depois Plataforma); diária de segunda a quinta e semanal na sexta às 09:03 com os críticos; Judy em "Botão flutuante" durante a rodada; pasta de evidências; riscos da semanal de 13/11 |
+| 1.2 | 16/11/2026 | Critério de saída: críticos 100% e geral 95%, sem as falhas conhecidas (`fixtures/falhas-conhecidas.ts`); instáveis contam como falha |

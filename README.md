@@ -226,6 +226,7 @@ Os vídeos (mp4, webm…) não são baixados nos testes: os do carrossel deixava
 - **Arquivo de responsividade:** `validacao_responsividade_` + nome da validação — `validacao_responsividade_login.spec.ts`, `validacao_responsividade_visualizar_senha.spec.ts`. Um por validação, para ficarem agrupados.
 - **Título do teste:** ID do caso no DT/EVT + o resultado esperado — `C02 - Login válido redireciona para a página inicial`.
 - **Passos:** um `test.step` por intenção, no formato Quando / E / Então.
+- **Falhas conhecidas:** possíveis defeitos e defeitos registrados ficam em `fixtures/falhas-conhecidas.ts`. O resumo da rodada marca cada falha como NOVA ou conhecida e calcula o critério de saída — críticos 100% e geral 95% ou mais, sem as conhecidas (Estratégia, seção 10).
 - **Prioridade por risco:** todo teste leva `{ tag: prioridade('<Módulo>', '<ID>') }` — `@critico`, `@alto`, `@medio` ou `@baixo`, definidos em `fixtures/prioridades.ts` (Estratégia de Automação, seção 9). ID novo sem regra na tabela faz a listagem falhar.
 - **Tags:** `@dt-<documento>` em todo teste; `@responsivo` para resolução. Testes que o DT/EVT não cobre não levam tag: ficam registrados no `RASTREABILIDADE.md` do módulo.
 - **Responsividade:** toda validação tem seu arquivo `validacao_responsividade_*`, com um teste por resolução — Celular, Celular rotacionado, Tablet e Monitor.

@@ -1,6 +1,7 @@
 import type { FullConfig, FullResult, Reporter, Suite, TestCase } from '@playwright/test/reporter';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, relative, sep } from 'node:path';
+import { falhasConhecidas, metaDeAprovacao, type FalhaConhecida } from '../../fixtures/falhas-conhecidas';
 
 // Resumo da rodada no terminal: testes por módulo, falhas com o motivo e totais.
 // Também salvo, sem cores, em test-results/resumo.txt — a skill de fechamento do dia pode ler.
@@ -60,6 +61,12 @@ function modulo(teste: TestCase, raiz: string): string {
   return nomes.join(' › ');
 }
 
+// ID do DT/EVT no início do título ("C03.1 - ...") e módulo sem o número da pasta ("Login", "Cadastro")
+const idDoTeste = (teste: TestCase) => /^([A-Z]+\d+(?:\.\d+)?) - /.exec(teste.title)?.[1] ?? '';
+const moduloCurto = (teste: TestCase, raiz: string) =>
+  (relative(raiz, teste.location.file).split(sep).slice(0, -1).at(-1) ?? '').replace(/^\d+-/, '');
+const ehDaRodada = (teste: TestCase) => teste.parent.project()?.name === 'desktop';
+
 class ResumoReporter implements Reporter {
   private raiz = '';
   private suite?: Suite;
@@ -104,6 +111,9 @@ class ResumoReporter implements Reporter {
     }
 
     const falhas = testes.filter((t) => ['falhou', 'instavel'].includes(situacao(t)));
+    // Falhas já conhecidas (fixtures/falhas-conhecidas.ts): aparecem, mas ficam fora da meta de aprovação
+    const conhecida = (teste: TestCase): FalhaConhecida | undefined =>
+      ehDaRodada(teste) ? falhasConhecidas.find((f) => f.modulo === moduloCurto(teste, this.raiz) && f.id === idDoTeste(teste)) : undefined;
     if (falhas.length) {
       escreve();
       escreve(`${cor.negrito}${cor.vermelho}✖ DETALHE DAS FALHAS${cor.fim}`);
@@ -117,7 +127,11 @@ class ResumoReporter implements Reporter {
         const passo = ultimo?.steps.find((p) => p.error)?.title;
         const evidencia = ultimo?.attachments.find((a) => a.name === 'screenshot')?.path;
         escreve();
-        escreve(`  ${cor.negrito}${i + 1}. ${teste.title}${cor.fim}`);
+        const jaConhecida = conhecida(teste);
+        escreve(
+          `  ${cor.negrito}${i + 1}. ${teste.title}${cor.fim}` +
+            (jaConhecida ? `  ${cor.amarelo}[conhecida desde ${jaConhecida.desde}]${cor.fim}` : `  ${cor.vermelho}[NOVA]${cor.fim}`),
+        );
         escreve(`     ${cor.cinza}Arquivo:${cor.fim} ${relative(process.cwd(), teste.location.file)}:${teste.location.line}`);
         if (passo) escreve(`     ${cor.cinza}Passo:${cor.fim}   ${passo}`);
         escreve(`     ${cor.cinza}Motivo:${cor.fim}  ${erro[0]}`);
@@ -154,6 +168,45 @@ class ResumoReporter implements Reporter {
 
     const conta = (s: Situacao) => testes.filter((t) => situacao(t) === s).length;
     const executados = testes.length - conta('nao-executado') - conta('pulado') - conta('pendente');
+
+    // Critério de saída (Estratégia, seção 10 — QA, 16/11): críticos 100% e geral >= 95%, sem as falhas conhecidas;
+    // instáveis contam como falha. Só os testes da rodada (projeto desktop), sem preparação e encerramento
+    const daRodada = testes.filter(ehDaRodada);
+    const executou = (t: TestCase) => ['passou', 'falhou', 'instavel'].includes(situacao(t));
+    const falhou = (t: TestCase) => ['falhou', 'instavel'].includes(situacao(t));
+    const conhecidasQueFalharam = daRodada.filter((t) => falhou(t) && conhecida(t));
+    const conhecidasQuePassaram = daRodada.filter((t) => situacao(t) === 'passou' && conhecida(t));
+    const naMeta = daRodada.filter((t) => executou(t) && !(falhou(t) && conhecida(t)));
+    const taxa = (lista: TestCase[]) =>
+      lista.length ? Math.round((lista.filter((t) => situacao(t) === 'passou').length / lista.length) * 1000) / 10 : null;
+    const criticos = naMeta.filter((t) => t.tags.includes('@critico'));
+    const taxaCriticos = taxa(criticos);
+    const taxaGeral = taxa(naMeta);
+    const interrompida = !['passed', 'failed'].includes(resultado.status);
+    const aprovada =
+      !interrompida &&
+      naMeta.length > 0 &&
+      (taxaCriticos === null || taxaCriticos >= metaDeAprovacao.criticos) &&
+      (taxaGeral ?? 0) >= metaDeAprovacao.geral;
+    const percentual = (v: number | null) => (v === null ? '—' : `${v}%`);
+    escreve();
+    escreve(
+      `${cor.negrito}🎯 CRITÉRIO DE SAÍDA${cor.fim}  ${cor.cinza}(críticos ${metaDeAprovacao.criticos}% e geral ${metaDeAprovacao.geral}% ou mais, sem as falhas conhecidas)${cor.fim}`,
+    );
+    escreve(
+      `  Críticos: ${criticos.filter((t) => situacao(t) === 'passou').length} de ${criticos.length} — ${percentual(taxaCriticos)}` +
+        `   Geral: ${naMeta.filter((t) => situacao(t) === 'passou').length} de ${naMeta.length} — ${percentual(taxaGeral)}`,
+    );
+    if (conhecidasQueFalharam.length)
+      escreve(
+        `  ${cor.amarelo}Falhas conhecidas fora da conta: ${conhecidasQueFalharam.length}${cor.fim} — ` +
+          conhecidasQueFalharam.map((t) => `${moduloCurto(t, this.raiz)} ${idDoTeste(t)}`).join(', '),
+      );
+    if (conhecidasQuePassaram.length)
+      escreve(
+        `  ${cor.verde}Falhas conhecidas que PASSARAM — revisar fixtures/falhas-conhecidas.ts:${cor.fim} ` +
+          conhecidasQuePassaram.map((t) => `${moduloCurto(t, this.raiz)} ${idDoTeste(t)}`).join(', '),
+      );
     escreve();
     escreve(`${cor.negrito}${'─'.repeat(largura)}${cor.fim}`);
     escreve(
@@ -164,12 +217,11 @@ class ResumoReporter implements Reporter {
         `${cor.cinza}⏸ Pulados/pendentes: ${conta('pulado') + conta('pendente')}${cor.fim}` +
         (conta('nao-executado') ? `   ${cor.cinza}⏹ Não executados: ${conta('nao-executado')}${cor.fim}` : ''),
     );
-    const situacaoGeral =
-      resultado.status === 'passed'
+    const situacaoGeral = interrompida
+      ? `${cor.amarelo}INTERROMPIDA${cor.fim}`
+      : aprovada
         ? `${cor.verde}APROVADA${cor.fim}`
-        : resultado.status === 'failed'
-          ? `${cor.vermelho}COM FALHAS${cor.fim}`
-          : `${cor.amarelo}INTERROMPIDA${cor.fim}`;
+        : `${cor.vermelho}REPROVADA${cor.fim}`;
     escreve(`  Rodada ${cor.negrito}${situacaoGeral}${cor.fim} — ${executados} executados em ${duracao(resultado.duration)}`);
     escreve(`  ${cor.cinza}Relatório completo, com prints e vídeos: npm run report${cor.fim}`);
     escreve(`${cor.negrito}${'═'.repeat(largura)}${cor.fim}`);
@@ -193,6 +245,14 @@ class ResumoReporter implements Reporter {
           falharam: conta('falhou'),
           instaveis: conta('instavel'),
           aprovacao: executados ? Math.round((passaram / executados) * 1000) / 10 : null,
+          criterioDeSaida: {
+            meta: metaDeAprovacao,
+            criticos: taxaCriticos,
+            geral: taxaGeral,
+            resultado: interrompida ? 'interrompida' : aprovada ? 'aprovada' : 'reprovada',
+            conhecidasQueFalharam: conhecidasQueFalharam.map((t) => `${moduloCurto(t, this.raiz)} ${idDoTeste(t)}`),
+            conhecidasQuePassaram: conhecidasQuePassaram.map((t) => `${moduloCurto(t, this.raiz)} ${idDoTeste(t)}`),
+          },
           modulos: metricas,
         },
         null,
