@@ -91,12 +91,14 @@ A redefinição padrão só aparece com a personalizada desabilitada. Desde 10/1
 - `valida_redefinicao_senha_padrao.spec.ts`, `validacao_responsividade_redefinicao_senha_padrao.spec.ts` e o C08 do Login **desabilitam** a personalizada, se estiver habilitada, e a deixam assim;
 - `valida_redefinicao_senha_personalizada.spec.ts`, `validacao_responsividade_redefinicao_senha_personalizada.spec.ts` e a suíte de configuração **habilitam** a personalizada no início e a **desabilitam** no final.
 
+**Layout novo (16/11/2026):** na rodada de 16/11 a página padrão "Perdeu a senha?" apareceu mudada — o título virou parágrafo (antes era cabeçalho), o campo "Nome de usuário" virou "CPF" e as buscas ficam nos grupos "Buscar por identificação de usuário" e "Buscar pelo endereço de e-mail", no mesmo formulário. C08, RS01 a RS03 e a responsividade da padrão falharam por localizador e foram ajustados ao layout novo. O título sem papel de cabeçalho fica para a QA avaliar (acessibilidade).
+
 Com isso RS01 a RS04 e a responsividade da padrão deixam de ser falha esperada. RS02 e RS03 enviam o e-mail de recuperação em toda rodada diária. Funciona com os testes rodando um por vez, como nas rodadas; em paralelo, as suítes disputariam a configuração.
 
 | Caso | Teste | Arquivo |
 |---|---|---|
 | C09, C11 | RS01 - "Perdeu a senha?" exibe as duas formas de recuperar o acesso | valida_redefinicao_senha_padrao.spec.ts |
-| C09 | RS02 - "Buscar" pelo nome de usuário confirma a recuperação e "Continuar" volta para o login | valida_redefinicao_senha_padrao.spec.ts |
+| C09 | RS02 - "Buscar" pela identificação de usuário confirma a recuperação e "Continuar" volta para o login | valida_redefinicao_senha_padrao.spec.ts |
 | C11 | RS03 - "Buscar" pelo e-mail confirma a recuperação e "Continuar" volta para o login | valida_redefinicao_senha_padrao.spec.ts |
 | C14 | RS04 - "Voltar ao acesso" volta para a página de login | valida_redefinicao_senha_padrao.spec.ts |
 | C10, C12 | RS05 e RS06 — `fixme` | valida_redefinicao_senha_padrao.spec.ts |

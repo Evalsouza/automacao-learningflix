@@ -4,7 +4,7 @@ import { semSessao, sessoes, comSessao } from '../../../support/sessoes';
 import { ConfiguracaoLoginPage } from '../../../support/login_commands/ConfiguracaoLoginPage';
 import { garantirRedefinicaoPersonalizada } from '../../../support/redefinicaosenha_commands/ConfiguracaoRedefinicaoPage';
 import { usuarios } from '../../../support/usuarios';
-import { mensagens, paginas } from '../../../fixtures/login';
+import { mensagens } from '../../../fixtures/login';
 import { Factories } from '../../../Factories';
 import { prioridade } from '../../../fixtures/prioridades';
 
@@ -98,13 +98,13 @@ test.describe('Acesso como Administrador', { tag: '@dt-pagina-de-login' }, () =>
   test(
     'C08 - Esqueci a senha redireciona para "Perdeu a senha?"',
     { tag: prioridade('Login', 'C08') },
-    async ({ browser, page, login, perdeuSenha }) => {
+    async ({ browser, login, perdeuSenha }) => {
       await test.step('Dado que verifiquei a "Redefinição de senha personalizada" e, se habilitada, desabilitei', () =>
         garantirRedefinicaoPersonalizada(browser, false));
       await test.step('Quando cliquei em "Esqueci a senha"', () => login.linkEsqueciSenha.click());
-      await test.step('Então a página "Perdeu a senha?" foi exibida, com a busca pelo nome de usuário e pelo e-mail', async () => {
-        await expect(page.getByRole('heading', { name: paginas.perdeuSenha })).toBeVisible();
-        await expect(perdeuSenha.campoNomeDeUsuarioPadrao).toBeVisible();
+      await test.step('Então a página "Perdeu a senha?" foi exibida, com a busca pela identificação de usuário (CPF) e pelo e-mail', async () => {
+        await expect(perdeuSenha.titulo).toBeVisible();
+        await expect(perdeuSenha.campoIdentificacaoPadrao).toBeVisible();
         await expect(perdeuSenha.campoEmailPadrao).toBeVisible();
       });
     },

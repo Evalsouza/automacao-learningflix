@@ -8,7 +8,8 @@ import { paginas } from '../../../fixtures/redefinicaosenha';
 import { garantirRedefinicaoPersonalizada } from '../../../support/redefinicaosenha_commands/ConfiguracaoRedefinicaoPage';
 import { prioridade } from '../../../fixtures/prioridades';
 
-const motivoPadraoIndisponivel = 'Redefinição padrão não exibida: a redefinição personalizada está ativada';
+const motivoPadraoIndisponivel =
+  'Redefinição padrão não exibida: busca por identificação de usuário (CPF) e por e-mail não encontrada — confira se a personalizada está desativada ou se a página mudou';
 const emailDaEstudante = 'eva.souza@yopmail.com';
 
 test.use({ storageState: semSessao });
@@ -26,21 +27,21 @@ test.describe('Redefinição de senha padrão', { tag: '@dt-pagina-de-login' }, 
     'RS01 - "Perdeu a senha?" exibe as duas formas de recuperar o acesso',
     { tag: prioridade('RedefinicaoSenha', 'RS01') },
     async ({ perdeuSenha }) => {
-      await test.step(`Então a página "${paginas.perdeuSenha}" exibiu a recuperação pelo nome de usuário e pelo e-mail`, async () => {
-        await expect(perdeuSenha.campoNomeDeUsuarioPadrao, motivoPadraoIndisponivel).toBeVisible();
+      await test.step(`Então a página "${paginas.perdeuSenha}" exibiu a recuperação pela identificação de usuário (CPF) e pelo e-mail`, async () => {
+        await expect(perdeuSenha.campoIdentificacaoPadrao, motivoPadraoIndisponivel).toBeVisible();
         await expect(perdeuSenha.campoEmailPadrao, motivoPadraoIndisponivel).toBeVisible();
       });
     },
   );
 
   test(
-    'RS02 - "Buscar" pelo nome de usuário confirma a recuperação e "Continuar" volta para o login',
+    'RS02 - "Buscar" pela identificação de usuário confirma a recuperação e "Continuar" volta para o login',
     { tag: prioridade('RedefinicaoSenha', 'RS02') },
     async ({ page, perdeuSenha }) => {
       await test.step(`Quando informei "${usuarios.estudante.identificacao}" e cliquei em "Buscar"`, async () => {
-        await expect(perdeuSenha.campoNomeDeUsuarioPadrao, motivoPadraoIndisponivel).toBeVisible();
-        await perdeuSenha.campoNomeDeUsuarioPadrao.fill(usuarios.estudante.identificacao);
-        await perdeuSenha.campoNomeDeUsuarioPadrao.locator('xpath=ancestor::form[1]').getByRole('button', { name: 'Buscar' }).click();
+        await expect(perdeuSenha.campoIdentificacaoPadrao, motivoPadraoIndisponivel).toBeVisible();
+        await perdeuSenha.campoIdentificacaoPadrao.fill(usuarios.estudante.identificacao);
+        await perdeuSenha.botaoBuscarIdentificacao.click();
       });
       await test.step('Então foi exibida a página para confirmar a recuperação', () => expect(perdeuSenha.botaoContinuar).toBeVisible());
       await test.step('Quando cliquei em "Continuar"', () => perdeuSenha.botaoContinuar.click());
@@ -55,7 +56,7 @@ test.describe('Redefinição de senha padrão', { tag: '@dt-pagina-de-login' }, 
       await test.step(`Quando informei "${emailDaEstudante}" e cliquei em "Buscar"`, async () => {
         await expect(perdeuSenha.campoEmailPadrao, motivoPadraoIndisponivel).toBeVisible();
         await perdeuSenha.campoEmailPadrao.fill(emailDaEstudante);
-        await perdeuSenha.campoEmailPadrao.locator('xpath=ancestor::form[1]').getByRole('button', { name: 'Buscar' }).click();
+        await perdeuSenha.botaoBuscarEmail.click();
       });
       await test.step('Então foi exibida a página para confirmar a recuperação', () => expect(perdeuSenha.botaoContinuar).toBeVisible());
       await test.step('Quando cliquei em "Continuar"', () => perdeuSenha.botaoContinuar.click());

@@ -161,8 +161,8 @@ test.describe('CENÁRIO 2: Redefinição da senha pelo usuário', { tag: '@dt-re
         await expect(perdeuSenha.rotuloDoCampo(perdeuSenha.blocoPrimario)).toHaveText(config.primario);
         await expect(perdeuSenha.rotuloDoCampo(perdeuSenha.blocoSecundario)).toHaveText(config.secundario);
       });
-      await test.step('E os campos da redefinição padrão (nome de usuário e e-mail) NÃO foram exibidos', async () => {
-        await expect(perdeuSenha.campoNomeDeUsuarioPadrao).toBeHidden();
+      await test.step('E os campos da redefinição padrão (identificação de usuário e e-mail) NÃO foram exibidos', async () => {
+        await expect(perdeuSenha.campoIdentificacaoPadrao).toBeHidden();
         await expect(perdeuSenha.campoEmailPadrao).toBeHidden();
       });
       await test.step('E os botões "Enviar" e "Cancelar" foram exibidos', async () => {

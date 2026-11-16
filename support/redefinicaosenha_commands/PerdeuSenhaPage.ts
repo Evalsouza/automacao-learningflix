@@ -3,7 +3,9 @@ import { PaginaBase } from '../PaginaBase';
 
 // Login → "Esqueci a senha" → "Perdeu a senha?"
 // Redefinição personalizada: campo primário + campo secundário configurados em "Redefinição de senha personalizada".
-// Redefinição padrão: busca pelo nome de usuário ou pelo e-mail — só aparece com a personalizada desativada
+// Redefinição padrão: busca pela identificação de usuário (CPF) ou pelo e-mail — só aparece com a personalizada desativada.
+// Layout de 16/11/2026: o título virou parágrafo, o campo "Nome de usuário" virou "CPF" e as duas buscas ficam em grupos
+// ("Buscar por identificação de usuário" e "Buscar pelo endereço de e-mail") do mesmo formulário
 export class PerdeuSenhaPage extends PaginaBase {
   readonly titulo: Locator;
   readonly blocoPrimario: Locator;
@@ -14,14 +16,20 @@ export class PerdeuSenhaPage extends PaginaBase {
   readonly tituloRedefinir: Locator;
   readonly campoNovaSenha: Locator;
   readonly campoRepetirSenha: Locator;
-  readonly campoNomeDeUsuarioPadrao: Locator;
+  readonly campoIdentificacaoPadrao: Locator;
+  readonly botaoBuscarIdentificacao: Locator;
   readonly campoEmailPadrao: Locator;
+  readonly botaoBuscarEmail: Locator;
   readonly botaoContinuar: Locator;
   readonly voltarAoAcesso: Locator;
 
   constructor(page: Page) {
     super(page);
-    this.titulo = page.getByRole('heading', { name: 'Perdeu a senha?' });
+    // Cabeçalho na personalizada; parágrafo na padrão desde 16/11
+    this.titulo = page
+      .getByRole('heading', { name: 'Perdeu a senha?' })
+      .or(page.getByRole('main').getByText('Perdeu a senha?', { exact: true }))
+      .first();
     this.blocoPrimario = page.locator('#fitem_id_firstfield');
     this.blocoSecundario = page.locator('#fitem_id_secondfield');
     this.botaoEnviar = page.getByRole('button', { name: 'Enviar' });
@@ -30,8 +38,12 @@ export class PerdeuSenhaPage extends PaginaBase {
     this.tituloRedefinir = page.locator(':text-is("Redefinir senha"):visible').first();
     this.campoNovaSenha = page.locator('input[name=password]');
     this.campoRepetirSenha = page.locator('input[name=password2]');
-    this.campoNomeDeUsuarioPadrao = page.getByRole('textbox', { name: /nome de usuário/i });
-    this.campoEmailPadrao = page.getByRole('textbox', { name: /e-?mail/i });
+    const grupoIdentificacao = page.getByRole('group', { name: 'Buscar por identificação de usuário' });
+    const grupoEmail = page.getByRole('group', { name: 'Buscar pelo endereço de e-mail' });
+    this.campoIdentificacaoPadrao = grupoIdentificacao.getByRole('textbox');
+    this.botaoBuscarIdentificacao = grupoIdentificacao.getByRole('button', { name: 'Buscar' });
+    this.campoEmailPadrao = grupoEmail.getByRole('textbox');
+    this.botaoBuscarEmail = grupoEmail.getByRole('button', { name: 'Buscar' });
     this.botaoContinuar = page
       .getByRole('button', { name: 'Continuar' })
       .or(page.getByRole('link', { name: 'Continuar' }))

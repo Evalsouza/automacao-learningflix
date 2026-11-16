@@ -18,9 +18,12 @@ for (const { tipo, dispositivo, resolucao } of resolucoes) {
     test(`Redefinição padrão - ${tipo} ${resolucao}`, { tag: prioridade('RedefinicaoSenha') }, async ({ page, perdeuSenha }) => {
       await perdeuSenha.acessarPeloLogin();
 
-      await test.step('Então a recuperação pelo nome de usuário e pelo e-mail ficou dentro da tela', async () => {
-        for (const elemento of [perdeuSenha.campoNomeDeUsuarioPadrao, perdeuSenha.campoEmailPadrao]) {
-          await expect(elemento, 'Redefinição padrão não exibida: a redefinição personalizada está ativada').toBeVisible();
+      await test.step('Então a recuperação pela identificação de usuário (CPF) e pelo e-mail ficou dentro da tela', async () => {
+        for (const elemento of [perdeuSenha.campoIdentificacaoPadrao, perdeuSenha.campoEmailPadrao]) {
+          await expect(
+            elemento,
+            'Redefinição padrão não exibida: busca por identificação de usuário (CPF) e por e-mail não encontrada — confira se a personalizada está desativada ou se a página mudou',
+          ).toBeVisible();
           await elemento.scrollIntoViewIfNeeded();
           await expect(elemento).toBeInViewport();
         }
