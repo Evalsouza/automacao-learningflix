@@ -47,6 +47,7 @@ O Jira não numera os casos; os IDs seguem a ordem em que aparecem.
 | Teste | Motivo |
 |---|---|
 | RD04 - "Adm Cliente" vê o rodapé sem "Privacidade" e "Termos" | A História LFXP-1907 cita o Administrador Cliente; o LFXP-1941 não testa |
+| RD20 a RD23 - Rodapé nos limites do tema: 767 px escondido e 768 px exibido na página de login; 991 px escondido e 992 px exibido na "Página inicial" da Estudante — `validacao_responsividade_rodape.spec.ts` | Pedido da QA (17/11): valor-limite das larguras em que o tema passa a exibir o rodapé — lacuna (c) da Estratégia |
 | Rodapé - Celular / Celular rotacionado / Tablet / Monitor — página de login e "Página inicial" da Estudante — `validacao_responsividade_rodape.spec.ts` | Responsividade é padrão da equipe |
 
 **Decisões tomadas com a QA (28/10)**

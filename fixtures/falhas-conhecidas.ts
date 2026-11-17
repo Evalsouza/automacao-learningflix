@@ -44,6 +44,12 @@ export const falhasConhecidas: FalhaConhecida[] = [
     motivo: '"Cancelar" da Ajuda não limpa o formulário',
     desde: '28/10/2026',
   },
+  ...['MC11', 'MC13'].map((id) => ({
+    modulo: 'MeusCursos' as const,
+    id,
+    motivo: '"Número de cards na página" abaixo do mínimo de 8 é salvo ("Mudanças gravadas" com 3 e com 7)',
+    desde: '17/11/2026',
+  })),
 ];
 
 // Critério de saída — Estratégia de Automação, seção 10

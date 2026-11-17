@@ -19,6 +19,9 @@ export const limitesMeusCursos = {
   cardsPorPaginaPadrao: 8,
   // Abaixo do mínimo de 8 — o DT/EVT usa 3 (Página inicial) e 6 (Página Genérica)
   abaixoDoMinimo: 3,
+  // Valor-limite do mínimo (requisito v8: 8 é o mínimo e o padrão) — lacuna (d) da Estratégia, 17/11
+  logoAbaixoDoMinimo: 7,
+  minimo: 8,
   // Acima do padrão — CASOS DE TESTE 01 do DT/EVT
   cardsPorPaginaDeTeste: 9,
 };

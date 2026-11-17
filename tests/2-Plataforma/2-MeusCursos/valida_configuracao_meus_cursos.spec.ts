@@ -79,4 +79,45 @@ test.describe('CASOS DE TESTE 01: configuração do bloco "Meus Cursos"', { tag:
         }));
     },
   );
+
+  // Valor-limite do mínimo: 7 recusado e 8 aceito — lacuna (d) da Estratégia, pedido da QA (17/11).
+  // Rodam depois do MC12, com o campo diferente de 8, para que o 8 seja de fato uma mudança
+  test(
+    `MC13 - "Número de cards na página" = ${limitesMeusCursos.logoAbaixoDoMinimo}, logo abaixo do mínimo, NÃO é salvo`,
+    { tag: prioridade('MeusCursos', 'MC13') },
+    async ({ configuracaoMeusCursos }) => {
+      const anterior = await test.step('Dado que li o valor atual de "Número de cards na página"', () =>
+        configuracaoMeusCursos.valorAtual());
+      await test.step(`Quando informei "${limitesMeusCursos.logoAbaixoDoMinimo}" e cliquei em "Salvar mudanças"`, async () => {
+        await configuracaoMeusCursos.acessar();
+        await configuracaoMeusCursos.definir(limitesMeusCursos.logoAbaixoDoMinimo);
+      });
+      await test.step(`Então o valor NÃO foi gravado: a configuração continuou com "${anterior}"`, async () => {
+        await expect(configuracaoMeusCursos.page.getByText(textosMeusCursos.gravadas)).toBeHidden();
+        expect(await configuracaoMeusCursos.valorAtual()).toBe(anterior);
+      });
+    },
+  );
+
+  test(
+    `MC14 - Com "Número de cards na página" = ${limitesMeusCursos.minimo}, o mínimo, o valor é salvo e o "Ver todos" apresenta ${limitesMeusCursos.minimo} cards`,
+    { tag: prioridade('MeusCursos', 'MC14') },
+    async ({ browser, configuracaoMeusCursos }) => {
+      await test.step(`Quando informei "${limitesMeusCursos.minimo}" e cliquei em "Salvar mudanças"`, async () => {
+        await configuracaoMeusCursos.acessar();
+        await configuracaoMeusCursos.definir(limitesMeusCursos.minimo);
+      });
+      await test.step(`Então a configuração ficou com "${limitesMeusCursos.minimo}"`, async () =>
+        expect(await configuracaoMeusCursos.valorAtual()).toBe(String(limitesMeusCursos.minimo)));
+      await test.step(`E o "Ver todos" da Estudante apresentou ${limitesMeusCursos.minimo} cards na página 1`, () =>
+        comSessao(browser, sessoes.estudante, async (pagina) => {
+          const meusCursos = new MeusCursosPage(pagina);
+          await meusCursos.acessarHome();
+          await meusCursos.verTodos.click();
+          await pagina.waitForURL(/\/blocks\/mycourses\/index\.php/);
+          await meusCursos.aguardarCards();
+          await expect(meusCursos.cardsDaPagina).toHaveCount(limitesMeusCursos.minimo);
+        }));
+    },
+  );
 });
