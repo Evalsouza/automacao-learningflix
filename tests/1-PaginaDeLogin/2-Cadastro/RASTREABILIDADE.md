@@ -52,6 +52,7 @@ https://epicbrasil.atlassian.net/wiki/spaces/LP1/pages/3953491971/DTI+EVTI+-+P+g
 | Criar conta - Celular / Celular rotacionado / Tablet / Monitor — `validacao_responsividade_criar_conta.spec.ts` | Responsividade é padrão da equipe; o documento não pede |
 | IDA01 e IDA02 - Idade 10 e 15 anos é bloqueada na página "Menor digital" | Pedido da QA (27/10) |
 | IDA03 - Idade 17 anos segue para a página "Nova conta" | Pedido da QA (27/10): 17 anos é liberado, confirmado pela QA |
+| OBR11 - "Telefone" é obrigatório na "Nova conta" ("- Campo obrigatório") | Pedido da QA (17/11): o "Telefone" obrigatório sem aparecer no cadastro impedia a criação da conta |
 | IDA04 - Idade 16 anos segue para a página "Nova conta" | Pedido da QA (16/11): valor-limite entre o bloqueio em 15 e a liberação em 17; 16 já segue, pelo limite padrão do Moodle (só menores de 16 são bloqueados) — confirmado pela QA |
 | C008.1 - Cadastro com "Cargo" "Analista de Qualidade" exibe o Cargo na "Minha página" — usuário `qa.aluno31` | Pedido da QA (27/10): cobertura com e sem Cargo |
 | C009.1 e C010.1 - "Adm Cliente" e "Administrador" consultam o Cargo de "QA Aluno 30 Automação" — vazio | Pedido da QA (27/10): C009 e C010 repetidos com o usuário criado |
@@ -124,6 +125,8 @@ Execuções de 28/10:
 - Usuários do documento entram em `support/usuarios.ts`.
 - Verificação de idade (27/10): 10 e 15 anos vão para a página "Menor digital" — "Você é muito jovem para criar uma conta neste site." —, não um modal; 17 anos segue para a "Nova conta", comportamento correto segundo a QA. Depois do bloqueio, o navegador continua na "Menor digital" ao clicar de novo em "Criar uma conta": cada teste de idade usa um navegador novo.
 - CAN03 (27/10): a QA foi redirecionada para o login ao cancelar a edição do "Cargo". Na automação, alterar um campo da janela e clicar em "Cancelar" fecha a janela, mantém a página "Campos de perfil do usuário" e não grava nada. A sessão do Administrador estava expirada no mesmo período ("Sua sessão expirou. Por favor, identifique-se novamente."), o que leva ao login na próxima ação — provável causa.
+
+**Causa do defeito de 28/10 (17/11):** "Criar minha conta" não criava a conta porque o campo de perfil "Telefone" (`testphone`) era obrigatório e estava com "Mostrar na página de cadastro?" = Não — o formulário não tinha como preenchê-lo e não mostrava mensagem. Com o "ok" da QA, a opção passou para "Sim" (o resto do campo continua igual: obrigatório, único e visível para o usuário, professores e administradores, como pedem RP09 e RP10). O cadastro preenche um Telefone gerado a cada conta. Em 17/11 a conta já é criada e confirmada; o C008 ainda para na "Minha página" depois do primeiro login (hipótese: "Acordo de política do site" do usuário novo) e o C008.1 na consulta ao "Gerenciador de Hierarquia" — por isso continuam nas falhas conhecidas.
 
 **Possíveis defeitos**
 

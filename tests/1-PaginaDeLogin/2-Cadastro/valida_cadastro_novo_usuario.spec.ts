@@ -72,7 +72,11 @@ test.describe('CENÁRIO 1: Cadastro de usuário com Cargo "Comum" — cadastro r
               const criarConta = new CriarContaPage(pagina);
               await criarConta.acessarPeloLogin();
               await criarConta.verificarIdadeELocalizacao(Factories.cadastro.idadeAdulta(), pais);
-              await criarConta.preencherNovaConta({ ...usuario, dataNascimento: Factories.cadastro.dataNascimentoAdulta() });
+              await criarConta.preencherNovaConta({
+                ...usuario,
+                dataNascimento: Factories.cadastro.dataNascimentoAdulta(),
+                telefone: Factories.cadastro.telefoneUnico(),
+              });
               if (cargo) await criarConta.selecionarCargo(cargo);
               await criarConta.botaoCriarMinhaConta.click();
               // Se o formulário não avançar, a falha mostra as mensagens dos campos

@@ -17,6 +17,7 @@ import {
   obrigatoriosVerificacao,
   obrigatoriosNovaConta,
   dataNascimento,
+  telefone,
   menorDigital,
   verificacoesDeIdade,
 } from '../../../fixtures/cadastro';
@@ -161,6 +162,23 @@ test.describe('Nova conta', { tag: '@dt-criar-conta' }, () => {
     },
   );
 
+  // Pedido da QA (17/11): o "Telefone" obrigatório sem aparecer no cadastro impedia a criação da conta
+  test(
+    `${telefone.id} - "${telefone.campo}" é obrigatório na "Nova conta"`,
+    { tag: prioridade('Cadastro', telefone.id) },
+    async ({ criarConta }) => {
+      await test.step('Quando acessei a página "Nova conta"', () =>
+        criarConta.verificarIdadeELocalizacao(Factories.cadastro.idadeAdulta(), pais));
+      await test.step(`Então o campo "${telefone.campo}" foi exibido e marcado como obrigatório`, () =>
+        expect(criarConta.marcaObrigatorio(telefone.bloco)).toBeVisible());
+      await test.step('Quando cliquei em "Criar minha conta" sem preencher os campos', () => criarConta.botaoCriarMinhaConta.click());
+      await test.step(`Então a mensagem "${telefone.mensagem}" foi exibida`, () =>
+        expect(criarConta.mensagemDoCampo(telefone.bloco)).toHaveText(telefone.mensagem));
+      await test.step(`E permaneci na página "${paginas.novaConta}", sem criar a conta`, () =>
+        expect(criarConta.tituloNovaConta).toBeVisible());
+    },
+  );
+
   test(
     'C004 - Campo "Cargo" exibe os cargos cadastrados e permite selecionar "Analista de Qualidade"',
     { tag: prioridade('Cadastro', 'C004') },
@@ -214,6 +232,8 @@ test.describe('Campos exibidos conforme a configuração', { tag: '@dt-criar-con
     'CD01 - "Criar uma conta" exibe os campos ativos na plataforma',
     { tag: prioridade('Cadastro', 'CD01') },
     async ({ browser, page, criarConta }) => {
+      // Lê a configuração de cada campo exibido como Administrador: com o "Telefone" (17/11) são 4 janelas de edição
+      test.setTimeout(180_000);
       const verificacaoAtiva =
         await test.step('Dado que li a "Verificação da idade de consentimento digital" em "Configurações de privacidade"', () =>
           comSessao(browser, sessoes.administrador, (pagina) => new ConfiguracaoPrivacidadePage(pagina).lerVerificacaoDeIdade()));

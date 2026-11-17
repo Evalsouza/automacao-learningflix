@@ -63,3 +63,6 @@ export const obrigatoriosNovaConta = [
 
 // Marcado como obrigatório, mas sem mensagem: dia, mês e ano já vêm com valor padrão
 export const dataNascimento = { id: 'OBR10', campo: 'Data de Nascimento', bloco: 'fitem_id_profile_field_dtanasc' };
+
+// "Telefone": obrigatório e exibido na "Nova conta" desde 17/11 — sem ele a conta não era criada (defeito de 28/10)
+export const telefone = { id: 'OBR11', campo: 'Telefone', bloco: 'fitem_id_profile_field_testphone', mensagem: '- Campo obrigatório' };

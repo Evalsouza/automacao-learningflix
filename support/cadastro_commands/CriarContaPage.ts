@@ -8,6 +8,7 @@ type DadosNovaConta = {
   nome: string;
   sobrenome: string;
   dataNascimento: { dia: string; mes: string; ano: string };
+  telefone: string;
 };
 
 // Fluxo "Criar uma conta": Verificação de idade e localização → Nova conta
@@ -27,6 +28,7 @@ export class CriarContaPage extends PaginaBase {
   readonly campoNome: Locator;
   readonly campoSobrenome: Locator;
   readonly campoCargo: Locator;
+  readonly campoTelefone: Locator;
   readonly entradaCargo: Locator;
   readonly selectCargo: Locator;
   readonly botaoCriarMinhaConta: Locator;
@@ -50,6 +52,7 @@ export class CriarContaPage extends PaginaBase {
     this.campoSobrenome = page.getByRole('textbox', { name: 'Sobrenome', exact: true });
     // Cargo é um autocomplete: o select real fica oculto e a digitação acontece no campo de busca ao lado
     this.campoCargo = page.locator('#fitem_id_profile_field_position');
+    this.campoTelefone = page.locator('#id_profile_field_testphone');
     this.entradaCargo = this.campoCargo.locator('input[type=text]');
     this.selectCargo = this.campoCargo.locator('select');
     this.botaoCriarMinhaConta = page.getByRole('button', { name: 'Criar minha conta' });
@@ -137,5 +140,7 @@ export class CriarContaPage extends PaginaBase {
     await nascimento.getByRole('combobox', { name: 'Dia' }).selectOption(dados.dataNascimento.dia);
     await nascimento.getByRole('combobox', { name: 'Mês' }).selectOption(dados.dataNascimento.mes);
     await nascimento.getByRole('combobox', { name: 'Ano' }).selectOption(dados.dataNascimento.ano);
+    // "Telefone" é obrigatório e único; aparece na "Nova conta" desde 17/11 ("Mostrar na página de cadastro?" = Sim)
+    await this.campoTelefone.fill(dados.telefone);
   }
 }
