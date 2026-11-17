@@ -10,6 +10,8 @@ export const redefinicao = {
       if (texto !== correta) return texto;
     }
   },
+  // Data no formato d/m/Y, sem comparar com o cadastro — para identificação que não existe
+  dataQualquer: () => redefinicao.dataDiferente(''),
   cidade: () => faker.location.city(),
   // Primeira opção da lista diferente do valor correto
   opcaoDiferente: (opcoes: string[], correta: string) =>

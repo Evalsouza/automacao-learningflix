@@ -15,7 +15,7 @@ Arquivos: `valida_*.spec.ts` para as validações funcionais e `validacao_respon
 | `npm run test:cadastro-real` | Só o cadastro real (`EXECUTAR_CADASTRO_REAL=sim`) — também roda na rodada semanal |
 | `npm run test:cadastro-config` | Só a suíte de configuração (`EXECUTAR_CONFIG_CADASTRO=sim`) — também roda na rodada semanal |
 
-**Ordem da QA (09/11) em `valida_criar_conta.spec.ts`:** Verificação de idade e localização (C002 → OBR01/OBR02 → IDA01 a IDA03, IDA01.1 → C003, C003.1 a C003.3 → CAN01, CAN01.1) → Nova conta (OBR03 a OBR10 → C004 → CAN02, CAN02.1) → CD01 → C001, C007, CAN03 → C006 → C009, C010. No cadastro real, C001 e C004 vêm antes do C008.
+**Ordem da QA (09/11) em `valida_criar_conta.spec.ts`:** Verificação de idade e localização (C002 → OBR01/OBR02 → IDA01, IDA02, IDA04 (16/11), IDA03, IDA01.1 → C003, C003.1 a C003.3 → CAN01, CAN01.1) → Nova conta (OBR03 a OBR10 → C004 → CAN02, CAN02.1) → CD01 → C001, C007, CAN03 → C006 → C009, C010. No cadastro real, C001 e C004 vêm antes do C008.
 
 ---
 
@@ -52,6 +52,7 @@ https://epicbrasil.atlassian.net/wiki/spaces/LP1/pages/3953491971/DTI+EVTI+-+P+g
 | Criar conta - Celular / Celular rotacionado / Tablet / Monitor — `validacao_responsividade_criar_conta.spec.ts` | Responsividade é padrão da equipe; o documento não pede |
 | IDA01 e IDA02 - Idade 10 e 15 anos é bloqueada na página "Menor digital" | Pedido da QA (27/10) |
 | IDA03 - Idade 17 anos segue para a página "Nova conta" | Pedido da QA (27/10): 17 anos é liberado, confirmado pela QA |
+| IDA04 - Idade 16 anos segue para a página "Nova conta" | Pedido da QA (16/11): valor-limite entre o bloqueio em 15 e a liberação em 17; 16 já segue, pelo limite padrão do Moodle (só menores de 16 são bloqueados) — confirmado pela QA |
 | C008.1 - Cadastro com "Cargo" "Analista de Qualidade" exibe o Cargo na "Minha página" — usuário `qa.aluno31` | Pedido da QA (27/10): cobertura com e sem Cargo |
 | C009.1 e C010.1 - "Adm Cliente" e "Administrador" consultam o Cargo de "QA Aluno 30 Automação" — vazio | Pedido da QA (27/10): C009 e C010 repetidos com o usuário criado |
 | C009.2 e C010.2 - "Adm Cliente" e "Administrador" consultam o Cargo de "QA Aluno 31 Automação" — "Analista de Qualidade" | Idem |

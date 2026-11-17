@@ -35,6 +35,8 @@ export const menorDigital = { titulo: 'Menor digital', mensagem: 'Você é muito
 export const verificacoesDeIdade = [
   { id: 'IDA01', idade: '10', bloqueado: true },
   { id: 'IDA02', idade: '15', bloqueado: true },
+  // Limite: 16 anos já segue (limite padrão do Moodle, só menores de 16 são bloqueados) — decisão da QA (16/11)
+  { id: 'IDA04', idade: '16', bloqueado: false },
   { id: 'IDA03', idade: '17', bloqueado: false },
 ];
 

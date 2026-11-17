@@ -56,12 +56,13 @@ Ao final a suíte restaura: campo primário e secundário iniciais, a configura�
 | CAN01 - "Cancelar" em "Perdeu a senha?" volta para a página de login | Padrão da equipe: validar "Cancelar" |
 | CAN01.1 - "Cancelar" com "CPF" e "Data de Nascimento" preenchidos volta para a página de login | Pedido da QA (09/11) |
 | RP11 - "Perdeu a senha?" exibe só os campos configurados na redefinição personalizada | Pedido da QA (09/11) |
+| RP12 - Identificação errada e data de nascimento errada NÃO altera a senha | Pedido da QA (16/11): completa a tabela de decisão do RP04 ao RP07 com os dois campos errados |
 | Redefinição personalizada - Celular / Celular rotacionado / Tablet / Monitor — `validacao_responsividade_redefinicao_senha_personalizada.spec.ts` | Responsividade é padrão da equipe |
 
 **Decisões tomadas com a QA**
 
 - Datas, cargos e demais dados dos usuários são lidos do cadastro na hora do teste, porque podem mudar a qualquer momento.
-- RP07 usa identificação errada com a data correta; o RP06 já cobre a data errada.
+- RP07 usa identificação errada com a data correta; o RP06 já cobre a data errada; o RP12 (16/11) cobre os dois errados, sem ler o cadastro.
 - Regra esperada do "Campo secundário": o campo aparece só com Obrigatório = "Sim" e visibilidade "Visível para o usuário" ou "Visivel para o usuário, professores e administradores".
 - A matriz completa de 8 combinações vale para Cargo, Unidade, Regional e Setor.
 - Os testes positivos param na página "Redefinir senha": nenhuma senha é alterada.

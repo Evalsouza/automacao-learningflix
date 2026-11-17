@@ -29,7 +29,7 @@ const regras: Record<Modulo, Regras> = {
   },
   RedefinicaoSenha: {
     '@critico': /^(RP0[3-5]|RS0[1-4])$/,
-    '@alto': /^(RP0[6-8]|RS0[5-7]|RC39|RC4\d|RC5[01])$/,
+    '@alto': /^(RP0[6-8]|RP12|RS0[5-7]|RC39|RC4\d|RC5[01])$/,
     '@medio': /^(RP0[129]|RP1[01]|OBR\d+|RC[0-3]\d|RC5[2-9]|RC6\d)$/,
     '@baixo': /^CAN\d+(\.\d)?$/,
   },
