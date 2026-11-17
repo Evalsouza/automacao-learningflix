@@ -82,14 +82,14 @@ Não é automatizado: avaliação visual subjetiva, testes exploratórios, casos
 
 | Técnica | Exemplo no projeto |
 |---|---|
-| Partição de equivalência | Credenciais válidas e inválidas (C02 × C04 a C07); países que seguem para a "Nova conta" (C003.1 a C003.3) |
-| Análise de valor-limite | Idade na verificação: 10 e 15 anos bloqueiam, 17 segue (IDA01 a IDA03); "Número de cards" 3 não salva, 9 salva (MC11, MC12) |
-| Tabela de decisão | Obrigatório × visibilidade × campo → aparece ou não no "Campo secundário" (RC07 a RC38); Única × Obrigatório no "Campo primário" (RC52 a RC63) |
-| Transição de estado | Configuração Sim/Não refletida na tela (PRV01/PRV02, V18/V19, rodapé RD10 a RD16); "Cancelar" e reentrada no fluxo (CAN02.1, IDA01.1) |
-| Teste baseado em perfis | Mesmo caso com Administrador, Adm Cliente e Estudante (P01, P02, C009, C010) |
-| Baseado na experiência | Obrigatórios, "Cancelar" e responsividade em todas as telas — padrão da equipe |
+| Partição de equivalência | Classes de entrada ou de perfil: cada perfil entrando (C02, P01, P02); campo obrigatório vazio (OBR); países que seguem para a "Nova conta" (C003.1 a C003.3); valor certo, errado ou ausente no cadastro (RC40 a RC42); cada resolução da responsividade |
+| Valor-limite | Idade na verificação: 10 e 15 anos bloqueiam, 17 segue (IDA01 a IDA03); imagem no mínimo de 1280x720 aceita e 940x627 recusada (CR11, CR12); intervalo do carrossel (CR04, CR16); 8 cards por página e "Número de cards" 3 não salva, 9 salva (MC05, MC11, MC12); link de recuperação expira em 30 min (RS07) |
+| Tabela de decisão | Obrigatório × visibilidade × campo → aparece ou não no "Campo secundário" (RC07 a RC38); Única × Obrigatório no "Campo primário" (RC52 a RC63); usuário × senha no login (C04 a C07); configuração × o que a tela exibe (LG01, CD01, RP11, PRV01/PRV02, V18/V19, rodapé RD10 a RD16) |
+| Transição de estado | "Cancelar" e reentrada no fluxo (CAN01 a CAN03, IDA01.1); exibir e ocultar a senha (CT001.2 a CT001.5); "Sim" e "Não" no acordo do visitante (V03 a V05); sair pelo menu lateral (C02.1, P01.1, P02.1); alternar filtros e páginas (OB02, OB03, OB07) |
+| Caso de uso | Fluxo do início ao fim ou navegação: criar conta (C002, C003), Cargo igual em todas as telas (C006, C009, C010), "Esqueci a senha" (RP03), menu do visitante (V14 a V17, V20 a V23), incluir e remover slide (CR10, CR19) |
+| Checklist | Conferência dos elementos da tela ou da configuração lida: página de login (C01), configurações da redefinição (RP01, RP02), botão do visitante (V01), blocos e menu do visitante (V06, V07), aba do carrossel (CR01) |
 
-**[QA]** Proposta: indicar a técnica em cada condição da página "Condições Validadas".
+Desde 16/11, cada condição da página "Condições Validadas" traz o rótulo da técnica, com a legenda no topo. As lacunas encontradas nessa classificação estão no item 8 da seção 17.
 
 ## 7. Arquitetura da automação (ISTQB gTAA)
 
@@ -216,11 +216,12 @@ Os testes rodam um por vez, por etapa do fluxo: primeiro `tests/1-PaginaDeLogin/
 
 1. ~~Aprovar a prioridade por risco (seção 9)~~ — aprovada e aplicada em 12/11.
 2. ~~Meta de aprovação da regressão (seção 10)~~ — críticos 100% e geral 95%, sem as falhas conhecidas (16/11).
-3. Incluir a técnica de teste nas condições do Confluence (seção 6).
+3. ~~Incluir a técnica de teste nas condições do Confluence (seção 6)~~ — feito em 16/11: rótulo da técnica em cada uma das 178 condições, com a legenda no topo da página.
 4. Revisão por pull request (seção 13).
 5. Testes não funcionais (desempenho, segurança) — fora do escopo ou planejar?
 6. Limite de tempo da rodada diária (passou de 230 min em 11/11).
 7. Skill de abertura de bugs no formato da equipe (seção 11).
+8. Lacunas de cobertura encontradas ao classificar as técnicas (16/11) — decidir se viram testes: (a) idade 16 anos na verificação de idade, entre o bloqueio em 15 e a liberação em 17 (IDA02/IDA03); (b) CPF e data de nascimento errados ao mesmo tempo na redefinição personalizada (RP04 a RP07); (c) rodapé nos limites do tema, 767/768 px e 991/992 px; (d) limite aceito pelo "Número de cards na página" do Meus Cursos, entre o 3 recusado e o 9 aceito (MC11/MC12).
 
 ## Histórico de versões
 
@@ -228,4 +229,4 @@ Os testes rodam um por vez, por etapa do fluxo: primeiro `tests/1-PaginaDeLogin/
 |---|---|---|
 | 1.0 | 12/11/2026 | Primeira versão, aprovada pela QA; prioridade por risco aplicada aos 264 testes; métricas por módulo no relatório da rodada |
 | 1.1 | 13/11/2026 | Testes organizados por etapa (Página de Login e depois Plataforma); diária de segunda a quinta e semanal na sexta às 09:03 com os críticos; Judy em "Botão flutuante" durante a rodada; pasta de evidências; riscos da semanal de 13/11 |
-| 1.2 | 16/11/2026 | Critério de saída: críticos 100% e geral 95%, sem as falhas conhecidas (`fixtures/falhas-conhecidas.ts`); instáveis contam como falha |
+| 1.2 | 16/11/2026 | Critério de saída: críticos 100% e geral 95%, sem as falhas conhecidas (`fixtures/falhas-conhecidas.ts`); instáveis contam como falha; técnica de teste nas condições do Confluence e 4 lacunas de cobertura nos pontos em aberto |
