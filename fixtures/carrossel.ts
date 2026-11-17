@@ -25,6 +25,14 @@ export const slideDeTeste = {
   url: 'https://somosrevvo.com.br/',
 };
 
+// Idiomas da plataforma e do campo "Idioma" do slide (mapeados em 17/11) — cada slide aparece só para quem
+// está com a plataforma no mesmo idioma; não existe a opção "Todos os idiomas"
+export const idiomasDaPlataforma = [
+  { id: 'CR06.1', codigo: 'pt_br', nome: 'Português - Brasil' },
+  { id: 'CR06.2', codigo: 'en', nome: 'English' },
+  { id: 'CR06.3', codigo: 'es', nome: 'Español - Internacional' },
+];
+
 // Intervalo usado no teste de troca — CT 2 do DT/EVT
 export const intervaloDeTeste = 5;
 

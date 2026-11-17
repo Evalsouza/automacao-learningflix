@@ -22,6 +22,17 @@ export class CarrosselPage extends PaginaBase {
     await this.abrir('/my/', 'domcontentloaded');
   }
 
+  // Página inicial no idioma escolhido, como o seletor de idioma do rodapé (?lang=) — vale só para a sessão
+  async acessarNoIdioma(idioma: string) {
+    await this.abrir(`/my/index.php?lang=${idioma}`, 'domcontentloaded');
+  }
+
+  // Slides exibidos, sem depender dos botões: com 1 slide o Glide não mostra "Próximo slide",
+  // e os nomes dos botões mudam com o idioma (17/11)
+  get slidesExibidos(): Locator {
+    return this.page.locator('#frontpage-carousel .glide__slide:not(.glide__slide--clone)');
+  }
+
   // O carrossel só aparece depois que o Glide inicia — com vídeos nos slides, o QA pode levar mais de 30 s
   async aguardar() {
     await this.carrossel.waitFor({ timeout: 90_000 });

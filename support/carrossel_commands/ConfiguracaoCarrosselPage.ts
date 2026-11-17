@@ -68,6 +68,14 @@ export class ConfiguracaoCarrosselPage extends PaginaBase {
     return this.botoesRemoverSlide.count();
   }
 
+  // Código do idioma de cada slide (pt_br, en, es), na ordem dos slides — só leitura
+  async idiomasDosSlides(): Promise<string[]> {
+    await this.acessar();
+    const idiomas: string[] = [];
+    for (let n = 1; n <= (await this.quantidadeDeSlides()); n++) idiomas.push(await this.campo(n, 'lang').inputValue());
+    return idiomas;
+  }
+
   async adicionarSlide() {
     await this.botaoAdicionarSlide.click();
     await this.page.waitForLoadState('domcontentloaded');

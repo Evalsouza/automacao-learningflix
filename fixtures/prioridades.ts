@@ -43,7 +43,7 @@ const regras: Record<Modulo, Regras> = {
     '@medio': /^RD\d+$/,
   },
   Carrossel: {
-    '@medio': /^CR\d+$/,
+    '@medio': /^CR\d+(\.\d)?$/,
   },
   MeusCursos: {
     '@critico': /^MC0[1-3]$/,

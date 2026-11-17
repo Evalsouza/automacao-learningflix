@@ -1,9 +1,10 @@
 // DT/EVT - Plugin Carrossel Infinito no Layout da Página inicial — rastreabilidade em RASTREABILIDADE.md
 // Só leitura: confere a configuração e o carrossel atuais, sem alterar os slides
 import { test, expect } from '../../../support/e2e';
-import { sessoes, comSessao } from '../../../support/sessoes';
+import { sessoes, semSessao, comSessao } from '../../../support/sessoes';
 import { ConfiguracaoCarrosselPage } from '../../../support/carrossel_commands/ConfiguracaoCarrosselPage';
-import { camposDoSlide } from '../../../fixtures/carrossel';
+import { CarrosselPage } from '../../../support/carrossel_commands/CarrosselPage';
+import { camposDoSlide, idiomasDaPlataforma } from '../../../fixtures/carrossel';
 import { prioridade } from '../../../fixtures/prioridades';
 
 // O módulo Carrossel valida os slides: os vídeos são carregados
@@ -76,5 +77,60 @@ test.describe('Carrossel na Página inicial', { tag: '@dt-carrossel' }, () => {
           expect.poll(() => carrossel.posicaoDoSlideAtivo(), { timeout: (intervalo + 10) * 1000, intervals: [1000] }).not.toBe(antes));
       },
     );
+  });
+});
+
+// Idioma dos slides — pedido da QA (17/11): cada slide aparece só para quem está com a plataforma no mesmo idioma.
+// Só leitura: a configuração é lida como Administrador, sem salvar, e comparada com a Página inicial
+const lerIdiomasDosSlides = (browser: Parameters<typeof comSessao>[0]) =>
+  comSessao(browser, sessoes.administrador, (page) => new ConfiguracaoCarrosselPage(page).idiomasDosSlides());
+
+test.describe('Idioma dos slides', { tag: '@dt-carrossel' }, () => {
+  test.describe('Estudante', () => {
+    test.use({ storageState: sessoes.estudante });
+
+    test(
+      'CR05 - Em português, Estudante e Administrador veem só os slides em "Português - Brasil"',
+      { tag: prioridade('Carrossel', 'CR05') },
+      async ({ browser, carrossel }) => {
+        const idiomas = await test.step('Dado que li o "Idioma" de cada slide em "Carrossel da Página Inicial", sem salvar', () =>
+          lerIdiomasDosSlides(browser));
+        const esperados = idiomas.filter((idioma) => idioma === 'pt_br').length;
+        await test.step(`E havia ${esperados} de ${idiomas.length} slides em "Português - Brasil"`, () =>
+          expect(esperados).toBeGreaterThan(0));
+        await test.step(`Quando a Estudante acessou a "Página inicial", então ${esperados} slides foram exibidos`, async () => {
+          await carrossel.acessar();
+          await expect(carrossel.slidesExibidos).toHaveCount(esperados, { timeout: 90_000 });
+        });
+        await test.step(`E o Administrador também viu ${esperados} slides`, () =>
+          comSessao(browser, sessoes.administrador, async (page) => {
+            const doAdministrador = new CarrosselPage(page);
+            await doAdministrador.acessar();
+            await expect(doAdministrador.slidesExibidos).toHaveCount(esperados, { timeout: 90_000 });
+          }));
+      },
+    );
+  });
+
+  // O visitante troca o idioma pelo seletor do rodapé: vale só para a sessão, sem alterar o cadastro de ninguém
+  test.describe('Visitante', () => {
+    test.use({ storageState: semSessao });
+
+    for (const { id, codigo, nome } of idiomasDaPlataforma) {
+      test(
+        `${id} - Com a plataforma em "${nome}", o visitante vê só os slides em "${nome}"`,
+        { tag: prioridade('Carrossel', id) },
+        async ({ browser, visitante, carrossel }) => {
+          const idiomas = await test.step('Dado que li o "Idioma" de cada slide em "Carrossel da Página Inicial", sem salvar', () =>
+            lerIdiomasDosSlides(browser));
+          const esperados = idiomas.filter((idioma) => idioma === codigo).length;
+          await test.step(`E havia ${esperados} de ${idiomas.length} slides em "${nome}"`, () => expect(esperados).toBeGreaterThan(0));
+          await test.step('Quando entrei como visitante', () => visitante.entrarComoVisitante());
+          await test.step(`E escolhi "${nome}" no idioma da plataforma`, () => carrossel.acessarNoIdioma(codigo));
+          await test.step(`Então ${esperados} slides foram exibidos no carrossel`, () =>
+            expect(carrossel.slidesExibidos).toHaveCount(esperados, { timeout: 90_000 }));
+        },
+      );
+    }
   });
 });

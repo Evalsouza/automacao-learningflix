@@ -47,6 +47,8 @@ O documento não numera as condições ("RF001 à RF010"); os IDs seguem a ordem
 |---|---|
 | CR13 - Imagem acima de 5 MB NÃO é adicionada ao slide | A história exige no máximo 5 MB, mas nenhum caso testa. A mensagem do campo fica registrada na execução: ainda não mapeada |
 | CR14 - Slide com idioma "English" NÃO é exibido para a Estudante em português | O campo "Idioma" filtra os slides; o documento não diz o esperado |
+| CR05 - Em português, Estudante e Administrador veem só os slides em "Português - Brasil" | Pedido da QA (17/11): cada slide aparece só para quem está com a plataforma no mesmo idioma. Só leitura — o "Idioma" de cada slide é lido como Administrador e a quantidade exibida é comparada |
+| CR06.1 a CR06.3 - Com a plataforma em "Português - Brasil", "English" e "Español - Internacional", o visitante vê só os slides daquele idioma | Pedido da QA (17/11). O visitante troca o idioma pelo seletor do rodapé (`?lang=`), que vale só para a sessão — nenhum cadastro é alterado |
 | CR15 - Slide com vídeo (mp4) é exibido na Página inicial | Os slides atuais usam vídeo; o DT/EVT só cobre imagens. Pendente até o vídeo de teste estar em `fixtures/arquivos/carrossel/video.mp4` |
 | Carrossel - Celular / Celular rotacionado / Tablet / Monitor — `validacao_responsividade_carrossel.spec.ts` | Responsividade é padrão da equipe |
 
@@ -56,6 +58,7 @@ O documento não numera as condições ("RF001 à RF010"); os IDs seguem a ordem
 - Os 6 slides existentes — com vídeos e imagens da equipe — **não são alterados**: o documento manda excluir o arquivo do slide 1 e remover os slides 5, 4 e 3, o que apagaria conteúdo que não pode ser restaurado. A suíte trabalha só com um slide de teste.
 - As imagens de teste (1280x720, 940x627 e uma de ~9,6 MB) são geradas em memória pelo próprio teste (`support/carrossel_commands/imagens.ts`) — sem arquivos no repositório.
 - O texto do slide (editor) não é preenchido: o DT/EVT só usa o campo como dado da tabela de decisão.
+- **Idioma dos slides (17/11):** o carrossel mostra só os slides com o "Idioma" igual ao da plataforma para quem acessa. Mapeado em 17/11, só leitura: 6 slides — 3 em "Português - Brasil" (2, 5 e 6), 2 em "English" (3 e 4) e 1 em "Español - Internacional" (1); o campo "Idioma" não tem a opção "Todos os idiomas". Com 1 slide o carrossel não mostra os botões "Próximo slide" e "Slide anterior", por isso CR05 e CR06 contam os slides em `#frontpage-carousel`. De manhã, em "English", só o slide 3 aparecia (o slide 4, "AI Assistant", não); a equipe alterou os slides no mesmo dia e, na execução das 13:19, os 2 slides em inglês foram exibidos — não ficou registrado como possível defeito.
 
 **Divergências entre DT/EVT, DT/EVTR e sistema**
 
