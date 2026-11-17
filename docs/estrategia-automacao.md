@@ -221,7 +221,7 @@ Os testes rodam um por vez, por etapa do fluxo: primeiro `tests/1-PaginaDeLogin/
 5. Testes não funcionais (desempenho, segurança) — fora do escopo ou planejar?
 6. Limite de tempo da rodada diária (passou de 230 min em 11/11).
 7. Skill de abertura de bugs no formato da equipe (seção 11).
-8. Lacunas de cobertura encontradas ao classificar as técnicas (16/11) — decidir se viram testes: ~~(a) idade 16 anos na verificação de idade~~ — virou o IDA04 (17/11), 16 anos segue para a "Nova conta"; ~~(b) CPF e data de nascimento errados ao mesmo tempo na redefinição personalizada~~ — virou o RP12 (17/11); (c) rodapé nos limites do tema, 767/768 px e 991/992 px; (d) limite aceito pelo "Número de cards na página" do Meus Cursos, entre o 3 recusado e o 9 aceito (MC11/MC12).
+8. ~~Lacunas de cobertura encontradas ao classificar as técnicas (16/11)~~ — as 4 viraram testes: (a) IDA04, idade 16 anos segue para a "Nova conta" (17/11); (b) RP12, identificação e data erradas (17/11); (c) RD20 a RD23, rodapé escondido em 767 e 991 px e exibido em 768 e 992 px (17/11); (d) MC13 e MC14, "Número de cards na página" 7 e 8 (17/11) — o MC13, junto com o MC11, revelou um **defeito confirmado pela QA**: valores abaixo do mínimo de 8 são salvos.
 
 ## Histórico de versões
 
@@ -230,4 +230,4 @@ Os testes rodam um por vez, por etapa do fluxo: primeiro `tests/1-PaginaDeLogin/
 | 1.0 | 12/11/2026 | Primeira versão, aprovada pela QA; prioridade por risco aplicada aos 264 testes; métricas por módulo no relatório da rodada |
 | 1.1 | 13/11/2026 | Testes organizados por etapa (Página de Login e depois Plataforma); diária de segunda a quinta e semanal na sexta às 09:03 com os críticos; Judy em "Botão flutuante" durante a rodada; pasta de evidências; riscos da semanal de 13/11 |
 | 1.2 | 16/11/2026 | Critério de saída: críticos 100% e geral 95%, sem as falhas conhecidas (`fixtures/falhas-conhecidas.ts`); instáveis contam como falha; técnica de teste nas condições do Confluence e 4 lacunas de cobertura nos pontos em aberto |
-| 1.3 | 17/11/2026 | Lacunas (a) e (b) do item 8 viraram os testes IDA04 (idade 16 anos) e RP12 (identificação e data erradas); seguem abertas as lacunas (c) e (d); métrica de cobertura consolidada por módulo na Rastreabilidade (seção 12) |
+| 1.3 | 17/11/2026 | Lacunas (a) a (d) do item 8 viraram os testes IDA04, RP12, RD20 a RD23, MC13 e MC14 — defeito confirmado no mínimo do número de cards (MC11 e MC13); métrica de cobertura consolidada por módulo na Rastreabilidade (seção 12); idioma dos slides do Carrossel (CR05, CR06); causa do defeito do cadastro: campo "Telefone" obrigatório fora da página de cadastro, ajustado com o "ok" da QA |
