@@ -29,9 +29,12 @@ for (const { tipo, dispositivo, resolucao } of resolucoes) {
       await test.step('Quando cliquei em "Sim"', () => visitante.botaoSim.click());
       await test.step('Então os blocos da Página Inicial ficaram dentro da tela', async () => {
         await expect(page).toHaveTitle(paginas.inicialDoVisitante);
+        // Os blocos carregam aos poucos e empurram a página depois da rolagem (17/11): rola e confere de novo até o bloco ficar na tela
         for (const bloco of blocos) {
-          await visitante.bloco(bloco).scrollIntoViewIfNeeded();
-          await expect(visitante.bloco(bloco)).toBeInViewport();
+          await expect(async () => {
+            await visitante.bloco(bloco).scrollIntoViewIfNeeded();
+            await expect(visitante.bloco(bloco)).toBeInViewport({ timeout: 2_000 });
+          }).toPass({ timeout: 30_000 });
         }
       });
       await test.step('E a página não teve rolagem horizontal', async () => expect(await temRolagemHorizontal(page)).toBe(false));

@@ -1,6 +1,6 @@
 # Estratégia de Automação de Testes — LearningFlix
 
-> **Versão 1.2 — 16/11/2026** (versão 1.0 aprovada pela QA em 12/11/2026). Itens marcados com **[QA]** ainda dependem de decisão da QA (seção 17).
+> **Versão 1.3 — 17/11/2026** (versão 1.0 aprovada pela QA em 12/11/2026). Itens marcados com **[QA]** ainda dependem de decisão da QA (seção 17).
 > Documento principal da automação: as páginas "Condições Validadas", "Rastreabilidade" e "Execução Diária" detalham o que está resumido aqui. A cópia no projeto fica em `docs/estrategia-automacao.md`.
 
 | Item | Valor |
@@ -174,7 +174,7 @@ Os testes rodam um por vez, por etapa do fluxo: primeiro `tests/1-PaginaDeLogin/
 | Executados, aprovados, falhos e instáveis por módulo | Resumo da rodada e `metricas.json` (desde 12/11) |
 | Taxa de aprovação (aprovados ÷ executados) e critério de saída (críticos e geral, sem as falhas conhecidas) | Idem — bloco "🎯 CRITÉRIO DE SAÍDA" e `criterioDeSaida` no `metricas.json` (desde 16/11) |
 | Tempo de execução por módulo e da rodada | Idem |
-| Cobertura de casos do DT/EVT automatizados | `RASTREABILIDADE.md` de cada módulo **[QA]** consolidar por módulo |
+| Cobertura de casos do DT/EVT automatizados | Seção "Cobertura consolidada" da página Rastreabilidade da Automação, montada a partir do `RASTREABILIDADE.md` de cada módulo — em 17/11: 99 de 105 itens dos documentos automatizados (94%), 6 pendentes (e-mail e massa) |
 | Defeitos encontrados pela automação | Seção "Possíveis defeitos" — passa ao Jira com a skill de bugs |
 | Testes pendentes (`fixme`) e falhas esperadas | Resumo da rodada |
 
@@ -221,7 +221,7 @@ Os testes rodam um por vez, por etapa do fluxo: primeiro `tests/1-PaginaDeLogin/
 5. Testes não funcionais (desempenho, segurança) — fora do escopo ou planejar?
 6. Limite de tempo da rodada diária (passou de 230 min em 11/11).
 7. Skill de abertura de bugs no formato da equipe (seção 11).
-8. Lacunas de cobertura encontradas ao classificar as técnicas (16/11) — decidir se viram testes: (a) idade 16 anos na verificação de idade, entre o bloqueio em 15 e a liberação em 17 (IDA02/IDA03); (b) CPF e data de nascimento errados ao mesmo tempo na redefinição personalizada (RP04 a RP07); (c) rodapé nos limites do tema, 767/768 px e 991/992 px; (d) limite aceito pelo "Número de cards na página" do Meus Cursos, entre o 3 recusado e o 9 aceito (MC11/MC12).
+8. Lacunas de cobertura encontradas ao classificar as técnicas (16/11) — decidir se viram testes: ~~(a) idade 16 anos na verificação de idade~~ — virou o IDA04 (17/11), 16 anos segue para a "Nova conta"; ~~(b) CPF e data de nascimento errados ao mesmo tempo na redefinição personalizada~~ — virou o RP12 (17/11); (c) rodapé nos limites do tema, 767/768 px e 991/992 px; (d) limite aceito pelo "Número de cards na página" do Meus Cursos, entre o 3 recusado e o 9 aceito (MC11/MC12).
 
 ## Histórico de versões
 
@@ -230,3 +230,4 @@ Os testes rodam um por vez, por etapa do fluxo: primeiro `tests/1-PaginaDeLogin/
 | 1.0 | 12/11/2026 | Primeira versão, aprovada pela QA; prioridade por risco aplicada aos 264 testes; métricas por módulo no relatório da rodada |
 | 1.1 | 13/11/2026 | Testes organizados por etapa (Página de Login e depois Plataforma); diária de segunda a quinta e semanal na sexta às 09:03 com os críticos; Judy em "Botão flutuante" durante a rodada; pasta de evidências; riscos da semanal de 13/11 |
 | 1.2 | 16/11/2026 | Critério de saída: críticos 100% e geral 95%, sem as falhas conhecidas (`fixtures/falhas-conhecidas.ts`); instáveis contam como falha; técnica de teste nas condições do Confluence e 4 lacunas de cobertura nos pontos em aberto |
+| 1.3 | 17/11/2026 | Lacunas (a) e (b) do item 8 viraram os testes IDA04 (idade 16 anos) e RP12 (identificação e data erradas); seguem abertas as lacunas (c) e (d); métrica de cobertura consolidada por módulo na Rastreabilidade (seção 12) |
