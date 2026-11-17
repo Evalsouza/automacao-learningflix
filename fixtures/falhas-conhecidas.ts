@@ -47,7 +47,8 @@ export const falhasConhecidas: FalhaConhecida[] = [
   ...['MC11', 'MC13'].map((id) => ({
     modulo: 'MeusCursos' as const,
     id,
-    motivo: '"Número de cards na página" abaixo do mínimo de 8 é salvo ("Mudanças gravadas" com 3 e com 7)',
+    motivo:
+      'Defeito confirmado pela QA (17/11): "Número de cards na página" abaixo do mínimo de 8 é salvo ("Mudanças gravadas" com 3 e com 7)',
     desde: '17/11/2026',
   })),
 ];

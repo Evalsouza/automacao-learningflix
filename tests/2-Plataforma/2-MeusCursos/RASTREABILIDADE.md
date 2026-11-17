@@ -96,11 +96,11 @@ Arquivos: `valida_*.spec.ts` para as validações funcionais e `validacao_respon
 - **Usuário novo:** criado pelo "Criar uma conta"; os cenários ficam prontos e passam a valer quando o defeito do cadastro (28/10) for corrigido. Agora só o caso sem cursos; a matrícula entra com a automação do vínculo de usuário.
 - OB10 abre o primeiro curso de cada opção, que já é o último acessado: a ordem do bloco não muda.
 
-**Possíveis defeitos**
+**Defeitos confirmados**
 
 | Caso | Esperado — requisito v8 (RF003, RNF002) e DT/EVT | Obtido |
 |---|---|---|
-| MC11 e MC13 | "Número de cards na página" abaixo de 8 **NÃO** é salvo — o DT/EVT usa "3"; o valor-limite, "7" | "Mudanças gravadas" e o campo ficou com 3 e com 7 — visto em 17/11 na suíte de configuração; o 8 (MC14) e o 9 (MC12) são salvos. Ao final a suíte restaurou o valor inicial (8). Aguarda a QA confirmar no teste manual |
+| MC11 e MC13 | "Número de cards na página" abaixo de 8 **NÃO** é salvo — o DT/EVT usa "3"; o valor-limite, "7" | "Mudanças gravadas" e o campo ficou com 3 e com 7 — visto em 17/11 na suíte de configuração; o 8 (MC14) e o 9 (MC12) são salvos. Ao final a suíte restaurou o valor inicial (8). **Defeito confirmado pela QA em 17/11** — requisito RF003: "sendo o padrão a quantidade mínima '8' (oito) para paginação". Abrir no Jira com a skill de bugs |
 
 **Divergências entre documentos e sistema**
 
