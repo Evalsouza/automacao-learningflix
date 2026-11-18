@@ -44,6 +44,15 @@ export class LoginPage extends PaginaBase {
     await this.botaoAcessar.click();
   }
 
+  // Usuário novo: no primeiro acesso a plataforma pede o "Acordo de política do site" (Administração → Segurança →
+  // Políticas, "sitepolicy") e não abre outra página até aceitar. Aceita com "Sim" se aparecer — C008, 18/11
+  async aceitarPoliticaSeExibida() {
+    const titulo = this.page.getByRole('heading', { name: 'Acordo de política do site' });
+    if (!(await titulo.waitFor({ timeout: 15_000 }).then(() => true, () => false))) return;
+    await this.page.getByRole('button', { name: 'Sim', exact: true }).click();
+    await this.page.waitForLoadState('load');
+  }
+
   async digitarSenha(senha: string) {
     await this.campoSenha.fill(senha);
   }

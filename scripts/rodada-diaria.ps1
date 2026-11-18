@@ -18,13 +18,28 @@ $projeto = Split-Path -Parent $PSScriptRoot
 $data = Get-Date -Format 'yyyy-MM-dd'
 $pasta = Join-Path $projeto ("relatorios\$data" + $(if ($Tipo -eq 'semanal') { '-semanal' } else { '' }))
 
+# Cada horário da tarefa (09:03, 10:03 e 11:03) deixa uma linha em agendamento.log: o Agendador do Windows mostra
+# "última execução" mesmo quando o horário de reserva só confere que a rodada já terminou e sai — pedido da QA (18/11)
+$logAgendamento = Join-Path $pasta 'agendamento.log'
+function Registrar([string]$texto) {
+  New-Item -ItemType Directory -Force -Path $pasta | Out-Null
+  Add-Content -Encoding utf8 $logAgendamento "$(Get-Date -Format 'HH:mm:ss') - $texto"
+}
+
 # A tarefa tem novas tentativas ao longo do dia: se a rodada de hoje já terminou, não roda de novo.
 # Rodada interrompida (notebook suspenso, desligado) não tem "fim" e roda de novo. -Forcar roda sempre
 $statusAnterior = Join-Path $pasta 'status.json'
 if (-not $Forcar -and (Test-Path $statusAnterior)) {
   $anterior = Get-Content $statusAnterior -Raw | ConvertFrom-Json
-  if ($anterior.fim) { Write-Host "Rodada $Tipo de $data já terminou às $($anterior.fim)."; exit 0 }
+  if ($anterior.fim) {
+    $horaFim = ([datetime]$anterior.fim).ToString('HH:mm')
+    Registrar "verificação: a rodada $Tipo de hoje já terminou às $horaFim - nenhum teste executado"
+    Write-Host "Rodada $Tipo de $data já terminou às $horaFim."
+    exit 0
+  }
+  Registrar "a rodada anterior começou às $(([datetime]$anterior.inicio).ToString('HH:mm')) e não terminou (interrompida) - rodando de novo"
 }
+if ($Forcar) { Registrar "rodada forçada (-Forcar)" }
 New-Item -ItemType Directory -Force -Path $pasta | Out-Null
 
 # Avisa o Windows que há trabalho em andamento: o notebook não suspende sozinho durante a rodada.
@@ -35,6 +50,7 @@ $manterAcordado = [uint32]'0x80000001'  # ES_CONTINUOUS | ES_SYSTEM_REQUIRED
 
 $status = [ordered]@{ tipo = $Tipo; data = $data; inicio = (Get-Date).ToString('s'); fim = $null; codigoSaida = $null; concluida = $false; interrompida = $null }
 $status | ConvertTo-Json | Out-File -Encoding utf8 (Join-Path $pasta 'status.json')
+Registrar "início da rodada $Tipo"
 
 Set-Location $projeto
 # Remove o resultado da rodada anterior para não publicar dados antigos
@@ -68,6 +84,7 @@ $status.fim = (Get-Date).ToString('s')
 $status.codigoSaida = $codigo
 $status.concluida = Test-Path (Join-Path $pasta 'resumo.txt')
 $status | ConvertTo-Json | Out-File -Encoding utf8 (Join-Path $pasta 'status.json')
+Registrar ("fim da rodada $Tipo - código de saída $codigo" + $(if ($status.interrompida) { " - $($status.interrompida)" } else { '' }))
 
 # Mantém só os últimos 30 dias de relatórios
 Get-ChildItem (Join-Path $projeto 'relatorios') -Directory |

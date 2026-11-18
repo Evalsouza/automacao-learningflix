@@ -23,6 +23,21 @@ export class GerenciadorHierarquiaPage extends PaginaBase {
     await this.page.getByRole('heading', { name: 'Gerenciar cargos' }).waitFor();
   }
 
+  // "Cargo Gestor" de um cargo, pela busca da aba (combobox): uma linha só, sem percorrer as páginas — C008.1, 18/11.
+  // Ler todos os gestores levava mais de 5 minutos no QA
+  async cargoGestor(cargo: string): Promise<string> {
+    const busca = this.page.locator('input.vs__search').first();
+    await busca.click();
+    await busca.fill(cargo);
+    const opcao = this.page.getByRole('option', { name: cargo, exact: true });
+    if (await opcao.waitFor({ timeout: 15_000 }).then(() => true, () => false)) await opcao.click();
+    await this.botaoFiltrar.click();
+    await this.aguardarCarregar();
+    const linha = this.page.locator('table tbody tr').filter({ has: this.page.getByRole('cell', { name: cargo, exact: true }) });
+    await linha.first().waitFor();
+    return (await linha.first().locator('td').nth(3).innerText()).trim();
+  }
+
   // Filtra pelos "Cargos de Gestão" e percorre as páginas da tabela, devolvendo os cargos com "Cargo Gestor" = Sim.
   // Sem o filtro eram 29 páginas de 5 cargos (144 em 09/11) e o teste estourava o tempo
   async cargosGestores(): Promise<string[]> {

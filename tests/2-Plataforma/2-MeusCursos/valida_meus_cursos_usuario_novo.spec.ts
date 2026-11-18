@@ -63,6 +63,7 @@ ${erro}`);
   test.beforeEach(async ({ login }) => {
     await login.acessar();
     await login.entrar(usuario);
+    await login.aceitarPoliticaSeExibida();
     await expect(login.page).not.toHaveURL(/\/login\//);
   });
 

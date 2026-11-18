@@ -22,12 +22,6 @@ export const falhasConhecidas: FalhaConhecida[] = [
     desde: '28/10/2026',
     jira: 'LFXP-7135',
   },
-  ...['C008', 'C008.1', 'C009.1', 'C010.1', 'C009.2', 'C010.2'].map((id) => ({
-    modulo: 'Cadastro' as const,
-    id,
-    motivo: 'Defeito confirmado pela QA: "Criar minha conta" com dados válidos não cria a conta',
-    desde: '28/10/2026',
-  })),
   {
     modulo: 'Cadastro',
     id: 'RC03',
