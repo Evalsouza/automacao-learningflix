@@ -128,11 +128,11 @@ Execuções de 28/10:
 
 **Causa do defeito de 28/10 (17/11):** "Criar minha conta" não criava a conta porque o campo de perfil "Telefone" (`testphone`) era obrigatório e estava com "Mostrar na página de cadastro?" = Não — o formulário não tinha como preenchê-lo e não mostrava mensagem. Com o "ok" da QA, a opção passou para "Sim" (o resto do campo continua igual: obrigatório, único e visível para o usuário, professores e administradores, como pedem RP09 e RP10). O cadastro preenche um Telefone gerado a cada conta. Em 17/11 a conta já é criada e confirmada; o C008 ainda para na "Minha página" depois do primeiro login (hipótese: "Acordo de política do site" do usuário novo) e o C008.1 na consulta ao "Gerenciador de Hierarquia" — por isso continuam nas falhas conhecidas.
 
-**Possíveis defeitos**
+**Defeitos confirmados**
 
 | Caso | Esperado — DTI/EVTI | Obtido |
 |---|---|---|
-| C007 | Cargos marcados como Gestor **NÃO** exibidos no campo "Cargo" da "Nova conta" | 36 cargos de gestão exibidos — ex.: Coordenador de Qualidade, CTO, Diretor Geral, Coordenador de Tecnologia. Em 04/11 passaram a 38: o Gerenciador de Hierarquia foi alterado — conferir com a QA |
+| C007 | Cargos marcados como Gestor **NÃO** exibidos no campo "Cargo" da "Nova conta" | 36 cargos de gestão exibidos — ex.: Coordenador de Qualidade, CTO, Diretor Geral, Coordenador de Tecnologia. Em 04/11 passaram a 38: o Gerenciador de Hierarquia foi alterado. **Regressão confirmada (18/11)** — validado em 24/10/2024 (LFXP-3437); definição do analista no requisito Gerenciador de Cargos (comentário de 28/10/2024): o usuário não escolhe cargo de gestão ao criar conta — [LFXP-7135](https://epicbrasil.atlassian.net/browse/LFXP-7135) |
 
 **Não automatizados**
 

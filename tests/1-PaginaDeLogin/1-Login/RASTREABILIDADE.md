@@ -70,7 +70,7 @@ O documento não numera os casos; C01 a C14 seguem a ordem em que aparecem.
 - Título "Perdeu a Senha?" no documento; na tela, "Perdeu a senha?".
 - "Página inicial" não é definida; os testes validam que o login saiu da tela de acesso e o menu do usuário apareceu.
 - A mensagem de erro aparece duas vezes na tela — possível defeito visual.
-- **Possível defeito — C03.1 (27/10):** com "Lembrar-me" desmarcado, a plataforma grava o cookie `MOODLEID1_` (lembrar o nome de usuário) no login. Depois de "Sair", a página de login volta com "CPF" preenchido com o usuário e "Lembrar-me" marcado. Num navegador novo o campo vem vazio. O teste fica falhando até a correção.
+- **Defeito confirmado — C03.1 (27/10) — [LFXP-7133](https://epicbrasil.atlassian.net/browse/LFXP-7133) (18/11):** com "Lembrar-me" desmarcado, a plataforma grava o cookie `MOODLEID1_` (lembrar o nome de usuário) no login. Depois de "Sair", a página de login volta com "CPF" preenchido com o usuário e "Lembrar-me" marcado. Num navegador novo o campo vem vazio. O teste fica falhando até a correção.
 - Senha do Adobe XD em texto aberto no documento.
 
 ---

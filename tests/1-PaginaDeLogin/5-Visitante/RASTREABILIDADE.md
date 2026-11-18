@@ -79,9 +79,9 @@ https://epicbrasil.atlassian.net/wiki/spaces/LP1/pages/3518365704/DT+EVT+-+Acess
 - Os marcadores do carrossel não têm nome acessível — leitores de tela não os identificam; o teste usa a classe do Glide.
 - O ícone "Acessar" do menu lateral e o item ao lado de "Página inicial" não têm nome acessível — leitores de tela não os identificam.
 - Curso "TESTE BOTÃO SCORM - Com restrição" não aparece no bloco "Cursos Livres" do visitante.
-- **Possível defeito — CAN01:** na Ajuda, "Cancelar" deveria limpar o formulário — confirmado pela QA —, mas mantém o que foi selecionado: o assunto continua "Assunto 1". O teste fica falhando até a correção.
+- **Defeito confirmado — CAN01 — [LFXP-7137](https://epicbrasil.atlassian.net/browse/LFXP-7137) (18/11):** na Ajuda, "Cancelar" deveria limpar o formulário — confirmado pela QA —, mas mantém o que foi selecionado: o assunto continua "Assunto 1". O teste fica falhando até a correção.
 - Na Ajuda, "Nome" e "Matrícula" vêm preenchidos e bloqueados para o visitante: "Usuário visitante" e "guest".
-- **Possível defeito — OBR01 a OBR03:** na Ajuda, "Selecione o curso", "Selecione o assunto" e "Mensagem" têm a marca de obrigatório, mas "Enviar" com eles vazios não exibe mensagem. Os testes mostram que a mensagem não aparece. Ainda não se sabe se esse envio vazio chega ao suporte.
+- **Defeito confirmado — OBR01 a OBR03 — [LFXP-7136](https://epicbrasil.atlassian.net/browse/LFXP-7136) (18/11):** na Ajuda, "Selecione o curso", "Selecione o assunto" e "Mensagem" têm a marca de obrigatório, mas "Enviar" com eles vazios não exibe mensagem. Os testes mostram que a mensagem não aparece. Ainda não se sabe se esse envio vazio chega ao suporte.
 
 ---
 

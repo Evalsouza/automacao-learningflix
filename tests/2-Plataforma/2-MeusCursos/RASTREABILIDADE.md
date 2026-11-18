@@ -100,7 +100,7 @@ Arquivos: `valida_*.spec.ts` para as validações funcionais e `validacao_respon
 
 | Caso | Esperado — requisito v8 (RF003, RNF002) e DT/EVT | Obtido |
 |---|---|---|
-| MC11 e MC13 | "Número de cards na página" abaixo de 8 **NÃO** é salvo — o DT/EVT usa "3"; o valor-limite, "7" | "Mudanças gravadas" e o campo ficou com 3 e com 7 — visto em 17/11 na suíte de configuração; o 8 (MC14) e o 9 (MC12) são salvos. Ao final a suíte restaurou o valor inicial (8). **Defeito confirmado pela QA em 17/11** — requisito RF003: "sendo o padrão a quantidade mínima '8' (oito) para paginação". Abrir no Jira com a skill de bugs |
+| MC11 e MC13 | "Número de cards na página" abaixo de 8 **NÃO** é salvo — o DT/EVT usa "3"; o valor-limite, "7" | "Mudanças gravadas" e o campo ficou com 3 e com 7 — visto em 17/11 na suíte de configuração; o 8 (MC14) e o 9 (MC12) são salvos. Ao final a suíte restaurou o valor inicial (8). **Defeito confirmado pela QA em 17/11** — requisito RF003: "sendo o padrão a quantidade mínima '8' (oito) para paginação". [LFXP-7138](https://epicbrasil.atlassian.net/browse/LFXP-7138) (18/11). Prints da QA em 18/11: mesmo com 3 ou 7 gravados, o "Ver todos" continua com 8 cards |
 
 **Divergências entre documentos e sistema**
 
