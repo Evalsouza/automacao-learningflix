@@ -58,7 +58,9 @@
     "tutorial:lote:confluence": "cross-env TUTORIAL=lote playwright test -c tutoriais --project=confluence",
     "tutorial:conversor:prints": "playwright test -c tutoriais --project=prints-cliente cliente-conversor.tutorial",
     "tutorial:conversor:confluence:seco": "cross-env TUTORIAL=conversor SECO=sim playwright test -c tutoriais --project=confluence",
-    "tutorial:conversor:confluence": "cross-env TUTORIAL=conversor playwright test -c tutoriais --project=confluence"
+    "tutorial:conversor:confluence": "cross-env TUTORIAL=conversor playwright test -c tutoriais --project=confluence",
+    "rotina:skill-link-scorm:listar": "playwright test -c rotinas --project=rotina skill-link-scorm",
+    "rotina:skill-link-scorm": "cross-env EXECUTAR_SKILL_LINK=sim playwright test -c rotinas --project=rotina skill-link-scorm"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
