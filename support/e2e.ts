@@ -20,6 +20,12 @@ import { ConfiguracaoCarrosselPage } from './carrossel_commands/ConfiguracaoCarr
 import { MeusCursosPage } from './meuscursos_commands/MeusCursosPage';
 import { ConfiguracaoMeusCursosPage } from './meuscursos_commands/ConfiguracaoMeusCursosPage';
 import { ConfiguracaoPrivacidadePage } from './cadastro_commands/ConfiguracaoPrivacidadePage';
+import { ConfiguracaoCompetenciasPage } from './skilllink_commands/ConfiguracaoCompetenciasPage';
+import { GerarCompetenciasPage } from './skilllink_commands/GerarCompetenciasPage';
+import { CreditosSkillLinkPage } from './skilllink_commands/CreditosSkillLinkPage';
+import { ModificarCreditosPage } from './skilllink_commands/ModificarCreditosPage';
+import { CursosRecomendadosPage } from './skilllink_commands/CursosRecomendadosPage';
+import { CompetenciasSkillLinkPage } from './skilllink_commands/CompetenciasSkillLinkPage';
 import { bloquearVideos, recolherJudy } from './sessoes';
 
 type Telas = {
@@ -44,6 +50,12 @@ type Telas = {
   meusCursos: MeusCursosPage;
   configuracaoMeusCursos: ConfiguracaoMeusCursosPage;
   configuracaoPrivacidade: ConfiguracaoPrivacidadePage;
+  configuracaoCompetencias: ConfiguracaoCompetenciasPage;
+  gerarCompetencias: GerarCompetenciasPage;
+  creditosSkillLink: CreditosSkillLinkPage;
+  modificarCreditos: ModificarCreditosPage;
+  cursosRecomendados: CursosRecomendadosPage;
+  competencias: CompetenciasSkillLinkPage;
 };
 
 type Opcoes = {
@@ -83,6 +95,12 @@ export const test = base.extend<Telas & Opcoes>({
   meusCursos: async ({ page }, use) => use(new MeusCursosPage(page)),
   configuracaoMeusCursos: async ({ page }, use) => use(new ConfiguracaoMeusCursosPage(page)),
   configuracaoPrivacidade: async ({ page }, use) => use(new ConfiguracaoPrivacidadePage(page)),
+  configuracaoCompetencias: async ({ page }, use) => use(new ConfiguracaoCompetenciasPage(page)),
+  gerarCompetencias: async ({ page }, use) => use(new GerarCompetenciasPage(page)),
+  creditosSkillLink: async ({ page }, use) => use(new CreditosSkillLinkPage(page)),
+  modificarCreditos: async ({ page }, use) => use(new ModificarCreditosPage(page)),
+  cursosRecomendados: async ({ page }, use) => use(new CursosRecomendadosPage(page)),
+  competencias: async ({ page }, use) => use(new CompetenciasSkillLinkPage(page)),
 });
 
 export { expect };

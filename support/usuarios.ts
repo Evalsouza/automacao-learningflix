@@ -57,3 +57,13 @@ export const novoCadastroMeusCursos = {
   email: 'qa.auto3@yopmail.com',
   senha: process.env.NOVO_CADASTRO_SENHA ?? '',
 };
+
+// Usuária sem cargo vinculado do DR/EVTR - Skill Link, Fluxo da Gestão (C074). Fora de `usuarios`: o login é feito no
+// próprio teste, para a falta das credenciais no .env deixar só esse teste pendente
+export const usuariosSkillLink = {
+  semCargo: {
+    nome: 'Atlas Shepherd',
+    identificacao: process.env.SEM_CARGO_USUARIO ?? '',
+    senha: process.env.SEM_CARGO_SENHA ?? '',
+  },
+};

@@ -9,7 +9,7 @@
 
 export type Prioridade = '@critico' | '@alto' | '@medio' | '@baixo';
 
-export type Modulo = 'Login' | 'Cadastro' | 'RedefinicaoSenha' | 'Visitante' | 'Rodape' | 'Carrossel' | 'MeusCursos';
+export type Modulo = 'Login' | 'Cadastro' | 'RedefinicaoSenha' | 'Visitante' | 'Rodape' | 'Carrossel' | 'MeusCursos' | 'SkillLink';
 
 type Regras = Partial<Record<Prioridade, RegExp>>;
 
@@ -49,6 +49,13 @@ const regras: Record<Modulo, Regras> = {
     '@critico': /^MC0[1-3]$/,
     '@alto': /^(MC04|OB\d+)$/,
     '@medio': /^(MC0[56]|MC1\d|MC2\d)$/,
+  },
+  // DR/EVTR - Skill Link, Fluxo da Gestão — proposta, a confirmar com a QA: acesso às páginas e regra de
+  // recomendação são críticos; saldo, permissões e habilitar/desabilitar, altos; o resto, médio
+  SkillLink: {
+    '@critico': /^(C001|C023|C024|C054|C056)$/,
+    '@alto': /^(C00[6-9]|C01\d|C020(\.\d)?|C02[16]|C04[0-6](\.\d)?|C05[13-8]|C06[2-9]|C07\d)$/,
+    '@medio': /^C0\d\d(\.\d)?$/,
   },
 };
 
