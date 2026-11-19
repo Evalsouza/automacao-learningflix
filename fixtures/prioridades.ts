@@ -47,7 +47,7 @@ const regras: Record<Modulo, Regras> = {
   },
   MeusCursos: {
     '@critico': /^MC0[1-3]$/,
-    '@alto': /^(MC04|OB\d+)$/,
+    '@alto': /^(MC04|OB\d+(\.\d)?)$/,
     '@medio': /^(MC0[56]|MC1\d|MC2\d)$/,
   },
   // DR/EVTR - Skill Link, Fluxo da Gestão — proposta, a confirmar com a QA: acesso às páginas e regra de

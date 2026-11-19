@@ -75,6 +75,16 @@ Arquivos: `valida_*.spec.ts` para as validações funcionais e `validacao_respon
 | Usuário 001 (card do "Meus Cursos" e "i") e 021 — mesma classificação no card e na página do curso | OB10 — "Necessário" e "Opcional" |
 | Usuário 026 a 028 — curso "Nenhuma" só em "Todos" | OB11 — `fixme` se a Estudante não tiver curso "Nenhuma" inscrito |
 
+**Campo, Configurações do curso, Catálogo e demais blocos — `valida_obrigatoriedade_curso.spec.ts`** (só leitura; incluídos em 19/11, mapeados no QA com o "ok" da QA)
+
+| Condição | Teste |
+|---|---|
+| Admin 001 a 005 — campo "Obrigatoriedade" em "Informações do curso para os blocos", "Menu suspenso", "Nome breve" `courserequirement` bloqueado, opções Necessário/Opcional, padrão "Opcional", "Obrigatório", "Dado único" e "Bloqueado" = Não, "Visível para" = Todos (o modal é aberto e cancelado) | OB12 — Administrador |
+| Admin 017 e 037 — Configurações do curso com "Nenhuma", "Necessário" e "Opcional" (abre sem salvar; curso 120) | OB13 — Administrador; o modal do Gerenciamento de Cursos ainda não foi mapeado |
+| Admin 030, Usuário 002 — tags no Catálogo; o "i" mostra a mesma classificação | OB14 — Estudante; categoria "Qualidade e Testes de Software" (8 cursos em 19/11: 1 Necessário e 7 Opcional). Curso "Nenhuma" sem tag fica pendente: a Estudante não vê nenhum no Catálogo (mesma falta de massa do OB11). Trilhas ficam para depois: os cards da trilha não abriram no mapeamento |
+| Usuário 001 (demais blocos) e 017 a 020 — tags nos cards de Novidades, Em Alta, Cursos Livres, Recomendados e Cursos recomendados para seu cargo; filtro "Obrigatoriedade" no "Ver todos" com Todos/Necessário/Opcional; cada opção só com a sua classificação | OB15 — um por bloco; "Recomendados para você" não tem curso "Necessário" (mostra "Nenhum curso") |
+| Capa (Observações) e Usuário 001 — curso com "Nenhuma" fica sem tag, o "i" não mostra classificação e o curso não aparece nos filtros "Necessário" e "Opcional" | OB15.1 — curso 125 no "Em Alta" (informado pela QA em 19/11); no Catálogo (OB14) a Estudante não vê curso "Nenhuma" |
+
 **Usuário novo — `valida_meus_cursos_usuario_novo.spec.ts`** (`@cria-usuario`; cria `qa.auto3` pelo "Criar uma conta" e o exclui ao final)
 
 | Condição | Teste |
@@ -92,7 +102,7 @@ Arquivos: `valida_*.spec.ts` para as validações funcionais e `validacao_respon
 - A Página inicial ordena pelos **últimos acessados**.
 - Os testes validam a **regra**, sem nomes de cursos: a massa do DT/EVT (Curso Teste 1 a 9, qa.aluno5 e qa.aluno6 com acessos de 2023, smart4-qa) não vale para o QA atual.
 - Da Página Genérica entra só a exibição do botão "Ver todos"; os filtros dela entram pela Obrigatoriedade.
-- Da Obrigatoriedade entram só o bloco e o "Ver todos". Ficam de fora: Administrador 001 a 030 e 034 a 044 (campo personalizado, criação e edição de curso, CSV, duplicação, backup, permissões, migração) e Usuário cenários 1 (demais blocos e Catálogo), 4 (demais blocos) e 6 (alteração da classificação).
+- Da Obrigatoriedade entram só o bloco e o "Ver todos". Ficam de fora (atualizado em 19/11, com OB12 a OB15): Administrador 006 a 016, 018 a 029, 034 a 036 e 038 a 044 — propostos OB16 a OB20 na suíte semanal, que alteram o campo ou criam curso de teste, aguardando decisão da QA; 024 a 026, 029 e 034 sem automação (duplicação, backup, CSV, "Visível para" e migração). Antes: Administrador 001 a 030 e 034 a 044 (campo personalizado, criação e edição de curso, CSV, duplicação, backup, permissões, migração) e Usuário cenários 1 (demais blocos e Catálogo), 4 (demais blocos) e 6 (alteração da classificação).
 - **Usuário novo:** criado pelo "Criar uma conta"; os cenários ficam prontos e passam a valer quando o defeito do cadastro (28/10) for corrigido. Agora só o caso sem cursos; a matrícula entra com a automação do vínculo de usuário.
 - OB10 abre o primeiro curso de cada opção, que já é o último acessado: a ordem do bloco não muda.
 

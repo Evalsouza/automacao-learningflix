@@ -331,7 +331,7 @@ test.describe('Obrigatoriedade do Curso no bloco "Meus Cursos"', { tag: '@dt-obr
         await test.step(`Quando abri o "i" do primeiro card, então a classificação "${opcao}" foi exibida`, async () => {
           const janela = await meusCursos.abrirInfo(card);
           await expect(janela.getByText(opcao, { exact: true })).toBeVisible();
-          await meusCursos.page.keyboard.press('Escape');
+          await meusCursos.fecharInfo(janela);
         });
         await test.step('Quando abri o curso pelo card', async () => {
           await card.locator('a.card-link').click();

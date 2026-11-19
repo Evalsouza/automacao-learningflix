@@ -5,7 +5,6 @@ import {
   paginas,
   blocos,
   menuLateral,
-  abasDashboards,
   cursoRestrito,
   cursoVisitante,
   obrigatoriosAjuda,
@@ -247,19 +246,13 @@ test.describe('CASOS DE TESTE 002: Acessando a plataforma como visitante', { tag
       },
     );
 
+    // "Dashboards" saiu do menu do visitante — confirmado pela QA em 18/11
     test(
-      'V22 - "Dashboards" no menu lateral abre a página "Geral" com as abas do painel',
+      'V22 - "Dashboards" NÃO é exibido no menu lateral do visitante',
       { tag: prioridade('Visitante', 'V22') },
-      async ({ page, visitante }) => {
-        await test.step('Quando cliquei em "Dashboards" no menu lateral', () => visitante.linkDoMenu('Dashboards').click());
-        await test.step(`Então fui redirecionada para a página "${paginas.dashboards}"`, async () => {
-          await expect(page).toHaveURL(/\/report\/dashboard\/index\.php/);
-          await expect(page).toHaveTitle(paginas.dashboards);
-        });
-        for (const aba of abasDashboards) {
-          await test.step(`E a aba "${aba}" foi exibida`, () =>
-            expect(page.getByRole('link', { name: aba, exact: true }).first()).toBeVisible());
-        }
+      async ({ visitante }) => {
+        await test.step('Então a opção "Dashboards" NÃO foi exibida no menu lateral', () =>
+          expect(visitante.menuLateral.getByRole('link', { name: 'Dashboards', exact: true })).toHaveCount(0));
       },
     );
 

@@ -13,7 +13,8 @@ export type FiltrosVerTodos = {
 
 export type Card = { id: string; titulo: string; obrigatoriedade: string; modalidade: string };
 
-// Bloco "Meus Cursos" da Página inicial e a página "Ver todos" (/blocks/mycourses/index.php)
+// Bloco "Meus Cursos" da Página inicial e a página "Ver todos" (/blocks/mycourses/index.php). Os demais blocos
+// (Novidades, Em Alta, Cursos Livres...) têm o mesmo "Ver todos": passe o nome do bloco — OB15, 19/11
 export class MeusCursosPage extends PaginaBase {
   readonly bloco: Locator;
   readonly tituloDoBloco: Locator;
@@ -30,9 +31,12 @@ export class MeusCursosPage extends PaginaBase {
   readonly ordenarPor: Locator;
   readonly busca: Locator;
 
-  constructor(page: Page) {
+  constructor(
+    page: Page,
+    readonly nomeDoBloco = 'mycourses',
+  ) {
     super(page);
-    this.bloco = page.locator('section.block_mycourses');
+    this.bloco = page.locator(`section.block_${nomeDoBloco}`);
     this.tituloDoBloco = this.bloco.getByRole('heading', { name: 'Meus Cursos', exact: true });
     this.verTodos = this.bloco.getByRole('link', { name: 'Ver todos os Meus Cursos' });
     this.cardsDoBloco = this.bloco.locator('.card[data-courseid]');
@@ -53,7 +57,8 @@ export class MeusCursosPage extends PaginaBase {
 
   async acessarHome() {
     await this.abrir('/my/');
-    await this.tituloDoBloco.waitFor();
+    // O título "Meus Cursos" só existe no próprio bloco; nos demais, espera a seção do bloco
+    await (this.nomeDoBloco === 'mycourses' ? this.tituloDoBloco : this.bloco).waitFor();
   }
 
   botaoObrigatoriedade(opcao: Obrigatoriedade): Locator {
@@ -96,18 +101,20 @@ export class MeusCursosPage extends PaginaBase {
     const parametros = new URLSearchParams({
       page: String(filtros.pagina ?? 1),
       status: filtros.status ?? 'all',
-      sort: filtros.ordenar ?? 'enrollment_start',
       modality: filtros.modalidade ?? 'all',
       courserequirement: filtros.obrigatoriedade ?? 'all',
       search: filtros.busca ?? '',
     });
-    await this.abrir(`/blocks/mycourses/index.php?${parametros}`);
+    // Cada bloco tem a sua ordenação padrão; "enrollment_start" só existe no "Meus Cursos"
+    const ordenar = filtros.ordenar ?? (this.nomeDoBloco === 'mycourses' ? 'enrollment_start' : undefined);
+    if (ordenar) parametros.set('sort', ordenar);
+    await this.abrir(`/blocks/${this.nomeDoBloco}/index.php?${parametros}`);
     await this.aguardarCards();
   }
 
   // Abre o "Ver todos" sem parâmetros, como o link do bloco
   async acessarVerTodosPadrao() {
-    await this.abrir('/blocks/mycourses/index.php');
+    await this.abrir(`/blocks/${this.nomeDoBloco}/index.php`);
     await this.aguardarCards();
   }
 
@@ -159,6 +166,18 @@ export class MeusCursosPage extends PaginaBase {
     return ids;
   }
 
+  // Percorre o "Ver todos" até a página que exibe o curso e devolve o card dele
+  async acharCurso(id: string, filtros: FiltrosVerTodos = {}): Promise<Locator> {
+    await this.acessarVerTodos(filtros);
+    const ultima = await this.ultimaPagina();
+    for (let pagina = 1; pagina <= ultima; pagina++) {
+      if (pagina > 1) await this.acessarVerTodos({ ...filtros, pagina });
+      if ((await this.lerCards(this.cardsDaPagina)).some((c) => c.id === id))
+        return this.cardsDaPagina.and(this.page.locator(`[data-courseid="${id}"]`));
+    }
+    throw new Error(`Curso ${id} não foi exibido no "Ver todos" de ${this.nomeDoBloco}`);
+  }
+
   // Janela do "i" do card: mostra a classificação do curso
   async abrirInfo(card: Locator): Promise<Locator> {
     await card.hover();
@@ -166,6 +185,14 @@ export class MeusCursosPage extends PaginaBase {
     const janela = this.page.getByRole('dialog').filter({ visible: true }).first();
     await janela.waitFor();
     return janela;
+  }
+
+  // Fecha a janela do "i" e espera sumir. Só o Escape deixava a janela aberta por cima do card (OB10, 18 e 19/11)
+  async fecharInfo(janela: Locator) {
+    const fechar = janela.locator('[data-bs-dismiss="modal"], [data-dismiss="modal"], .btn-close, .close').first();
+    if (await fechar.isVisible()) await fechar.click();
+    else await this.page.keyboard.press('Escape');
+    await janela.waitFor({ state: 'hidden' });
   }
 
   // Tag de obrigatoriedade na página inicial do curso

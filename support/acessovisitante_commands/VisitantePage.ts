@@ -26,7 +26,7 @@ export class VisitantePage extends PaginaBase {
     this.menuLateral = page
       .locator('div')
       .filter({ has: page.getByRole('link', { name: 'Página inicial', exact: true }) })
-      .filter({ has: page.getByRole('link', { name: 'Calendário', exact: true }) })
+      .filter({ has: page.getByRole('link', { name: 'Chamados', exact: true }) })
       .last();
     // O ícone "Acessar" do menu não tem nome acessível: é o link do bloco "login" do menu lateral
     this.botaoAcessarDoMenu = page.locator('.login > a.menu-item[href$="/login/index.php"]:visible').first();

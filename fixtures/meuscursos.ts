@@ -41,3 +41,44 @@ export const statusDoCurso = {
   emAndamento: { valor: 'in_progress', texto: 'Em andamento' },
   naoIniciados: { valor: 'not_started', texto: 'Não iniciados' },
 };
+
+// Campo personalizado de curso "Obrigatoriedade" (Administração → Cursos → Campos personalizados de curso) — mapeado em
+// 19/11. DT/EVT Obrigatoriedade - Como Administrador, casos 001 a 005. Só leitura: o modal é aberto e cancelado
+export const campoObrigatoriedade = {
+  categoria: 'Informações do curso para os blocos',
+  nome: 'Obrigatoriedade',
+  nomeBreve: 'courserequirement',
+  tipo: 'Menu suspenso',
+  tituloDoModal: 'Atualizando Obrigatoriedade',
+  // Campos do modal pelo atributo name: texto (valor digitado) e lista (opção marcada)
+  texto: {
+    'configdata[options]': 'Necessário\nOpcional',
+    'configdata[defaultvalue]': 'Opcional',
+  },
+  lista: {
+    'configdata[required]': 'Não',
+    'configdata[uniquevalues]': 'Não',
+    'configdata[locked]': 'Não',
+    'configdata[visibility]': 'Todos',
+  },
+};
+
+// Opções do campo nas Configurações do curso — "Nenhuma" deixa o curso sem classificação (Capa, Observações)
+export const opcoesNoCurso = ['Nenhuma', 'Necessário', 'Opcional'];
+// Catálogo: a página inicial lista só as categorias; os cursos aparecem ao abrir uma categoria — mapeado em 19/11
+export const categoriaDoCatalogo = { id: 16, nome: 'Qualidade e Testes de Software' };
+
+// Curso usado só para ler as Configurações (OB13), sem salvar
+export const cursoDeReferencia = 120;
+
+// Curso com "Obrigatoriedade" = "Nenhuma" exibido no bloco "Em Alta" — informado pela QA em 19/11
+export const cursoSemClassificacao = { id: '125', bloco: 'popularcourses', tituloDoBloco: 'Em Alta' };
+
+// Demais blocos da Página inicial com "Ver todos" e filtro "Obrigatoriedade" — DT/EVT Usuário Final 001 e 017 a 020
+export const blocosComObrigatoriedade = [
+  { bloco: 'newsforyou', titulo: 'Novidades para você' },
+  { bloco: 'popularcourses', titulo: 'Em Alta' },
+  { bloco: 'freecourses', titulo: 'Cursos Livres' },
+  { bloco: 'recommendedcourses', titulo: 'Recomendados para você' },
+  { bloco: 'skillcourses', titulo: 'Cursos recomendados para seu cargo' },
+];

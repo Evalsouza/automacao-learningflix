@@ -48,8 +48,8 @@ https://epicbrasil.atlassian.net/wiki/spaces/LP1/pages/3518365704/DT+EVT+-+Acess
 | OBR01 a OBR03 — campos obrigatórios da Ajuda | Padrão da equipe: todo formulário tem os obrigatórios validados |
 | CAN01 — "Cancelar" na Ajuda | Padrão da equipe: botões "Cancelar" sempre cobertos |
 | V06 — blocos "Novidades para você" e "Cursos recomendados para seu cargo" | Exibidos na tela; incluídos a pedido da QA |
-| V07 — opções "Dashboards" e "Chamados" do menu lateral | Exibidas ao visitante; incluídas a pedido da QA (27/10) |
-| V22 - "Dashboards" no menu lateral abre a página "Geral" com as abas do painel | Pedido da QA (27/10) |
+| V07 — opção "Chamados" do menu lateral | Exibida ao visitante; incluída a pedido da QA (27/10). "Dashboards" saiu do menu em 18/11 |
+| V22 - "Dashboards" **NÃO** é exibido no menu lateral do visitante | Pedido da QA (27/10); até 18/11 conferia a página "Geral". "Dashboards" saiu do menu do visitante — confirmado pela QA em 18/11 |
 | V23 - "Chamados" no menu lateral abre a página "Chamados" | Pedido da QA (27/10) |
 | V24 - "Slide anterior" volta para o slide exibido antes | Pedido da QA (27/10): navegação completa do carrossel |
 | V25 - Marcador do carrossel mostra o slide correspondente | Idem |
@@ -67,7 +67,7 @@ https://epicbrasil.atlassian.net/wiki/spaces/LP1/pages/3518365704/DT+EVT+-+Acess
 - Curso usado nos testes: 319, "ACESSO COMO VISITANTE", com o método "Acesso como visitante" já configurado e a Tarefa "Acesso como visitante" na Temporada 1 — no lugar de "Como liderar na era digital", que no documento é aberto pelo Catálogo.
 - "Catálogo": o teste confere que ele NÃO aparece no menu do visitante — comportamento atual; o curso é aberto direto pelo endereço.
 - Carrossel: "se comportou corretamente" = o carrossel é exibido na página "my" e "Próximo slide" mostra outro slide (V09); "Slide anterior" (V24) e os marcadores (V25) também são validados.
-- Menu lateral: "Dashboards" e "Chamados" são validados — exibidos e abrindo a página, que o visitante pode acessar, confirmado pela QA. O link "Teste" não é validado.
+- Menu lateral: "Chamados" é validado — exibido e abrindo a página, que o visitante pode acessar, confirmado pela QA. "Dashboards" saiu do menu em 18/11 (QA) e o V22 confere que **NÃO** é exibido. Na diária de 18/11, "Ajuda" e "Chamados" também não foram achados pelo localizador antigo (bloco com "Página inicial" e "Calendário"), embora estejam no menu; ele passou a usar o bloco com "Página inicial" e "Chamados". O link "Teste" não é validado.
 - Ajuda: "todos os campos funcionaram" = cada campo aceita o valor; sem enviar.
 - V10 e V11: em vez de "TESTE BOTÃO SCORM - Com restrição", abrem o primeiro curso exibido no bloco "Cursos Livres" — os cursos do bloco mudam com as atualizações da página.
 
@@ -75,7 +75,7 @@ https://epicbrasil.atlassian.net/wiki/spaces/LP1/pages/3518365704/DT+EVT+-+Acess
 
 - "Catálogo" não aparece no menu lateral do visitante — o DT/EVT espera.
 - O menu lateral do visitante mostra o link "Teste", que aponta para as configurações do tema na Administração do site.
-- "Dashboards" abre para o visitante a página "Geral" com o caminho "Administração do site \ Geral", as abas Geral, Usuários, Gamificação e Recertificação e o conteúdo em branco. "Chamados" abre "Meus Chamados" com o botão "Novo Ticket".
+- Até 17/11, "Dashboards" abria para o visitante a página "Geral" (abas Geral, Usuários, Gamificação e Recertificação, conteúdo em branco); saiu do menu em 18/11. "Chamados" abre "Meus Chamados" com o botão "Novo Ticket".
 - Os marcadores do carrossel não têm nome acessível — leitores de tela não os identificam; o teste usa a classe do Glide.
 - O ícone "Acessar" do menu lateral e o item ao lado de "Página inicial" não têm nome acessível — leitores de tela não os identificam.
 - Curso "TESTE BOTÃO SCORM - Com restrição" não aparece no bloco "Cursos Livres" do visitante.

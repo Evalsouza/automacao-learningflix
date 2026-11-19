@@ -3,7 +3,6 @@ export const paginas = {
   inicialDoVisitante: 'Painel (Visitante)',
   calendario: 'Calendário',
   ajuda: 'Ajuda',
-  dashboards: 'Geral',
   chamados: 'Chamados',
 };
 
@@ -17,12 +16,10 @@ export const blocos = [
   'Cursos recomendados para seu cargo',
 ];
 
-// Opções do menu lateral do visitante. "Dashboards" e "Chamados" não estão no DT/EVT: incluídas a pedido da QA.
-// O link "Teste" também aparece, mas não é validado — decisão da QA
-export const menuLateral = ['Página inicial', 'Dashboards', 'Calendário', 'Ajuda', 'Chamados'];
-
-// Abas exibidas ao visitante em "Dashboards"
-export const abasDashboards = ['Geral', 'Usuários', 'Gamificação', 'Recertificação'];
+// Opções do menu lateral do visitante. "Chamados" não está no DT/EVT: incluído a pedido da QA.
+// O link "Teste" também aparece, mas não é validado — decisão da QA.
+// "Dashboards" saiu do menu do visitante — confirmado pela QA em 18/11 (V22 passou a conferir que NÃO é exibido)
+export const menuLateral = ['Página inicial', 'Calendário', 'Ajuda', 'Chamados'];
 
 // O DT/EVT usa "TESTE BOTÃO SCORM - Com restrição"; o teste abre o primeiro curso exibido no bloco — decisão da QA
 export const cursoRestrito = {
