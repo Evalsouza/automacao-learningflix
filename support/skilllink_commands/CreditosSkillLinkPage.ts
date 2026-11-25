@@ -132,6 +132,14 @@ export class CreditosSkillLinkPage extends PaginaBase {
       .first();
   }
 
+  // Uso do card "Créditos contratados": "0 usados no mês" no mês e "1 usados no total" em "Todo o período", sem barra
+  // nem percentual — informação aceita pela QA em 25/11
+  usoNoCard(nome: string, periodo: 'mês' | 'total'): Locator {
+    return this.card(nome)
+      .first()
+      .getByText(new RegExp(`^\\s*[\\d.]+ usados no ${periodo}\\s*$`));
+  }
+
   async percentual(nome: string) {
     const card = this.card(nome).first();
     const rotulos = await card.getByRole('progressbar').evaluateAll((bs) => bs.map((b) => b.getAttribute('aria-label') ?? ''));

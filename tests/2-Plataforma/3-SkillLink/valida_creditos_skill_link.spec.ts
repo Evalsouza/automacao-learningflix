@@ -42,8 +42,9 @@ test.describe(
             expect(await creditos.titulosDosCards()).toEqual(creditosSkillLink.cards));
           await test.step('E "Franquia mensal" exibiu o saldo do mês com o percentual', async () =>
             expect(await creditos.percentual('Franquia mensal')).not.toBe(''));
-          await test.step('E "Créditos contratados" exibiu o saldo (do mês anterior, se houver) com a barra do total utilizado', () =>
-            expect(creditos.barraDeUso('Créditos contratados')).toBeVisible());
+          // O card não tem barra nem percentual: mostra quantos créditos contratados foram usados no mês (QA, 25/11)
+          await test.step('E "Créditos contratados" exibiu o saldo e quantos foram "usados no mês"', () =>
+            expect(creditos.usoNoCard('Créditos contratados', 'mês')).toBeVisible());
           await test.step('E "Créditos consumidos" exibiu os créditos já utilizados com o percentual', async () =>
             expect(await creditos.percentual('Créditos consumidos')).not.toBe(''));
           await test.step('E "Créditos restantes" exibiu os créditos restantes com o percentual', async () =>
@@ -74,7 +75,7 @@ test.describe(
       );
 
       test(
-        `C027 - Com o filtro "${creditosSkillLink.periodoTodo}", os cards são atualizados e exibidos com o percentual`,
+        `C027 - Com o filtro "${creditosSkillLink.periodoTodo}", os cards são atualizados com o total do período`,
         { tag: prioridade('SkillLink', 'C027') },
         async ({ creditosSkillLink: creditos }) => {
           const doMes = await test.step(`Dado que selecionei "${creditosSkillLink.periodoMes}"`, async () => {
@@ -85,11 +86,12 @@ test.describe(
             creditos.selecionarPeriodo(creditosSkillLink.periodoTodo));
           await test.step(`Então foram exibidos ${creditosSkillLink.cardsTodoPeriodo.join(', ')}`, async () =>
             expect(await creditos.titulosDosCards()).toEqual(creditosSkillLink.cardsTodoPeriodo));
-          for (const nome of creditosSkillLink.cardsTodoPeriodo)
-            await test.step(`E "${nome}" exibiu o percentual`, async () =>
-              nome === 'Créditos contratados'
-                ? expect(creditos.barraDeUso(nome), nome).toBeVisible()
-                : expect(await creditos.percentual(nome), nome).not.toBe(''));
+          // Em "Todo o período" só a "Franquia mensal" tem percentual; "Créditos contratados" mostra os "usados no total" e
+          // "Créditos consumidos" só o número (tela de 25/11, aceita pela QA)
+          await test.step('E "Franquia mensal" exibiu a soma das franquias com o percentual', async () =>
+            expect(await creditos.percentual('Franquia mensal')).not.toBe(''));
+          await test.step('E "Créditos contratados" exibiu quantos foram "usados no total"', () =>
+            expect(creditos.usoNoCard('Créditos contratados', 'total')).toBeVisible());
           await test.step('E os consumidos do período inteiro incluíram os do mês', async () =>
             expect(await creditos.valor('Créditos consumidos')).toBeGreaterThanOrEqual(doMes));
         },
