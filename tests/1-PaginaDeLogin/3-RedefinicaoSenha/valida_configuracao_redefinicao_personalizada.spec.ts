@@ -11,6 +11,7 @@ import {
   garantirRedefinicaoPersonalizada,
 } from '../../../support/redefinicaosenha_commands/ConfiguracaoRedefinicaoPage';
 import { lerDadosDoUsuario } from '../../../support/redefinicaosenha_commands/dadosDoUsuario';
+import { GerenciarUsuariosPage } from '../../../support/cadastro_commands/GerenciarUsuariosPage';
 import { usuariosRedefinicao } from '../../../support/usuarios';
 import {
   mensagens,
@@ -33,6 +34,9 @@ const configuracaoInicial: Record<string, Required<ConfiguracaoCampo>> = {};
 let redefinicaoInicial = { primario: '', secundario: '' };
 
 const comoAdministrador = <T>(browser: Browser, acao: (pagina: Page) => Promise<T>) => comSessao(browser, sessoes.administrador, acao);
+// "Perdeu a senha?" só exibe o formulário sem sessão: logado, redireciona para "/my/" ("Você já se identificou") — 23/11
+const semLogin = <T>(browser: Browser, acao: (perdeuSenha: PerdeuSenhaPage) => Promise<T>) =>
+  comSessao(browser, semSessao, (pagina) => acao(new PerdeuSenhaPage(pagina)));
 
 // Sem `serial`: com 1 worker os testes já rodam em ordem, e uma falha não pula o resto. Depois de uma falha
 // o Playwright roda o afterAll (restaura) e o beforeAll lê de novo a configuração — já restaurada
@@ -113,7 +117,7 @@ test.describe(
       test(
         `${id(0)} - Com "${campo}" no "Campo secundário", "Perdeu a senha?" exibe "CPF" e "${campo}"`,
         { tag: prioridade('RedefinicaoSenha', id(0)) },
-        async ({ browser, camposPerfil, configuracaoRedefinicao: config, perdeuSenha }) => {
+        async ({ browser, camposPerfil, configuracaoRedefinicao: config }) => {
           await test.step(`Quando configurei "${campo}" com Obrigatório "Sim" e "${visibilidades.usuario}"`, () =>
             camposPerfil.configurar(campo, { obrigatorio: 'Sim', visibilidade: visibilidades.usuario }));
           await test.step(`E selecionei "${campo}" no "Campo secundário" e salvei`, async () => {
@@ -121,46 +125,48 @@ test.describe(
             await config.definir(config.campoSecundario, campo);
           });
           await test.step(`Então "Perdeu a senha?" exibiu os campos "CPF" e "${campo}"`, () =>
-            comSessao(browser, semSessao, async (pagina) => {
-              const visitante = new PerdeuSenhaPage(pagina);
-              await visitante.acessar();
-              await expect(visitante.rotuloDoCampo(visitante.blocoPrimario)).toHaveText('CPF');
-              await expect(visitante.rotuloDoCampo(visitante.blocoSecundario)).toHaveText(campo);
+            semLogin(browser, async (perdeuSenha) => {
+              await perdeuSenha.acessar();
+              await expect(perdeuSenha.rotuloDoCampo(perdeuSenha.blocoPrimario)).toHaveText('CPF');
+              await expect(perdeuSenha.rotuloDoCampo(perdeuSenha.blocoSecundario)).toHaveText(campo);
             }));
-          void perdeuSenha;
         },
       );
 
       test(
         `${id(1)} - "${evaSouza.identificacao}" com "${campo}" do cadastro é redirecionada para "${paginas.redefinir}"`,
         { tag: prioridade('RedefinicaoSenha', id(1)) },
-        async ({ browser, perdeuSenha }) => {
+        async ({ browser }) => {
           const dados = await test.step(`Dado que consultei "${campo}" no cadastro da usuária`, () =>
             lerDadosDoUsuario(browser, evaSouza.nome));
-          await test.step(`Quando preenchi "${evaSouza.identificacao}" e "${campo}" correto e cliquei em "Enviar"`, async () => {
-            await perdeuSenha.acessar();
-            await perdeuSenha.redefinir(evaSouza.identificacao, dados[chave]);
+          await semLogin(browser, async (perdeuSenha) => {
+            await test.step(`Quando preenchi "${evaSouza.identificacao}" e "${campo}" correto e cliquei em "Enviar"`, async () => {
+              await perdeuSenha.acessar();
+              await perdeuSenha.redefinir(evaSouza.identificacao, dados[chave]);
+            });
+            await test.step(`Então fui redirecionada para a página "${paginas.redefinir}"`, () =>
+              expect(perdeuSenha.tituloRedefinir).toBeVisible());
           });
-          await test.step(`Então fui redirecionada para a página "${paginas.redefinir}"`, () =>
-            expect(perdeuSenha.tituloRedefinir).toBeVisible());
         },
       );
 
       test(
         `${id(2)} - "${evaSouza.identificacao}" com "${campo}" errado NÃO altera a senha`,
         { tag: prioridade('RedefinicaoSenha', id(2)) },
-        async ({ browser, perdeuSenha }) => {
+        async ({ browser }) => {
           const dados = await test.step(`Dado que consultei "${campo}" no cadastro da usuária`, () =>
             lerDadosDoUsuario(browser, evaSouza.nome));
-          await test.step(`Quando preenchi "${evaSouza.identificacao}" e "${campo}" errado e cliquei em "Enviar"`, async () => {
-            await perdeuSenha.acessar();
-            const opcoes = await perdeuSenha.blocoSecundario.locator('option').allInnerTexts();
-            const errado = Factories.redefinicao.opcaoDiferente(opcoes, dados[chave]) || `${dados[chave]} QA`;
-            await perdeuSenha.redefinir(evaSouza.identificacao, errado);
-          });
-          await test.step(`Então a mensagem "${mensagens.dadosIncorretos}" foi exibida e a senha NÃO pôde ser alterada`, async () => {
-            await expect(perdeuSenha.mensagemErro).toBeVisible();
-            await expect(perdeuSenha.campoNovaSenha).toHaveCount(0);
+          await semLogin(browser, async (perdeuSenha) => {
+            await test.step(`Quando preenchi "${evaSouza.identificacao}" e "${campo}" errado e cliquei em "Enviar"`, async () => {
+              await perdeuSenha.acessar();
+              const opcoes = await perdeuSenha.blocoSecundario.locator('option').allInnerTexts();
+              const errado = Factories.redefinicao.opcaoDiferente(opcoes, dados[chave]) || `${dados[chave]} QA`;
+              await perdeuSenha.redefinir(evaSouza.identificacao, errado);
+            });
+            await test.step(`Então a mensagem "${mensagens.dadosIncorretos}" foi exibida e a senha NÃO pôde ser alterada`, async () => {
+              await expect(perdeuSenha.mensagemErro).toBeVisible();
+              await expect(perdeuSenha.campoNovaSenha).toHaveCount(0);
+            });
           });
         },
       );
@@ -169,17 +175,24 @@ test.describe(
         test(
           `${id(3)} - "${rayssaLima.identificacao}" sem "Cargo" cadastrado NÃO altera a senha`,
           { tag: prioridade('RedefinicaoSenha', id(3)) },
-          async ({ browser, perdeuSenha }) => {
-            await test.step('Dado que o usuário NÃO tem "Cargo" cadastrado', async () =>
-              expect((await lerDadosDoUsuario(browser, rayssaLima.nome)).position ?? '').toBe(''));
-            await test.step(`Quando preenchi "${rayssaLima.identificacao}" e um "Cargo" e cliquei em "Enviar"`, async () => {
-              await perdeuSenha.acessar();
-              const opcoes = await perdeuSenha.blocoSecundario.locator('option').allInnerTexts();
-              await perdeuSenha.redefinir(rayssaLima.identificacao, Factories.redefinicao.opcaoDiferente(opcoes, ''));
+          async ({ browser }) => {
+            // Pedido da QA (23/11): o Adm Cliente confere o "Cargo" e, se estiver preenchido, apaga antes do teste
+            await test.step('Dado que, como Adm Cliente, conferi que o usuário NÃO tem "Cargo" cadastrado (e apaguei, se tinha)', async () => {
+              await comSessao(browser, sessoes.cliente, (pagina) => new GerenciarUsuariosPage(pagina).garantirSemCargo(rayssaLima.nome, 'cliente'));
+              expect((await lerDadosDoUsuario(browser, rayssaLima.nome, sessoes.cliente)).position ?? '').toBe('');
             });
-            await test.step(`Então a mensagem "${mensagens.dadosIncorretos}" foi exibida e a senha NÃO pôde ser alterada`, async () => {
-              await expect(perdeuSenha.mensagemErro).toBeVisible();
-              await expect(perdeuSenha.campoNovaSenha).toHaveCount(0);
+            await semLogin(browser, async (perdeuSenha) => {
+              await test.step(`Quando preenchi "${rayssaLima.identificacao}" e um "Cargo" e cliquei em "Enviar"`, async () => {
+                await perdeuSenha.acessar();
+                const opcoes = await perdeuSenha.blocoSecundario.locator('option').allInnerTexts();
+                // "Cargo" no "Perdeu a senha?" é campo de texto (sem opções) desde 23/11: usa um cargo qualquer
+                const cargo = Factories.redefinicao.opcaoDiferente(opcoes, '') || 'Analista de Qualidade';
+                await perdeuSenha.redefinir(rayssaLima.identificacao, cargo);
+              });
+              await test.step(`Então a mensagem "${mensagens.dadosIncorretos}" foi exibida e a senha NÃO pôde ser alterada`, async () => {
+                await expect(perdeuSenha.mensagemErro).toBeVisible();
+                await expect(perdeuSenha.campoNovaSenha).toHaveCount(0);
+              });
             });
           },
         );
@@ -251,7 +264,7 @@ test.describe(
     test(
       `RP08 - "${rayssaLima.identificacao}" sem "Cidade de Nascimento" cadastrada NÃO altera a senha`,
       { tag: prioridade('RedefinicaoSenha', 'RP08') },
-      async ({ browser, camposPerfil, configuracaoRedefinicao: config, perdeuSenha }) => {
+      async ({ browser, camposPerfil, configuracaoRedefinicao: config }) => {
         await test.step('Dado que o usuário NÃO tem "Cidade de Nascimento" cadastrada', async () =>
           expect((await lerDadosDoUsuario(browser, rayssaLima.nome)).city ?? '').toBe(''));
         await test.step(`E configurei "Cidade de Nascimento" com Obrigatório "Sim" e "${visibilidades.usuario}" no "Campo secundário"`, async () => {
@@ -259,13 +272,43 @@ test.describe(
           await config.acessar();
           await config.definir(config.campoSecundario, 'Cidade de Nascimento');
         });
-        await test.step(`Quando preenchi "${rayssaLima.identificacao}" e uma "Cidade de Nascimento" e cliquei em "Enviar"`, async () => {
-          await perdeuSenha.acessar();
-          await perdeuSenha.redefinir(rayssaLima.identificacao, Factories.redefinicao.cidade());
+        await semLogin(browser, async (perdeuSenha) => {
+          await test.step(`Quando preenchi "${rayssaLima.identificacao}" e uma "Cidade de Nascimento" e cliquei em "Enviar"`, async () => {
+            await perdeuSenha.acessar();
+            await perdeuSenha.redefinir(rayssaLima.identificacao, Factories.redefinicao.cidade());
+          });
+          await test.step(`Então a mensagem "${mensagens.dadosIncorretos}" foi exibida e a senha NÃO pôde ser alterada`, async () => {
+            await expect(perdeuSenha.mensagemErro).toBeVisible();
+            await expect(perdeuSenha.campoNovaSenha).toHaveCount(0);
+          });
         });
-        await test.step(`Então a mensagem "${mensagens.dadosIncorretos}" foi exibida e a senha NÃO pôde ser alterada`, async () => {
-          await expect(perdeuSenha.mensagemErro).toBeVisible();
-          await expect(perdeuSenha.campoNovaSenha).toHaveCount(0);
+      },
+    );
+
+    // Completa a tabela de decisão do RP04 ao RP07 com os dois campos errados (16/11). Desde 23/11, a pedido da QA,
+    // troca antes o "Campo secundário" para "Telefone": valida que dá para alterar o que já estava definido
+    test(
+      'RP12 - Com "Telefone" no "Campo secundário", identificação errada e telefone errado NÃO altera a senha',
+      { tag: prioridade('RedefinicaoSenha', 'RP12') },
+      async ({ browser, camposPerfil, configuracaoRedefinicao: config }) => {
+        await test.step(`Dado que configurei "Telefone" com Obrigatório "Sim", Única "Sim" e "${configuracaoPrimario.visibilidade}"`, () =>
+          camposPerfil.configurar('Telefone', configuracaoPrimario));
+        await test.step('Quando troquei o "Campo secundário" para "Telefone" e salvei', async () => {
+          await config.acessar();
+          await config.definir(config.campoSecundario, 'Telefone');
+        });
+        await semLogin(browser, async (perdeuSenha) => {
+          await test.step('Então "Perdeu a senha?" exibiu os campos "CPF" e "Telefone"', async () => {
+            await perdeuSenha.acessar();
+            await expect(perdeuSenha.rotuloDoCampo(perdeuSenha.blocoPrimario)).toHaveText('CPF');
+            await expect(perdeuSenha.rotuloDoCampo(perdeuSenha.blocoSecundario)).toHaveText('Telefone');
+          });
+          await test.step('Quando preenchi uma identificação errada e um telefone errado e cliquei em "Enviar"', () =>
+            perdeuSenha.redefinir(Factories.redefinicao.identificacaoInexistente(), Factories.redefinicao.telefone()));
+          await test.step(`Então a mensagem "${mensagens.dadosIncorretos}" foi exibida e a senha NÃO pôde ser alterada`, async () => {
+            await expect(perdeuSenha.mensagemErro).toBeVisible();
+            await expect(perdeuSenha.campoNovaSenha).toHaveCount(0);
+          });
         });
       },
     );

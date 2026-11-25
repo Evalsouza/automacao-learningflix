@@ -27,9 +27,9 @@ const comoAdministrador = <T>(browser: Browser, acao: (pagina: Page) => Promise<
 const naNovaConta = (browser: Browser, verificar: (criarConta: CriarContaPage) => Promise<void>) =>
   comSessao(browser, semSessao, async (pagina) => {
     const criarConta = new CriarContaPage(pagina);
-    // Depois do PRV02 a verificação de idade fica desligada até o final: passa por ela só se for exibida
+    // O beforeAll do "Campo de perfil Cargo" desliga a verificação de idade: vai direto para a "Nova conta" (25/11)
     await criarConta.clicarCriarContaNoLogin();
-    await criarConta.avancarParaNovaConta(Factories.cadastro.idadeAdulta(), pais);
+    await criarConta.avancarParaNovaConta(Factories.cadastro.idadeAdulta(), pais, { comVerificacao: false });
     await verificar(criarConta);
   });
 
@@ -81,6 +81,11 @@ test.describe('Configuração do "Criar uma conta"', { tag: ['@dt-criar-conta', 
   });
 
   test.describe('Campo de perfil "Cargo"', () => {
+    // Estado conhecido, mesmo rodando só estes testes: verificação de idade desligada (o afterAll restaura) — 25/11
+    test.beforeAll(async ({ browser }) => {
+      await comoAdministrador(browser, (pagina) => new ConfiguracaoPrivacidadePage(pagina).definirVerificacaoDeIdade(false));
+    });
+
     test(
       'RC01 - Com "Este campo é obrigatório?" = "Sim", o "Cargo" é obrigatório na "Nova conta"',
       { tag: prioridade('Cadastro', 'RC01') },
@@ -121,7 +126,7 @@ test.describe('Configuração do "Criar uma conta"', { tag: ['@dt-criar-conta', 
         async ({ browser, camposPerfil }) => {
           const idDaEva = await comoAdministrador(browser, async (pagina) => {
             const gerenciar = new GerenciarUsuariosPage(pagina);
-            await gerenciar.acessarPelaAdministracao();
+            await gerenciar.acessarPelaAdministracao('administrador');
             await gerenciar.pesquisar(evaSouza.nome);
             return gerenciar.idDoUsuario(evaSouza.nome);
           });

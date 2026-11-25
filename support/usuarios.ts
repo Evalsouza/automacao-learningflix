@@ -21,7 +21,8 @@ export const usuarios = {
 // do cadastro na hora da execução, porque podem ser atualizados a qualquer momento
 export const usuariosRedefinicao = {
   evaSouza: { nome: 'Eva Souza', identificacao: 'eva.souza' },
-  meridaValente: { nome: 'Merida Valente', identificacao: 'qa.aluno5' },
+  // Senha trocada pela automação (RP05) para "Senha@123"; sobrenome marcado AUTOMTIZADO com o ok da QA (23/11)
+  meridaValente: { nome: 'Merida Valente AUTOMTIZADO', identificacao: 'qa.aluno5' },
   anyaForger: { nome: 'Anya Forger', identificacao: 'qa.anya' },
   qaAluno21: { nome: 'Maria Fernanda Silva', identificacao: 'qa.aluno21' },
   // Massa limpa pela QA em 26/10: sem "Cargo" e sem "Cidade de Nascimento". Sobrenome marcado como AUTOMTIZADO

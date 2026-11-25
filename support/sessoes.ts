@@ -17,6 +17,13 @@ export async function bloquearVideos(contexto: BrowserContext) {
   await contexto.route(/\.(mp4|m4v|webm|f4v|mov|ogv)(\?|$)/i, (rota) => rota.abort());
 }
 
+// Microsoft Clarity e Google Analytics/Tag Manager: os testes não usam, e em 24 e 25/11 chamadas do Clarity que nunca
+// terminavam deixavam a página sem concluir o carregamento ("load") até o teste estourar o tempo — decisão da QA (25/11).
+// Bloqueados em todos os testes, inclusive no Carrossel
+export async function bloquearRastreadores(contexto: BrowserContext) {
+  await contexto.route(/^https:\/\/([a-z0-9-]+\.)*(clarity\.ms|google-analytics\.com|googletagmanager\.com)\//i, (rota) => rota.abort());
+}
+
 // Barra "Pergunte para a Judy" (chat de IA, desde 09/11): fica fixa no rodapé das páginas com login e cobre
 // botões como "Cancelar" e "Salvar mudanças" das janelas. Sempre que aparece, clica na seta para recolhê-la —
 // decisão da QA (10/11). O Playwright verifica a barra antes de cada ação e de cada expect.
@@ -45,6 +52,7 @@ export async function comSessao<T>(
 ): Promise<T> {
   const contexto = await browser.newContext({ storageState: sessao });
   try {
+    await bloquearRastreadores(contexto);
     if (!videos) await bloquearVideos(contexto);
     const pagina = await contexto.newPage();
     await recolherJudy(pagina);

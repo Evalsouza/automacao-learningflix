@@ -13,7 +13,7 @@ import { mensagens, paginas, configuracaoAtual, configuracaoPrimario } from '../
 import { Factories } from '../../../Factories';
 import { prioridade } from '../../../fixtures/prioridades';
 
-const { evaSouza, meridaValente, anyaForger, qaAluno21 } = usuariosRedefinicao;
+const { evaSouza, anyaForger, qaAluno21 } = usuariosRedefinicao;
 
 // Habilita a personalizada antes, se estiver desabilitada, e desabilita no final — decisão da QA (10/11)
 test.beforeAll(async ({ browser }) => {
@@ -172,10 +172,8 @@ test.describe('CENÁRIO 2: Redefinição da senha pelo usuário', { tag: '@dt-re
     },
   );
 
-  const corretos = [
-    { id: 'RP04', usuario: evaSouza },
-    { id: 'RP05', usuario: meridaValente },
-  ];
+  // RP05 foi para a suíte semanal valida_troca_senha_redefinicao.spec.ts em 23/11: troca a senha e envia e-mail (pedido da QA)
+  const corretos = [{ id: 'RP04', usuario: evaSouza }];
   for (const { id, usuario } of corretos) {
     test(
       `${id} - "${usuario.identificacao}" com a data de nascimento do cadastro é redirecionado para "${paginas.redefinir}"`,
@@ -228,20 +226,5 @@ test.describe('CENÁRIO 2: Redefinição da senha pelo usuário', { tag: '@dt-re
       });
     },
   );
-
-  // Completa a tabela de decisão do RP04 ao RP07: os dois campos errados — pedido da QA (16/11)
-  test(
-    'RP12 - Identificação errada e data de nascimento errada NÃO altera a senha',
-    { tag: prioridade('RedefinicaoSenha', 'RP12') },
-    async ({ perdeuSenha }) => {
-      await test.step('Quando preenchi uma identificação errada e uma data de nascimento errada e cliquei em "Enviar"', async () => {
-        await perdeuSenha.acessar();
-        await perdeuSenha.redefinir(Factories.redefinicao.identificacaoInexistente(), Factories.redefinicao.dataQualquer());
-      });
-      await test.step(`Então a mensagem "${mensagens.dadosIncorretos}" foi exibida e a senha NÃO pôde ser alterada`, async () => {
-        await expect(perdeuSenha.mensagemErro).toBeVisible();
-        await expect(perdeuSenha.campoNovaSenha).toHaveCount(0);
-      });
-    },
-  );
+  // RP12 foi para a suíte de configuração em 23/11: troca o "Campo secundário" para "Telefone" (pedido da QA)
 });

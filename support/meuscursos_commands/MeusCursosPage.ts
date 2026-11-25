@@ -1,4 +1,4 @@
-import { Page, Locator } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
 import { PaginaBase } from '../PaginaBase';
 import type { Obrigatoriedade } from '../../fixtures/meuscursos';
 
@@ -71,13 +71,11 @@ export class MeusCursosPage extends PaginaBase {
     await this.aguardarCards();
   }
 
-  // Os cards chegam depois da página: espera o carregador sumir
+  // Os cards chegam depois da página: espera o carregador sumir. Se não sumir, falha — antes seguia sem os cards
+  // e o teste podia passar com a lista vazia (QA, 25/11; "Em Alta" girando em 25/11)
   async aguardarCards() {
     await this.page.waitForLoadState('load');
-    await this.carregando
-      .first()
-      .waitFor({ state: 'hidden' })
-      .catch(() => {});
+    await expect(this.carregando.first(), 'os cards terminaram de carregar').toBeHidden({ timeout: 45_000 });
   }
 
   // Dados de cada card: id do curso, título, tag de obrigatoriedade (vazia em "Nenhuma") e modalidade

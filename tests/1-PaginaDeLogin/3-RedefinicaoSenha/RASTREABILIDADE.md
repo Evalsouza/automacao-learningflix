@@ -78,6 +78,8 @@ Ao final a suíte restaura: campo primário e secundário iniciais, a configura�
 - Os cargos dos usuários citados no documento mudaram.
 - A data de nascimento não pode ser apagada pela tela: "Editar usuário" só tem listas de dia, mês e ano, sem opção em branco. Por isso o RP08 (usuário sem o dado cadastrado) usa "Cidade de Nascimento" no "Campo secundário" e foi para a suíte de configuração — decisão da QA.
 - Massa do RP08 e do RC42: `qa.aluno102`, que nunca acessou a plataforma. Em 26/10 a QA autorizou limpar "Cargo" e "Cidade de Nascimento" do cadastro dela; o sobrenome passou a "Lima AUTOMTIZADO" para marcar a alteração. Antes, `qa.aluno23` e `qa.andre` tinham data de nascimento e cargo e não serviam.
+- **Semanal 20/11 — RC40 a RC51 e RP08 falharam por erro do teste:** a suíte roda como Administrador, e logado o "Perdeu a senha?" redireciona para "/my/" ("Você já se identificou"), sem formulário. Desde 23/11 esses testes abrem a página sem sessão (`semLogin`, via `comSessao(browser, semSessao, ...)`).
+- **Semanal 20/11 — RC07, RC10, RC15, RC18, RC23, RC26, RC31 e RC34 (possível defeito, a confirmar com a QA):** com Obrigatório "Sim", o campo aparece no "Campo secundário" mesmo com visibilidade "Não visível" ou "Visível para todos" — a visibilidade é ignorada.
 - Na página "Redefinir senha", "Nova senha" fica atrás do "Clique para inserir texto": o teste confere que o campo existe, não que está visível.
 - A mensagem "Algo deu errado ao alterar a senha. Por favor, tente novamente!" fala em "alterar" mesmo sem nada alterado, e é a mesma para identificação errada, dado errado e dado não cadastrado.
 
@@ -115,6 +117,14 @@ Com isso RS01 a RS04 e a responsividade da padrão deixam de ser falha esperada.
 **Decisões tomadas com a QA**
 
 - RS02 e RS03 enviam e-mail de recuperação para `eva.souza@yopmail.com` — aceito.
+
+---
+
+## Ajustes pedidos pela QA — comentários no Confluence "Condições Validadas" (23/11), a implementar
+
+- **RP05:** feito em 23/11. Saiu da suíte normal e foi para `valida_troca_senha_redefinicao.spec.ts` (`@envia-email`, `EXECUTAR_TROCA_SENHA`, só na semanal — `npm run test:redefinicao-troca`). Troca a senha da "qa.aluno5" para "Senha@123" em "Redefinir senha". Depois de "Salvar mudanças" volta para o login com o aviso "Um email com as informações da solicitação de troca de senha foi enviado!" (visto em 23/11; a senha da "qa.aluno5" já foi trocada). Se a plataforma não aceitar repetir a última senha, a 2ª semana falha.
+- **RP12 — feito (23/11):** movido para a suíte de configuração com o "ok" da QA. Configura "Telefone" (Obrigatório e Única "Sim", visível ao usuário), troca o "Campo secundário" para "Telefone", confere "CPF" + "Telefone" no "Perdeu a senha?" e envia identificação e telefone errados. O `afterAll` restaura a configuração.
+- **RC42 — feito (23/11):** antes do teste, o Adm Cliente confere o "Cargo" de `qa.aluno102` e, se estiver preenchido, apaga e salva (`garantirSemCargo`).
 
 ---
 

@@ -1,6 +1,8 @@
 export const mensagens = {
   dadosIncorretos: 'Algo deu errado ao alterar a senha. Por favor, tente novamente!',
   campoObrigatorio: '- Campo obrigatório',
+  // Aviso na página de login depois de "Salvar mudanças" em "Redefinir senha" (RP05, 23/11)
+  senhaAlterada: 'Um email com as informações da solicitação de troca de senha foi enviado!',
 };
 
 export const paginas = {

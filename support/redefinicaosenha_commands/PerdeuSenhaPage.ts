@@ -1,4 +1,4 @@
-import { Page, Locator } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
 import { PaginaBase } from '../PaginaBase';
 
 // Login → "Esqueci a senha" → "Perdeu a senha?"
@@ -22,6 +22,7 @@ export class PerdeuSenhaPage extends PaginaBase {
   readonly botaoBuscarEmail: Locator;
   readonly botaoContinuar: Locator;
   readonly voltarAoAcesso: Locator;
+  readonly botaoAcessarLogin: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -48,6 +49,7 @@ export class PerdeuSenhaPage extends PaginaBase {
       .getByRole('button', { name: 'Continuar' })
       .or(page.getByRole('link', { name: 'Continuar' }))
       .first();
+    this.botaoAcessarLogin = page.getByRole('button', { name: 'Acessar', exact: true });
     this.voltarAoAcesso = page
       .getByRole('button', { name: 'Voltar ao acesso' })
       .or(page.getByRole('link', { name: 'Voltar ao acesso' }))
@@ -91,6 +93,28 @@ export class PerdeuSenhaPage extends PaginaBase {
   async redefinir(primario: string, secundario: string) {
     await this.preencherCampos(primario, secundario);
     await this.botaoEnviar.click();
+  }
+
+  // "Redefinir senha": cada campo fica escondido atrás do "Clique para inserir texto" (passwordunmask) — mapeado em 23/11
+  // O clique só abre o campo depois que os scripts da página carregam: repete até o campo aparecer (23/11)
+  async salvarNovaSenha(senha: string) {
+    await this.aguardarCarregar();
+    for (const campo of [this.campoNovaSenha, this.campoRepetirSenha]) {
+      const id = await campo.getAttribute('id');
+      const editar = this.page.locator(`[data-passwordunmaskid="${id}"] [data-passwordunmask="edit"]`);
+      await expect(async () => {
+        if (await editar.isVisible()) await editar.click();
+        await expect(campo).toBeVisible({ timeout: 2_000 });
+      }).toPass({ timeout: 20_000 });
+      await campo.fill(senha);
+      await campo.press('Tab');
+    }
+    await this.page.getByRole('button', { name: 'Salvar mudanças' }).click();
+  }
+
+  aviso(texto: string): Locator {
+    // Sem `exact`: o aviso vem junto com o "×" de fechar
+    return this.page.getByText(texto).first();
   }
 
   marcaObrigatorio(bloco: Locator): Locator {

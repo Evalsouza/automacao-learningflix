@@ -6,7 +6,7 @@ import { test, expect } from '../../../support/e2e';
 import { sessoes, semSessao, comSessao } from '../../../support/sessoes';
 import { CriarContaPage } from '../../../support/cadastro_commands/CriarContaPage';
 import { ListaUsuariosAdminPage } from '../../../support/cadastro_commands/ListaUsuariosAdminPage';
-import { GerenciarUsuariosPage } from '../../../support/cadastro_commands/GerenciarUsuariosPage';
+import { GerenciarUsuariosPage, perfilDaSessao } from '../../../support/cadastro_commands/GerenciarUsuariosPage';
 import { GerenciadorHierarquiaPage } from '../../../support/cadastro_commands/GerenciadorHierarquiaPage';
 import { novoCadastro, novoCadastroComCargo } from '../../../support/usuarios';
 import { cargos, pais } from '../../../fixtures/cadastro';
@@ -119,7 +119,7 @@ ${erro}`);
           async ({ browser }) => {
             const lido =
               await test.step(`Quando acessei com o "${perfil}" "Gerenciar usuários", pesquisei "${usuario.email}" e abri "Editar usuário"`, () =>
-                comSessao(browser, sessao, (pagina) => new GerenciarUsuariosPage(pagina).cargoDoUsuario(usuario.email)));
+                comSessao(browser, sessao, (pagina) => new GerenciarUsuariosPage(pagina).cargoDoUsuario(usuario.email, perfilDaSessao(sessao))));
             await test.step(`Então o campo "Cargo" exibiu ${cargoEsperado}, e fechei sem salvar`, () => expect(lido).toBe(cargo));
           },
         );

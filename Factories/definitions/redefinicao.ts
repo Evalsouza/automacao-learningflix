@@ -13,6 +13,7 @@ export const redefinicao = {
   // Data no formato d/m/Y, sem comparar com o cadastro — para identificação que não existe
   dataQualquer: () => redefinicao.dataDiferente(''),
   cidade: () => faker.location.city(),
+  telefone: () => faker.string.numeric(11),
   // Primeira opção da lista diferente do valor correto
   opcaoDiferente: (opcoes: string[], correta: string) =>
     opcoes.find((o) => o && o !== correta && !/^Nenhum|^Nenhuma|^Selecione/.test(o)) ?? '',

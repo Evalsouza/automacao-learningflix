@@ -30,7 +30,8 @@ export class GerenciadorHierarquiaPage extends PaginaBase {
     await busca.click();
     await busca.fill(cargo);
     const opcao = this.page.getByRole('option', { name: cargo, exact: true });
-    if (await opcao.waitFor({ timeout: 15_000 }).then(() => true, () => false)) await opcao.click();
+    // O cargo TEM que aparecer na busca: antes filtrava mesmo sem ele e lia o que viesse (QA, 25/11)
+    await opcao.click({ timeout: 15_000 });
     await this.botaoFiltrar.click();
     await this.aguardarCarregar();
     const linha = this.page.locator('table tbody tr').filter({ has: this.page.getByRole('cell', { name: cargo, exact: true }) });

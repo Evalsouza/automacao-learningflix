@@ -151,6 +151,12 @@ Execuções de 28/10:
 
 ---
 
+## Comentários da QA no Confluence "Condições Validadas" (23/11), a resolver
+
+- **RC03:** a QA considera correto: o Administrador vê o "Cargo" com "Não visível", porque a regra vale para o perfil Estudante. O teste já espera isso. A falha registrada desde 26/10 é outra: a **Estudante** continua vendo o "Cargo". **A QA vai analisar manualmente (23/11) e passar as instruções**; até lá o RC03 continua como possível defeito.
+
+---
+
 ## Resoluções
 
 | Tipo | Resolução |
@@ -159,3 +165,10 @@ Execuções de 28/10:
 | Celular rotacionado | 863x360 |
 | Tablet | 810x1080 |
 | Monitor | 1920x1080 |
+
+## Condicionais revistas — resultado único (25/11, pedido da QA)
+Os testes não aceitam mais "o que aparecer na tela":
+- `avancarParaNovaConta(idade, país, { comVerificacao })`: quem chama diz se a "Verificação de idade e localização" deve aparecer. O CD01 usa a configuração lida; a suíte de configuração desliga a verificação no `beforeAll` do "Campo de perfil Cargo".
+- `acessarPelaAdministracao(perfil)`: o Adm Cliente **tem que** ter "Administração" no sidebar; o Administrador abre `client_admin.php`.
+- `cargoGestor` (C008.1): o cargo **tem que** aparecer na busca do Gerenciador de Hierarquia.
+- Meus Cursos — `aguardarCards`: o carregamento **tem que** terminar (45 s); não segue mais sem os cards.

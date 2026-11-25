@@ -1,6 +1,7 @@
 // DTI/EVTI - Página Criar uma conta — rastreabilidade em RASTREABILIDADE.md
 // Ordem da QA (09/11): Verificação de idade e localização → Nova conta → consultas do Cargo
 import { test, expect } from '../../../support/e2e';
+import { perfilDaSessao } from '../../../support/cadastro_commands/GerenciarUsuariosPage';
 import { sessoes, semSessao, comSessao } from '../../../support/sessoes';
 import { CriarContaPage } from '../../../support/cadastro_commands/CriarContaPage';
 import { MinhaPaginaPage } from '../../../support/cadastro_commands/MinhaPaginaPage';
@@ -247,7 +248,7 @@ test.describe('Campos exibidos conforme a configuração', { tag: '@dt-criar-con
       });
 
       await test.step(`Quando segui para a página "${paginas.novaConta}"`, () =>
-        criarConta.avancarParaNovaConta(Factories.cadastro.idadeAdulta(), pais));
+        criarConta.avancarParaNovaConta(Factories.cadastro.idadeAdulta(), pais, { comVerificacao: verificacaoAtiva }));
       await test.step('Então os campos padrão foram exibidos', async () => {
         for (const { campo, bloco } of camposPadraoNovaConta) await expect.soft(page.locator(`#${bloco}`), campo).toBeVisible();
       });
@@ -381,7 +382,7 @@ test.describe('CENÁRIO 2: Consulta do cadastro do usuário na página de Cadast
               return minhaPagina.valorOuVazio('Cargo');
             }));
           await test.step('Quando acessei "Administração → Gerenciar usuários" e pesquisei "Eva Souza"', async () => {
-            await gerenciarUsuarios.acessarPelaAdministracao();
+            await gerenciarUsuarios.acessarPelaAdministracao(perfilDaSessao(sessao));
             await gerenciarUsuarios.pesquisar('Eva Souza');
           });
           await test.step('E abri "Editar usuário"', () => gerenciarUsuarios.abrirEdicao('Eva Souza'));

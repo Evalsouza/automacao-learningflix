@@ -174,6 +174,6 @@ Saíram das falhas conhecidas: C020.4, C042, C050, C060 e C070.
 |---|---|---|
 | C044 | Sem confirmação ao adicionar créditos | 13/11 |
 | C045.3 | "1.5" aceito, soma 2 créditos | 18/11 |
-| C064 | Curso oculto exibido — LFXP-6424 | 13/11 |
+| ~~C064~~ | Curso oculto exibido — LFXP-6424. **Passou em 24 e 25/11: saiu das falhas conhecidas (ok da QA, 25/11)** | 13/11 |
 
 Prioridades em `fixtures/prioridades.ts` (módulo `SkillLink`) são uma proposta: críticos C001, C023, C024, C054 e C056.

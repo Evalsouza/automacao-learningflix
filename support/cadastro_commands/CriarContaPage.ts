@@ -1,4 +1,4 @@
-import { Page, Locator } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
 import { PaginaBase } from '../PaginaBase';
 
 type DadosNovaConta = {
@@ -76,9 +76,15 @@ export class CriarContaPage extends PaginaBase {
     await this.aguardarCarregar();
   }
 
-  // Passa pela "Verificação de idade e localização" só se ela for exibida — depende da configuração de privacidade
-  async avancarParaNovaConta(idade: string, pais: string) {
-    if (await this.tituloVerificacao.isVisible()) await this.verificarIdadeELocalizacao(idade, pais);
+  // Quem chama diz se a "Verificação de idade e localização" deve aparecer (configuração de privacidade lida ou
+  // definida antes). Se não for o esperado, falha aqui — antes passava por ela "só se aparecesse" (QA, 25/11)
+  async avancarParaNovaConta(idade: string, pais: string, { comVerificacao }: { comVerificacao: boolean }) {
+    if (comVerificacao) {
+      await expect(this.tituloVerificacao, `"Verificação de idade e localização" exibida`).toBeVisible();
+      await this.verificarIdadeELocalizacao(idade, pais);
+    } else {
+      await expect(this.tituloVerificacao, `"Verificação de idade e localização" NÃO exibida`).toBeHidden();
+    }
     await this.tituloNovaConta.waitFor();
   }
 

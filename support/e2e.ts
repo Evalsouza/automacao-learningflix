@@ -26,7 +26,7 @@ import { CreditosSkillLinkPage } from './skilllink_commands/CreditosSkillLinkPag
 import { ModificarCreditosPage } from './skilllink_commands/ModificarCreditosPage';
 import { CursosRecomendadosPage } from './skilllink_commands/CursosRecomendadosPage';
 import { CompetenciasSkillLinkPage } from './skilllink_commands/CompetenciasSkillLinkPage';
-import { bloquearVideos, recolherJudy } from './sessoes';
+import { bloquearVideos, bloquearRastreadores, recolherJudy } from './sessoes';
 
 type Telas = {
   login: LoginPage;
@@ -67,6 +67,7 @@ type Opcoes = {
 export const test = base.extend<Telas & Opcoes>({
   bloquearVideos: [true, { option: true }],
   context: async ({ context, bloquearVideos: bloquear }, use) => {
+    await bloquearRastreadores(context);
     if (bloquear) await bloquearVideos(context);
     await use(context);
   },

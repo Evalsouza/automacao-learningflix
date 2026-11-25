@@ -1,5 +1,11 @@
 import { Page, Locator } from '@playwright/test';
 import { PaginaBase } from '../PaginaBase';
+import { sessoes, Sessao } from '../sessoes';
+
+export type PerfilAdministrativo = 'cliente' | 'administrador';
+
+// Perfil de uma sessão que entra em "Gerenciar usuários": só o Adm Cliente e o Administrador
+export const perfilDaSessao = (sessao: Sessao): PerfilAdministrativo => (sessao === sessoes.cliente ? 'cliente' : 'administrador');
 
 // Sidebar → Administração → Gerenciar Usuários
 export class GerenciarUsuariosPage extends PaginaBase {
@@ -16,11 +22,11 @@ export class GerenciarUsuariosPage extends PaginaBase {
     this.botaoCancelarModal = this.modalEditar.getByRole('button', { name: 'Cancelar' });
   }
 
-  async acessarPelaAdministracao() {
+  // O caminho depende do perfil, não do que aparece na tela (QA, 25/11): o Adm Cliente TEM que ter "Administração" no
+  // sidebar; o Administrador geral não tem, só "Administração do site", e abre a mesma página direto
+  async acessarPelaAdministracao(perfil: PerfilAdministrativo) {
     await this.abrir('/my/');
-    const administracao = this.page.getByRole('link', { name: 'Administração', exact: true });
-    // O Administrador geral não tem "Administração" no sidebar, só "Administração do site": abre a mesma página direto
-    if (await administracao.count()) await administracao.first().click();
+    if (perfil === 'cliente') await this.page.getByRole('link', { name: 'Administração', exact: true }).first().click();
     else await this.abrir('/theme/smart/client_admin.php');
     await this.page.getByRole('link', { name: 'Gerenciar Usuários', exact: true }).click();
     await this.campoPesquisa.waitFor();
@@ -79,9 +85,27 @@ export class GerenciarUsuariosPage extends PaginaBase {
     return dados;
   }
 
+  // Apaga o "Cargo" no "Editar usuário" (1ª opção, a vazia) e salva — só para usuário autorizado pela QA (RC42, 23/11)
+  async limparCargo(nome: string) {
+    await this.pesquisar(nome);
+    await this.abrirEdicao(nome);
+    await this.modalEditar.locator('select[name=profile_field_position]').selectOption({ index: 0 });
+    await this.modalEditar.getByRole('button', { name: 'Salvar mudanças' }).click();
+    await this.modalEditar.waitFor({ state: 'hidden' });
+    await this.aguardarCarregar();
+  }
+
+  // Confere o "Cargo" e apaga só se estiver preenchido; devolve o cargo que havia ('' se já estava vazio)
+  async garantirSemCargo(nome: string, perfil: PerfilAdministrativo): Promise<string> {
+    await this.acessarPelaAdministracao(perfil);
+    const cargo = (await this.dadosDoUsuario(nome)).position ?? '';
+    if (cargo) await this.limparCargo(nome);
+    return cargo;
+  }
+
   // Cargo lido em "Editar usuário", fechando com "Cancelar"; sem Cargo, devolve ''
-  async cargoDoUsuario(email: string): Promise<string> {
-    await this.acessarPelaAdministracao();
+  async cargoDoUsuario(email: string, perfil: PerfilAdministrativo): Promise<string> {
+    await this.acessarPelaAdministracao(perfil);
     return (await this.dadosDoUsuario(email)).position ?? '';
   }
 }
