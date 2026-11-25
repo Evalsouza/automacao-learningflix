@@ -22,7 +22,7 @@ export async function estavel(ler: () => Promise<string>, timeout = 30_000) {
   return anterior ?? '';
 }
 
-// Página "Skill Link" — "Créditos do Skill Link": Adm Cliente em /local/skillbox/credits.php e
+// Página "Consumo de IA no LearningFlix" (até 24/11, "Skill Link" — "Créditos do Skill Link"): Adm Cliente em /local/skillbox/credits.php e
 // Administrador Revvo em /local/skillbox/tokens.php (mesma tela, com o botão "Modificar créditos")
 export class CreditosSkillLinkPage extends PaginaBase {
   readonly titulo: Locator;
@@ -75,12 +75,19 @@ export class CreditosSkillLinkPage extends PaginaBase {
     await this.aguardarCarregar();
   }
 
+  // Página "Skill Link" (Administração → card "Skill Link"): atalhos Cargos, Cursos, Vídeos e SCORM desde 24/11
+  async acessarPaginaSkillLink() {
+    await this.abrir(caminhosSkillLink.paginaSkillLink);
+    await this.page.getByRole('heading', { name: 'Skill Link', exact: true }).filter({ visible: true }).first().waitFor();
+  }
+
   async acessarAdministracaoCliente() {
     await this.abrir(caminhosSkillLink.administracaoCliente);
     await this.tituloAdministracao.waitFor();
   }
 
-  // Administrador Revvo: "Administração do site → Relatórios → Créditos do Skill Link"
+  // Administrador Revvo: "Administração do site → Relatórios → <link da página>". O nome do link em "Relatórios" ainda
+  // não foi visto depois da troca de 24/11: o teste usa o mesmo nome do card do Adm Cliente
   async acessarPorRelatorios() {
     await this.abrir(caminhosSkillLink.administracaoDoSite);
     await this.page.getByRole('tab', { name: 'Relatórios', exact: true }).filter({ visible: true }).first().click();
@@ -137,12 +144,12 @@ export class CreditosSkillLinkPage extends PaginaBase {
     await estavel(() => this.cards.innerText());
   }
 
-  // Cursos, Vídeos e SCORM são botões [data-mode] que abrem janela; Cargos é link para a Hierarquia
+  // Cursos, Vídeos e SCORM são botões [data-mode] que abrem janela; Cargos é link para a Hierarquia. Desde 24/11 o
+  // nome acessível traz também a descrição do card ("Cursos Gerencie os cursos e vincule às competências.")
   atalho(nome: string): Locator {
+    const papel = nome === 'Cargos' ? 'link' : 'button';
     return this.principal
-      .locator('[data-mode]')
-      .filter({ hasText: new RegExp(`^\\s*${nome}\\s*$`) })
-      .or(this.principal.getByRole('link', { name: nome, exact: true }))
+      .getByRole(papel, { name: new RegExp(`^${nome}\\b`) })
       .filter({ visible: true })
       .first();
   }

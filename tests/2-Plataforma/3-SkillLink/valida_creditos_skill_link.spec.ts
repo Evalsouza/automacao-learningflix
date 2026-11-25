@@ -1,5 +1,5 @@
 // DR/EVTR - Skill Link, Fluxo da Gestão — Cenário 2 (só leitura) — rastreabilidade em RASTREABILIDADE.md
-// "Exportar" baixa o histórico para a pasta do teste; "Adicionar créditos" só é clicado com o campo vazio (C046)
+// "Exportar" baixa o histórico para a pasta do teste; "Ajustar créditos" só é clicado com o campo vazio (C046)
 import { readFile } from 'fs/promises';
 import { test, expect } from '../../../support/e2e';
 import { sessoes } from '../../../support/sessoes';
@@ -15,7 +15,7 @@ test.describe(
     test.setTimeout(180_000);
 
     test(
-      'C023 - Sidebar Administração exibe "Créditos do Skill Link", que leva à página "Skill Link"',
+      'C023 - Sidebar Administração exibe "Consumo de IA no LearningFlix", que leva à página de créditos do Skill Link',
       { tag: prioridade('SkillLink', 'C023') },
       async ({ page, creditosSkillLink: creditos }) => {
         await test.step('Quando acessei "Administração" pelo Sidebar', async () => {
@@ -31,7 +31,7 @@ test.describe(
       },
     );
 
-    test.describe('Página "Skill Link"', () => {
+    test.describe('Página "Consumo de IA no LearningFlix"', () => {
       test.beforeEach(({ creditosSkillLink: creditos }) => creditos.acessarComoCliente());
 
       test(
@@ -108,59 +108,6 @@ test.describe(
           await test.step('Então os consumidos passaram a ser só os do mês, e os gráficos continuaram exibidos', async () => {
             expect(await creditos.valor('Créditos consumidos')).toBeLessThanOrEqual(total);
             for (const grafico of creditosSkillLink.graficos) await expect(creditos.graficos.filter({ hasText: grafico })).toHaveCount(1);
-          });
-        },
-      );
-
-      test(
-        'C029 - Os atalhos "Cargos", "Cursos", "Vídeos" e "SCORM" são exibidos',
-        { tag: prioridade('SkillLink', 'C029') },
-        async ({ creditosSkillLink: creditos }) => {
-          for (const nome of ['Cargos', 'Cursos', 'Vídeos', 'SCORM'])
-            await test.step(`Então o atalho "${nome}" foi exibido`, () => expect(creditos.atalho(nome)).toBeVisible());
-        },
-      );
-
-      for (const { id, nome, janela, destino, tela } of creditosSkillLink.atalhos) {
-        test(
-          `${id} - O atalho "${nome}" abre a janela "${janela}" e, após a seleção, leva à edição`,
-          { tag: prioridade('SkillLink', id) },
-          async ({ page, creditosSkillLink: creditos }) => {
-            await test.step(`Quando cliquei no atalho "${nome}"`, () => creditos.abrirAtalho(nome));
-            await test.step(`Então a janela "${janela}" foi exibida com a seleção de categoria e curso`, async () => {
-              await expect(creditos.janela.getByRole('heading', { name: janela })).toBeVisible();
-              await expect(creditos.janela.getByRole('combobox', { name: 'Categoria' })).toBeVisible();
-            });
-            const editar = await test.step(
-              nome === 'Cursos' ? 'Quando selecionei a categoria e o curso' : 'Quando selecionei a categoria, o curso e a atividade',
-              () => creditos.selecionarNaJanela({ comAtividade: nome !== 'Cursos' }),
-            );
-            await test.step('E cliquei em "Editar"', async () => {
-              await editar.click();
-              await creditos.aguardarCarregar();
-            });
-            await test.step('Então fui direcionada à edição do item selecionado', async () => {
-              await expect(page).toHaveURL(destino);
-              // Cursos: janela "Editar configurações do curso" no Gerenciamento de Cursos; atividades: página de edição
-              await expect(
-                page
-                  .getByRole('document', { name: tela })
-                  .or(page.getByRole('heading', { name: tela }))
-                  .first(),
-              ).toBeVisible();
-            });
-          },
-        );
-      }
-
-      test(
-        'C033 - O atalho "Cargos" leva à página "Cargos" do Gerenciador de Hierarquia',
-        { tag: prioridade('SkillLink', 'C033') },
-        async ({ page, creditosSkillLink: creditos }) => {
-          await test.step('Quando cliquei no atalho "Cargos"', () => creditos.atalho('Cargos').click());
-          await test.step('Então fui direcionada à página "Cargos" da Hierarquia', async () => {
-            await expect(page).toHaveURL(/\/local\/hierarchy\//);
-            await expect(page.getByRole('heading', { name: /cargos/i }).first()).toBeVisible();
           });
         },
       );
@@ -262,6 +209,65 @@ test.describe(
         },
       );
     });
+
+    // Desde 24/11 os atalhos de competências ficam na página "Skill Link" da Administração, e não mais na de créditos
+    // ("Consumo de IA no LearningFlix") — mapeado em 25/11 com o Adm Cliente
+    test.describe('Página "Skill Link"', () => {
+      test.beforeEach(({ creditosSkillLink: creditos }) => creditos.acessarPaginaSkillLink());
+
+      test(
+        'C029 - Os atalhos "Cargos", "Cursos", "Vídeos" e "SCORM" são exibidos',
+        { tag: prioridade('SkillLink', 'C029') },
+        async ({ creditosSkillLink: creditos }) => {
+          for (const nome of ['Cargos', 'Cursos', 'Vídeos', 'SCORM'])
+            await test.step(`Então o atalho "${nome}" foi exibido`, () => expect(creditos.atalho(nome)).toBeVisible());
+        },
+      );
+
+      for (const { id, nome, janela, destino, tela } of creditosSkillLink.atalhos) {
+        test(
+          `${id} - O atalho "${nome}" abre a janela "${janela}" e, após a seleção, leva à edição`,
+          { tag: prioridade('SkillLink', id) },
+          async ({ page, creditosSkillLink: creditos }) => {
+            await test.step(`Quando cliquei no atalho "${nome}"`, () => creditos.abrirAtalho(nome));
+            await test.step(`Então a janela "${janela}" foi exibida com a seleção de categoria e curso`, async () => {
+              await expect(creditos.janela.getByRole('heading', { name: janela })).toBeVisible();
+              await expect(creditos.janela.getByRole('combobox', { name: 'Categoria' })).toBeVisible();
+            });
+            const editar = await test.step(
+              nome === 'Cursos' ? 'Quando selecionei a categoria e o curso' : 'Quando selecionei a categoria, o curso e a atividade',
+              () => creditos.selecionarNaJanela({ comAtividade: nome !== 'Cursos' }),
+            );
+            await test.step('E cliquei em "Editar"', async () => {
+              await editar.click();
+              await creditos.aguardarCarregar();
+            });
+            await test.step('Então fui direcionada à edição do item selecionado', async () => {
+              await expect(page).toHaveURL(destino);
+              // Cursos: janela "Editar configurações do curso" no Gerenciamento de Cursos; atividades: página de edição
+              await expect(
+                page
+                  .getByRole('document', { name: tela })
+                  .or(page.getByRole('heading', { name: tela }))
+                  .first(),
+              ).toBeVisible();
+            });
+          },
+        );
+      }
+
+      test(
+        'C033 - O atalho "Cargos" leva à página "Cargos" do Gerenciador de Hierarquia',
+        { tag: prioridade('SkillLink', 'C033') },
+        async ({ page, creditosSkillLink: creditos }) => {
+          await test.step('Quando cliquei no atalho "Cargos"', () => creditos.atalho('Cargos').click());
+          await test.step('Então fui direcionada à página "Cargos" da Hierarquia', async () => {
+            await expect(page).toHaveURL(/\/local\/hierarchy\//);
+            await expect(page.getByRole('heading', { name: /cargos/i }).first()).toBeVisible();
+          });
+        },
+      );
+    });
   },
 );
 
@@ -312,9 +318,9 @@ test.describe(
         { tag: prioridade('SkillLink', 'C046') },
         async ({ modificarCreditos }) => {
           const antes = await modificarCreditos.estado();
-          await test.step('Quando deixei o campo vazio e cliquei em "Adicionar créditos"', async () => {
+          await test.step('Quando deixei o campo vazio e cliquei em "Ajustar créditos"', async () => {
             await expect(modificarCreditos.quantidade).toHaveValue('');
-            await modificarCreditos.adicionar.click();
+            await modificarCreditos.ajustar.click();
           });
           await test.step(`Então a mensagem "${creditosSkillLink.campoObrigatorio}" foi exibida`, () =>
             expect(modificarCreditos.erroDoCampo).toContainText(creditosSkillLink.campoObrigatorio));

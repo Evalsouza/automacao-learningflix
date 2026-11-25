@@ -12,14 +12,14 @@ import { prioridade } from '../../../fixtures/prioridades';
 
 const executar = process.env.EXECUTAR_CREDITOS_SKILL_LINK === 'sim';
 
-// Clica em "Adicionar créditos" e aceita a confirmação, se houver (diálogo do navegador ou janela). Devolve se pediu
+// Clica em "Ajustar créditos" e aceita a confirmação, se houver (diálogo do navegador ou janela). Devolve se pediu
 async function adicionarConfirmando(modificar: ModificarCreditosPage, valor: string) {
   let confirmou = false;
   modificar.page.once('dialog', (dialogo) => {
     confirmou = true;
     void dialogo.accept();
   });
-  await modificar.preencherEAdicionar(valor);
+  await modificar.preencherEAjustar(valor);
   const janela = modificar.page.locator('.modal.show, [role="dialog"]').filter({ visible: true }).first();
   if (
     await janela.waitFor({ timeout: 5_000 }).then(
@@ -51,7 +51,7 @@ test.describe(
       async ({ modificarCreditos }) => {
         await modificarCreditos.acessar();
         const [restantes, total] = [await modificarCreditos.restantes(), await modificarCreditos.total()];
-        await test.step(`Quando informei "${creditosSkillLink.quantidadeValida}" e cliquei em "Adicionar créditos"`, () =>
+        await test.step(`Quando informei "${creditosSkillLink.quantidadeValida}" e cliquei em "Ajustar créditos"`, () =>
           adicionarConfirmando(modificarCreditos, creditosSkillLink.quantidadeValida));
         await test.step('Então o saldo do cliente foi atualizado e a movimentação foi registrada no histórico', async () => {
           await modificarCreditos.acessar();
@@ -63,12 +63,12 @@ test.describe(
     );
 
     test(
-      'C044 - "Adicionar créditos" solicita a confirmação e efetiva saldo e histórico juntos',
+      'C044 - "Ajustar créditos" solicita a confirmação e efetiva saldo e histórico juntos',
       { tag: prioridade('SkillLink', 'C044') },
       async ({ modificarCreditos }) => {
         await modificarCreditos.acessar();
         const [restantes, total] = [await modificarCreditos.restantes(), await modificarCreditos.total()];
-        const confirmou = await test.step('Quando cliquei em "Adicionar créditos"', () =>
+        const confirmou = await test.step('Quando cliquei em "Ajustar créditos"', () =>
           adicionarConfirmando(modificarCreditos, creditosSkillLink.quantidadeValida));
         await test.step('Então o sistema solicitou a confirmação', () =>
           expect(confirmou, 'Nenhuma confirmação antes de adicionar').toBe(true));
@@ -85,9 +85,12 @@ test.describe(
         `${id} - "Quantidade de créditos" ${tipo} ("${valor}") NÃO é aceito e exibe a mensagem de bloqueio`,
         { tag: prioridade('SkillLink', id) },
         async ({ modificarCreditos }) => {
+          // Desde 24/11 a página diz "Adicione ou desconte créditos": o "-10" pode ser aceito e descontar 10 créditos de
+          // verdade. Fica pendente até a QA definir a regra nova do desconto (25/11)
+          test.fixme(id === 'C045.2', 'A página passou a permitir descontar créditos (24/11): aguarda a regra da QA para valor negativo');
           const antes = await modificarCreditos.estado();
-          await test.step(`Quando informei "${valor}" e cliquei em "Adicionar créditos"`, async () => {
-            await modificarCreditos.preencherEAdicionar(valor);
+          await test.step(`Quando informei "${valor}" e cliquei em "Ajustar créditos"`, async () => {
+            await modificarCreditos.preencherEAjustar(valor);
             await modificarCreditos.aguardarCarregar();
           });
           await test.step('Então a mensagem de bloqueio foi exibida', () => expect(modificarCreditos.erroDoCampo).toBeVisible());

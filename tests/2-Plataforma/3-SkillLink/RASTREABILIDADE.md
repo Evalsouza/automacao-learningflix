@@ -177,3 +177,9 @@ Saíram das falhas conhecidas: C020.4, C042, C050, C060 e C070.
 | ~~C064~~ | Curso oculto exibido — LFXP-6424. **Passou em 24 e 25/11: saiu das falhas conhecidas (ok da QA, 25/11)** | 13/11 |
 
 Prioridades em `fixtures/prioridades.ts` (módulo `SkillLink`) são uma proposta: críticos C001, C023, C024, C054 e C056.
+
+## Textos novos da plataforma (25/11, pedido da QA)
+Em 24/11 a plataforma mudou, sem requisito no LP1: o card e o título "Créditos do Skill Link"/"Skill Link" viraram **"Consumo de IA no LearningFlix"**; o subtítulo de "Modificar créditos" passou a "Adicione ou desconte créditos do saldo do Skill Link e acompanhe o histórico completo de alterações."; o botão "Adicionar créditos" virou **"Ajustar créditos"**. Testes ajustados (`fixtures/skilllink.ts`, `ModificarCreditosPage.ajustar`/`preencherEAjustar`).
+- **C041:** o nome do link em "Administração do site → Relatórios" ainda não foi visto depois da troca; o teste usa "Consumo de IA no LearningFlix".
+- **C045.2 ("-10") fica `fixme`:** com "ou desconte", o valor negativo pode ser aceito e descontar créditos de verdade. Aguarda a regra da QA. A suíte `test:skill-link-creditos` não está na semanal.
+- **C029 a C033 (25/11):** os atalhos "Cargos", "Cursos", "Vídeos" e "SCORM" saíram da página de créditos e foram para a nova página **"Skill Link"** da Administração (`/theme/smart/client_admin.php?section=skilllink`, subtítulo "Gerencie as competências do Skill Link nos cargos, cursos, vídeos e SCORMs."). Mapeada com o Adm Cliente, só leitura: as janelas "Editar curso", "Editar vídeo" e "Editar SCORM" continuam iguais. Os testes foram para o grupo "Página Skill Link", que abre essa página antes de cada teste.

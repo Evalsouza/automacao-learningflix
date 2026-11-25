@@ -1,6 +1,6 @@
 import { Page, Locator } from '@playwright/test';
 import { PaginaBase } from '../PaginaBase';
-import { caminhosSkillLink } from '../../fixtures/skilllink';
+import { caminhosSkillLink, creditosSkillLink } from '../../fixtures/skilllink';
 
 const limpo = (t: string | null) => (t ?? '').trim().replace(/\s+/g, ' ');
 
@@ -10,7 +10,7 @@ export class ModificarCreditosPage extends PaginaBase {
   readonly subtitulo: Locator;
   readonly cards: Locator;
   readonly quantidade: Locator;
-  readonly adicionar: Locator;
+  readonly ajustar: Locator;
   readonly cancelar: Locator;
   readonly erroDoCampo: Locator;
   readonly tituloDaGrade: Locator;
@@ -22,10 +22,10 @@ export class ModificarCreditosPage extends PaginaBase {
   constructor(page: Page) {
     super(page);
     this.principal = page.locator('#region-main, main, #page-content').first();
-    this.subtitulo = this.principal.getByText(/Adicione créditos/).first();
+    this.subtitulo = this.principal.getByText(/^Adicione .*créditos/).first();
     this.cards = page.locator('.sb-credits-kpis');
     this.quantidade = page.getByLabel('Quantidade de créditos');
-    this.adicionar = page.getByRole('button', { name: 'Adicionar créditos' });
+    this.ajustar = page.getByRole('button', { name: creditosSkillLink.ajustar, exact: true });
     this.cancelar = this.principal.getByRole('button', { name: 'Cancelar', exact: true }).filter({ visible: true }).first();
     // Erro DO CAMPO: o aviso geral "créditos esgotados" da página não conta
     this.erroDoCampo = this.quantidade
@@ -73,9 +73,9 @@ export class ModificarCreditosPage extends PaginaBase {
     return Number(/de ([\d.]+) resultados/.exec(texto)?.[1].replace(/\./g, '') ?? NaN);
   }
 
-  async preencherEAdicionar(valor: string) {
+  async preencherEAjustar(valor: string) {
     await this.quantidade.fill(valor);
-    await this.adicionar.click();
+    await this.ajustar.click();
   }
 
   async colunas() {

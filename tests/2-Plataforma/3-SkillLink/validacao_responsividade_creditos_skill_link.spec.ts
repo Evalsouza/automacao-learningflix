@@ -13,7 +13,7 @@ for (const { tipo, dispositivo, resolucao } of resolucoes) {
       `Créditos do Skill Link - ${tipo} ${resolucao}`,
       { tag: prioridade('SkillLink') },
       async ({ page, creditosSkillLink: creditos }) => {
-        await test.step('Quando acessei a página "Skill Link" com o Adm Cliente', () => creditos.acessarComoCliente());
+        await test.step('Quando acessei a página "Consumo de IA no LearningFlix" com o Adm Cliente', () => creditos.acessarComoCliente());
         await test.step('Então os cards de créditos ficaram visíveis, sem rolagem horizontal', async () => {
           for (const nome of creditosSkillLink.cards) await expect(creditos.card(nome)).toBeVisible();
           expect(await temRolagemHorizontal(page)).toBe(false);

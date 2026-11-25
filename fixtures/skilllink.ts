@@ -7,6 +7,8 @@ export const caminhosSkillLink = {
   creditosAdmin: '/local/skillbox/tokens.php',
   modificarCreditos: '/local/skillbox/change_tokens.php',
   administracaoCliente: '/theme/smart/client_admin.php',
+  // Página "Skill Link" da Administração do Adm Cliente, com os atalhos de competências (desde 24/11; mapeada em 25/11)
+  paginaSkillLink: '/theme/smart/client_admin.php?section=skilllink',
   administracaoDoSite: '/admin/search.php',
   cargos: '/local/hierarchy/index.php/positions',
   recomendados: '/blocks/skillcourses/index.php',
@@ -91,8 +93,10 @@ export const configuracaoSkillLink = {
 
 // Cenário 2 — "Créditos do Skill Link"
 export const creditosSkillLink = {
-  titulo: 'Skill Link',
-  link: 'Créditos do Skill Link',
+  // Desde 24/11 a plataforma chama a página de "Consumo de IA no LearningFlix" (antes "Skill Link", com o link
+  // "Créditos do Skill Link"). Sem requisito no LP1 sobre a mudança: confirmar com a QA (25/11)
+  titulo: 'Consumo de IA no LearningFlix',
+  link: 'Consumo de IA no LearningFlix',
   // C024 — nesta ordem, da esquerda para a direita (QA, 19/11). Com "Todo o período" o card "Créditos restantes" não
   // é exibido (C027)
   cards: ['Franquia mensal', 'Créditos contratados', 'Créditos consumidos', 'Créditos restantes'],
@@ -109,8 +113,10 @@ export const creditosSkillLink = {
   colunasConsumo: ['Data', 'Tipo', 'Recurso', 'Usuário', 'Créditos', 'Saldo após', 'Ações'],
   tipoFiltrado: 'Cargo',
   modificar: 'Modificar créditos',
-  // Texto atual, depois da correção do LFXP-7126 (QA, 19/11)
-  subtitulo: 'Adicione créditos ao saldo do Skill Link e acompanhe o histórico completo de alterações.',
+  // Texto visto em 25/11 (antes: "Adicione créditos ao saldo do Skill Link...", da correção do LFXP-7126)
+  subtitulo: 'Adicione ou desconte créditos do saldo do Skill Link e acompanhe o histórico completo de alterações.',
+  // Botão de "Modificar créditos": era "Adicionar créditos" até 24/11
+  ajustar: 'Ajustar créditos',
   colunasAlteracoes: ['Data', 'Tipo', 'Usuário', 'Valor em dólares (US$)', 'Créditos'],
   quantidadeValida: '1',
   quantidadesInvalidas: [

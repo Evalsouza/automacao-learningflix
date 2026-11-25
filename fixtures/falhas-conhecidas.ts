@@ -52,7 +52,7 @@ export const falhasConhecidas: FalhaConhecida[] = [
   })),
   // DR/EVTR - Skill Link, Fluxo da Gestão — falhas das evidências de 13 e 18/11/2026 (CENARIO2-CREDITOS.md e
   // CENARIO3-RECOMENDADOS.md na branch evidencia/skill-link-fluxo-gestao); ainda sem bug no Jira
-  { modulo: 'SkillLink', id: 'C044', motivo: '"Adicionar créditos" grava sem pedir confirmação', desde: '13/11/2026' },
+  { modulo: 'SkillLink', id: 'C044', motivo: '"Ajustar créditos" (antes "Adicionar créditos") grava sem pedir confirmação', desde: '13/11/2026' },
   { modulo: 'SkillLink', id: 'C045.3', motivo: 'Decimal "1.5" aceito: soma 2 créditos (arredonda)', desde: '18/11/2026' },
 ];
 
