@@ -32,6 +32,11 @@ export class MinhaPaginaPage extends PaginaBase {
       .last();
   }
 
+  // Rótulo do campo na página: campo sem valor não é exibido (só aparece em "Modificar perfil") — QA, 26/11
+  campo(rotulo: string): Locator {
+    return this.rotulo(rotulo);
+  }
+
   // Na página, cada campo é um parágrafo com o rótulo seguido de um parágrafo com o valor
   valorDoCampo(rotulo: string): Locator {
     return this.rotulo(rotulo).locator('xpath=following::p[1]');

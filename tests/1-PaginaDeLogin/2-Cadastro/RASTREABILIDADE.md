@@ -172,3 +172,5 @@ Os testes não aceitam mais "o que aparecer na tela":
 - `acessarPelaAdministracao(perfil)`: o Adm Cliente **tem que** ter "Administração" no sidebar; o Administrador abre `client_admin.php`.
 - `cargoGestor` (C008.1): o cargo **tem que** aparecer na busca do Gerenciador de Hierarquia.
 - Meus Cursos — `aguardarCards`: o carregamento **tem que** terminar (45 s); não segue mais sem os cards.
+- **Cadastro sem Cargo (26/11, decisão da QA):** a "Minha página" NÃO exibe o campo "Cargo" quando o usuário não tem cargo — o campo só aparece em "Modificar perfil", mostrando que está sem cargo. O teste do cadastro real confere só que o campo NÃO foi exibido (antes aceitava vazio ou "Nenhum cargo selecionado"). A tela de edição fica para os testes do módulo "Minha página".
+- **Tempo-limite (26/11, ok da QA):** C009 e C010 passaram de 90 para 180 s e o CD01 de 180 para 240 s — estouravam com o QA lento em 23 a 25/11, sem erro de tela.

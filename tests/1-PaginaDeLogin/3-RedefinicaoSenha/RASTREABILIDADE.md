@@ -136,3 +136,4 @@ Com isso RS01 a RS04 e a responsividade da padrão deixam de ser falha esperada.
 | Celular rotacionado | 863x360 |
 | Tablet | 810x1080 |
 | Monitor | 1920x1080 |
+- **Campos da redefinição definidos antes dos testes (26/11, decisão da QA):** na diária de 26/11 o "Campo secundário" estava em "Telefone" e RP02 a RP04 falharam. Agora `prepararRedefinicaoPersonalizada` (antes de cada suíte da personalizada: normal, responsividade, configuração e troca de senha) ativa a personalizada e define "CPF" e "Data de Nascimento". O RP02 passou a selecionar os dois campos, salvar e conferir. Fica na diária: só regrava a configuração de referência.

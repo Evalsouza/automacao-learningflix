@@ -101,10 +101,15 @@ ${erro}`);
             await login.aceitarPoliticaSeExibida();
             await expect(page).not.toHaveURL(/\/login\//);
           });
-          await test.step(`Então na "Minha página" o campo "Cargo" foi exibido ${cargoEsperado}`, async () => {
+          // Sem Cargo, a "Minha página" NÃO exibe o campo (QA, 26/11). Ver o "sem cargo" em "Modificar perfil" fica para os
+          // testes da própria "Minha página"
+          await test.step(`Então na "Minha página" o campo "Cargo" ${cargo ? `foi exibido ${cargoEsperado}` : 'NÃO foi exibido'}`, async () => {
             await minhaPagina.acessar();
             if (cargo) expect(await minhaPagina.valorOuVazio('Cargo')).toBe(cargo);
-            else expect(await minhaPagina.valorOuVazio('Cargo')).toMatch(/^(Nenhum cargo selecionado)?$/);
+            else {
+              await minhaPagina.campo('Dados Pessoais').waitFor();
+              await expect(minhaPagina.campo('Cargo')).toHaveCount(0);
+            }
           });
         },
       );

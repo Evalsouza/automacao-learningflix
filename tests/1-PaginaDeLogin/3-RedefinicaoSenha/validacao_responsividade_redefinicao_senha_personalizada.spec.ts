@@ -4,13 +4,16 @@ import { resolucoes, temRolagemHorizontal } from '../../../support/responsividad
 import { usuariosRedefinicao } from '../../../support/usuarios';
 import { mensagens } from '../../../fixtures/redefinicaosenha';
 import { Factories } from '../../../Factories';
-import { garantirRedefinicaoPersonalizada } from '../../../support/redefinicaosenha_commands/ConfiguracaoRedefinicaoPage';
+import {
+  garantirRedefinicaoPersonalizada,
+  prepararRedefinicaoPersonalizada,
+} from '../../../support/redefinicaosenha_commands/ConfiguracaoRedefinicaoPage';
 import { prioridade } from '../../../fixtures/prioridades';
 
 // Habilita a personalizada antes, se estiver desabilitada, e desabilita no final — decisão da QA (10/11)
 test.beforeAll(async ({ browser }) => {
   test.setTimeout(120_000);
-  await garantirRedefinicaoPersonalizada(browser, true);
+  await prepararRedefinicaoPersonalizada(browser);
 });
 test.afterAll(async ({ browser }) => {
   test.setTimeout(120_000);

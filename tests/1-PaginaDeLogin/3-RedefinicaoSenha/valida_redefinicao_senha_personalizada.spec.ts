@@ -6,6 +6,7 @@ import { sessoes, semSessao, comSessao } from '../../../support/sessoes';
 import {
   ConfiguracaoRedefinicaoPage,
   garantirRedefinicaoPersonalizada,
+  prepararRedefinicaoPersonalizada,
 } from '../../../support/redefinicaosenha_commands/ConfiguracaoRedefinicaoPage';
 import { usuariosRedefinicao } from '../../../support/usuarios';
 import { lerDadosDoUsuario } from '../../../support/redefinicaosenha_commands/dadosDoUsuario';
@@ -15,10 +16,12 @@ import { prioridade } from '../../../fixtures/prioridades';
 
 const { evaSouza, anyaForger, qaAluno21 } = usuariosRedefinicao;
 
-// Habilita a personalizada antes, se estiver desabilitada, e desabilita no final — decisão da QA (10/11)
+// Habilita a personalizada antes, se estiver desabilitada, e desabilita no final — decisão da QA (10/11).
+// Desde 26/11 também define "CPF" e "Data de Nascimento" nos campos antes dos testes (em 26/11 o secundário estava em
+// "Telefone"): é a configuração de referência, por isso fica na diária — decisão da QA
 test.beforeAll(async ({ browser }) => {
   test.setTimeout(120_000);
-  await garantirRedefinicaoPersonalizada(browser, true);
+  await prepararRedefinicaoPersonalizada(browser);
 });
 test.afterAll(async ({ browser }) => {
   test.setTimeout(120_000);
@@ -39,12 +42,13 @@ test.describe('CENÁRIO 1: Ativação do Reset de Senha Personalizado', { tag: '
   );
 
   test(
-    'RP02 - Redefinição personalizada ativa com "CPF" e "Data de Nascimento"',
+    'RP02 - Redefinição personalizada ativa, com "CPF" no "Campo primário" e "Data de Nascimento" no "Campo secundário"',
     { tag: prioridade('RedefinicaoSenha', 'RP02') },
     async ({ configuracaoRedefinicao: config }) => {
-      await test.step('Quando acessei "Configurações - Redefinição de senha personalizada"', () => config.acessar());
+      await test.step(`Quando, em "Configurações - Redefinição de senha personalizada", selecionei "${configuracaoAtual.primario}" no "Campo primário" e "${configuracaoAtual.secundario}" no "Campo secundário" e salvei`, () =>
+        config.definirCampos(configuracaoAtual.primario, configuracaoAtual.secundario));
       await test.step('Então a redefinição personalizada estava ativa', () => expect(config.ativar).toBeChecked());
-      await test.step(`E o "Campo primário" era "${configuracaoAtual.primario}" e o "Campo secundário" "${configuracaoAtual.secundario}"`, async () => {
+      await test.step(`E o "Campo primário" ficou "${configuracaoAtual.primario}" e o "Campo secundário" "${configuracaoAtual.secundario}"`, async () => {
         await expect(config.selecionado(config.campoPrimario)).toHaveText(configuracaoAtual.primario);
         await expect(config.selecionado(config.campoSecundario)).toHaveText(configuracaoAtual.secundario);
       });

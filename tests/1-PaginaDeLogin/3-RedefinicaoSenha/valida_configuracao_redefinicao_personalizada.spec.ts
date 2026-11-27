@@ -9,6 +9,7 @@ import { CamposPerfilPage, ConfiguracaoCampo } from '../../../support/cadastro_c
 import {
   ConfiguracaoRedefinicaoPage,
   garantirRedefinicaoPersonalizada,
+  prepararRedefinicaoPersonalizada,
 } from '../../../support/redefinicaosenha_commands/ConfiguracaoRedefinicaoPage';
 import { lerDadosDoUsuario } from '../../../support/redefinicaosenha_commands/dadosDoUsuario';
 import { GerenciarUsuariosPage } from '../../../support/cadastro_commands/GerenciarUsuariosPage';
@@ -51,7 +52,7 @@ test.describe(
     test.beforeAll(async ({ browser }) => {
       test.setTimeout(600_000);
       // Habilita a personalizada antes, se estiver desabilitada — decisão da QA (10/11)
-      await garantirRedefinicaoPersonalizada(browser, true);
+      await prepararRedefinicaoPersonalizada(browser);
       await comoAdministrador(browser, async (pagina) => {
         const campos = new CamposPerfilPage(pagina);
         for (const campo of camposAlterados) configuracaoInicial[campo] = await campos.lerConfiguracao(campo);
@@ -178,7 +179,9 @@ test.describe(
           async ({ browser }) => {
             // Pedido da QA (23/11): o Adm Cliente confere o "Cargo" e, se estiver preenchido, apaga antes do teste
             await test.step('Dado que, como Adm Cliente, conferi que o usuário NÃO tem "Cargo" cadastrado (e apaguei, se tinha)', async () => {
-              await comSessao(browser, sessoes.cliente, (pagina) => new GerenciarUsuariosPage(pagina).garantirSemCargo(rayssaLima.nome, 'cliente'));
+              await comSessao(browser, sessoes.cliente, (pagina) =>
+                new GerenciarUsuariosPage(pagina).garantirSemCargo(rayssaLima.nome, 'cliente'),
+              );
               expect((await lerDadosDoUsuario(browser, rayssaLima.nome, sessoes.cliente)).position ?? '').toBe('');
             });
             await semLogin(browser, async (perdeuSenha) => {

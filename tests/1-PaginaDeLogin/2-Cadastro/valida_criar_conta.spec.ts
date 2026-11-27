@@ -234,7 +234,7 @@ test.describe('Campos exibidos conforme a configuração', { tag: '@dt-criar-con
     { tag: prioridade('Cadastro', 'CD01') },
     async ({ browser, page, criarConta }) => {
       // Lê a configuração de cada campo exibido como Administrador: com o "Telefone" (17/11) são 4 janelas de edição
-      test.setTimeout(180_000);
+      test.setTimeout(240_000); // 180 s estourava com o QA lento (25/11) — QA, 26/11
       const verificacaoAtiva =
         await test.step('Dado que li a "Verificação da idade de consentimento digital" em "Configurações de privacidade"', () =>
           comSessao(browser, sessoes.administrador, (pagina) => new ConfiguracaoPrivacidadePage(pagina).lerVerificacaoDeIdade()));
@@ -369,6 +369,8 @@ test.describe('CENÁRIO 2: Consulta do cadastro do usuário na página de Cadast
   for (const { id, perfil, sessao } of consultas) {
     test.describe(perfil, () => {
       test.use({ storageState: sessao });
+      // "Minha página", "Gerenciar usuários" e "Editar usuário" duas vezes: 90 s estourava com o QA lento (23 a 25/11) — QA, 26/11
+      test.setTimeout(180_000);
 
       // Inclui o antigo CAN04: "Cancelar" fecha a janela sem alterar o Cargo — decisão da QA (09/11)
       test(
